@@ -1,5 +1,7 @@
 # Programutveckling för Tekniska Tillämpningar - Arbetsblad 2
 
+> **Att tänka på:** När **...** visas i programexemplen anger detta att det saknas kod som ni själva måste lägga till. Variabler och datastrukturer är bara exempel. Beroende på problemtyp kan man behöva andra datastrukturer än de som är beskrivna i kodexemplen.
+
 ## Strukturering av datorprogram
 
 Utveckling av datorprogram är ett tidskrävande arbete. Det är därför viktigt att programkoden ut-formas på sådant sätt att modifiering och vidareutveckling underlättas. Detta innebär att program-met skall vara välstrukturerat och ha god läsbarhet. En beräkningsprocess kan i regel delas in i olika logiska delar. Vid programmeringen delas programmet lämpligen upp i subrutiner. Överföring av data görs via parametrarna i deklarationen och anropet. Valet av parametrar ska vara genomtänkt, så att överflödiga parametrar inte tas med. Överföring av parametrar med globala variabler bör undvikas, eftersom dessa ofta medför att parametrar som inte används i aktuellt underprogram kommer med, vilket försämrar överskådligheten.
@@ -16,9 +18,7 @@ En finita element analys kan oftast delas in i tre olika steg:
 
 Varje sådant steg utförs ofta med hjälp av ett separat program. Data överförs då mellan de olika programmen med hjälp av filer. Ibland väljer man att, istället för att dela upp analysen i tre separata program, låta två eller alla tre stegen utföras av samma program.
 
-I början av kursen väljer vi att inrikta oss på steg 2 enligt ovan. Enklare indata definieras direkt i Pyt-hon för att förenkla felsökning vid implementeringen av beräkningsdelen.
-
-## Inlämningsuppgift 2
+I början av kursen väljer vi att inrikta oss på steg 2 enligt ovan. Enklare indata definieras direkt i Python för att förenkla felsökning vid implementeringen av beräkningsdelen.
 
 I denna inlämning skall stommen till beräkningsprogrammet skapas. En av problemtyperna:
 
@@ -28,7 +28,7 @@ I denna inlämning skall stommen till beräkningsprogrammet skapas. En av proble
  
 skall väljas. Det valda problemet kommer sedan att användas för alla kommande arbetsblad. Ni behöver alltså inte implementera ett program som hanterar alla problemtyperna.
 
-En ny python-fil skapa, t ex flowmodel.py, vilken skall innehålla beräkningsdelen av programmet. Ge filen   ett namn som passar det problemområde ni valt. I början av filen anges följande deklarationer för de moduler som skall användas:
+Vi börjar med att definiera en python-mode, t ex flowmodel.py, vilken skall innehålla beräkningsdelen av programmet. Ge filen ett namn som passar det problemområde ni valt. I början av filen anges följande deklarationer för de moduler som skall användas:
 
     # -*- coding: utf-8 -*-
     
@@ -312,14 +312,125 @@ Exempel på en körning av programmet visas nedan:
     [[-100.   0.]
      [-100.   0.]
      [-100.   0.]
-     [-100.   0.]]        
+     [-100.   0.]]   
+     
+## Spara och läsa in från fil med JSON
 
-## Redovisning
+En viktig del av ett beräkningsprogram är att kunna läsa och skriva indata till filer. I de flest fall är problemen så stora att de inte kan definieras i programkod. I detta program kommer vi att använda JSON (Javascript Object Notation) som format på de filer vi kommer att skriva. Följande kod är ett exempel på hur en JSON fil kan se ut. 
 
-Redovisningen av uppgiften skall innehålla:
+    {"employees":[
+        {"firstName":"John", "lastName":"Doe"},
+        {"firstName":"Anna", "lastName":"Smith"},
+        {"firstName":"Peter", "lastName":"Jones"}
+    ]}
+    
+Filen påminner mycket om den syntax som Python använder för dictionaries. Vad som gör formatet attraktivt är att vi inte själva behöver kunna skriva det till fil utan Python har ett inbyggt bibliotek för att både läsa och skriva filer av denna typ. 
 
- * Programlista
- * Utskrift från programkörning
+För att implementera funktionaliteten läsa och skriva i vårt program lägger vi förs till följande **import**-sats i början på vår modulfil:
+
+    # -*- coding: utf-8 -*-
+
+    import numpy as np
+    import calfem.core as cfc
+    import json # <--- Denna rad
+    
+Vi börjar med att implementera skrivning till fil, eftersom vi har alla indata för detta ändamål. Vi lägger till en metod, **save(...)** i **InputData**-klassen:
+
+    class InputData(object):
+        """Klass för att definiera indata för vår modell."""
+        
+        ...
+
+        def save(self, filename):
+            """Spara indata till fil."""
+            
+            ...
+
+För att definiera strukturen av det som skall lagras, men också för att göra det enkelt att läsa in data, kommer vi att utgå från ett dictionary som bas för det som skall skrivas och läsas till fil. I metoden **save(...)** lägger vi till följande kod för att definiera grundstommen till vår datastruktur:
+
+            inputData = {}
+            inputData["version"] = self.version
+            inputData["t"] = self.t
+            inputData["ep"] = self.ep
+                        
+**inputData["version"]** kan vara bra att ha för att hålla koll på vilken version av filformatet man använder när man väl läser tillbaka filen.
+
+Ett problem vi måste hantera är att JSON modulen i Python inte kan hantera Numpy-arrayer. Detta löses dock enkelt genom att vi konverterar våra Numpy-arrayer till listor. I följande kod konverterar vi arrayen **self.coord** till en lista med metoden **.tolist(...)**.
+
+            inputData["coord"] = self.coord.tolist()
+            
+När **inputData** är definierad kan vi öppna en fil för skrivning och sedan skriva ut får JSON-fil med funktionen **json.dumps(...)**
+
+            ofile = open(filename, "w")
+            json.dump(inputData, ofile, sort_keys = True, indent = 4)
+            ofile.close()
+
+**sort_keys** och **indent** ser till att den skrivna filen blir snyggt formaterad.
+
+För att läsa in en befintlig JSON-fil gör vi i omvänd ordning. Vi läser in hela filen till en teckensträng som vi sedan konverterar tillbaka till ett dictionary med funktionen **json.load(...)**
+
+    def load(self, filename):
+        """Läs indata från fil."""
+        
+        ifile = open(filename, "r")
+        inputData = json.load(ifile)
+        ifile.close()
+
+        self.version = inputData["version"]
+        self.t = inputData["t"]
+        self.ep = inputData["ep"]
+
+För vår coord-array måste nu konvertera tillbaka denna till en Numpy-array. Detta görs med Numpy-funktionen **np.asarray(...)**            
+
+        self.coord = np.asarray(inputData["coord"])
+        
+De kompletta skriv- och läsfunktionerna blir då:
+
+    class InputData(object):
+        """Klass för att definiera indata för vår modell."""
+
+        def save(self, filename):
+            """Spara indata till fil."""
+
+            inputData = {}
+            inputData["version"] = self.version
+            inputData["t"] = self.t
+            inputData["ep"] = self.ep
+            ...
+            inputData["coord"] = self.coord.tolist()
+            ...
+
+            ofile = open(filename, "w")
+            json.dump(inputData, ofile, sort_keys = True, indent = 4)
+            ofile.close()
+
+        def load(self, filename):
+            """Läs indata från fil."""
+            
+            ifile = open(filename, "r")
+            inputData = json.load(ifile)
+            ifile.close()
+
+            self.version = inputData["version"]
+            self.t = inputData["t"]
+            self.ep = inputData["ep"]
+            ...
+            self.coord = np.asarray(inputData["coord"])
+            ...
+
+## Inlämning och redovisning
+
+Det som skall göras i detta arbetsblad är:
+
+ * Slutföra implementeringen av **InputData**-klassen med all indata som krävs för att kunna lösa det valda problemet. Rutiner för att spara och läsa från JSON-filer skall också implementeras för alla indatavariabler.
+ * Slutföra implementeringen av **Solver**-klassen med en finita element lösare implementerad med de metoder som finns beskriva i CALFEM.
+ * Slutföra implementeringen av **Report**-klassen med en komplett utskrift av indata- och utdata variabler med beskrivande texter.
+
+Inlämningen skall bestå av en zip-fil (eller annat arkivformat) bestående av: 
+
+ * Alla Python-filer. (.py-filer)
+ * Ett exempel på en sparad json-fil.
+ * Utskrift från programkörning.
  * Jämförande beräkning i CALFEM
 
 ## Elementtyper
