@@ -148,6 +148,70 @@ blir istället (med import enligt tidigare):
     cfv.figure()
     cfv.drawMesh(coords=coords, edof=edof, dofsPerNode=dofsPerNode, elType=elType, filled=True, title="Mesh")
     
+Följande kod visar hur klassen kan implementeras med visualiering av geometrin.
 
+    class Visualisation(object):
+        def __init__(self, inputData, outputData):
+            self.inputData = inputData
+            self.outputData = outputData
+            
+        def show(self):
+            
+            geometry = self.outputData.geometry
+            a = self.outputData.a
+            maxFlow = self.outputData.maxFlow
+            coords = self.outputData.coords
+            edof = self.outputData.edof
+            dofsPerNode = self.outputData.dofsPerNode
+            elType = self.outputData.elType
+            
+            cfv.figure() 
+            cfv.drawGeometry(geometry, title="Geometry")
+            
+            ...
+                       
+        def wait(self):
+            """Denna metod ser till att fönstren hålls uppdaterade och kommer att returnera
+            När sista fönstret stängs"""
+
+            cfv.showAndWait()
+            
+**Visualisation**-klassen läggs sedan till i huvudprogrammet som koden nedan visar:
+
+    # -*- coding: utf-8 -*-
+
+    import flowmodel as fm
+
+    if __name__ == "__main__":
+        
+        inputData = fm.InputData()
+
+        outputData = fm.OutputData()
+
+        solver = fm.Solver(inputData, outputData)
+        solver.execute()
+
+        report = fm.Report(inputData, outputData)
+        print(report)
+        
+        vis = fm.Visualisation(inputData, outputData)
+        vis.show()
+        vis.wait()        
+
+**vis.wait()** måste anropas sist i huvudprogrammet eftersom denna funktion inte returnerar förrän sista visualiseringsfönstret stängs.
+
+## Inlämning och redovisning
+
+Det som skall göras i detta arbetsblad är:
+
+ * Ändra **InputData**-klassen så att den beskriver problemet parametriskt enligt de beskrivna exemplen. Skapa en metod **geometry()** som returnerar en **cfg.Geometry**-instans med geometri definierad utifrån parameterbeskrivningen. 
+ * Uppdatera **Solver**-klassen så att denna skapar ett elementnät med hjälp av **cfm.GmshMeshGenerator** klassen.
+ * Slutföra implementeringen av **Visualisation**-klassen så att den kan hantera visualisera geometri, elementnät, elementflöden och nodvärden.
+
+Inlämningen skall bestå av en zip-fil (eller annat arkivformat) bestående av: 
+
+ * Alla Python-filer. (.py-filer)
+ * Ett exempel på en sparad json-fil.
+ * Utskrift från programkörning.
 
 ** ---- ARBETSBLADET ÄR UNDER KONSTRUKTION --- **
