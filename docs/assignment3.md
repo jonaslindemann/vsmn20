@@ -126,4 +126,28 @@ I **Report**-klassen behöver vi lägga till utskrift för geometribeskrivning, 
 
 I arbetsblad 2 var det enda resulatet en utskrift från vår **Report**-klass. Att tolka resultat i textform kan vara svårt. Vi skall därför använda av oss CALFEM:rutiner för visualisering i modulen **calfem.vis**. Dessa rutiner bygger på det etablerade visualiseringspaketet **visvis**. Visualiseringen skall implementeras i den nya klassen **Visualisation**. Denna klass har samma indata som **Result**-klassen, dvs referenser till instanser av **InputData** och **OutputData**. 
 
+Det finns ett antal visualiseringsfunktioner i CALFEM. I detta arbetsblad skall följande visualiseringar implementeras:
+
+ * Geometri - drawGeometry(...)
+ * Genererat nät - drawMesh(...)
+ * Deformerat nät - drawMesh(...) (för spänningsexemplet)
+ * Elementvärden - drawElementValues(...)
+ * Nodvärden - drawNodalValues(...)
+ 
+Dokumentation för dessa rutiner finns i användarhandboken för nätgeneringsrutinerna i 
+
+http://training.lunarc.lu.se/pluginfile.php/473/mod_resource/content/1/DAE_rapport_draft06.pdf
+
+Notera att dessa rutiner är integrerade i CALFEM och visvis behöver inte importeras explicit. Följande kod från manualen:
+
+    vv.figure()
+    pcv.drawMesh(coords=coords, edof=edof, dofsPerNode=dofsPerNode, elType=elType, filled=True, title="Mesh")
+    
+blir istället (med import enligt tidigare):
+
+    cfv.figure()
+    cfv.drawMesh(coords=coords, edof=edof, dofsPerNode=dofsPerNode, elType=elType, filled=True, title="Mesh")
+    
+
+
 ** ---- ARBETSBLADET ÄR UNDER KONSTRUKTION --- **
