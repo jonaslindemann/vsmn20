@@ -213,5 +213,42 @@ Inlämningen skall bestå av en zip-fil (eller annat arkivformat) bestående av:
  * Alla Python-filer. (.py-filer)
  * Ett exempel på en sparad json-fil.
  * Utskrift från programkörning.
+ 
+## Exempelproblem
+
+### Grundvattenströmning
+ 
+![case2](images/gw.svg)
+
+h = 40.0
+w = 160.0
+d = 10.0
+t = 0.5
+k_x = k_y = 20 m/dag
+
+### Tvådimensionell värmeledning
+ 
+![case2](images/temp.svg)
+
+h = 0.1
+w = 0.1
+a = 0.01
+b = 0.01
+x = 0.01
+y = 0.01
+lambda_x = lambda_y = 1.7 W/m C
+
+### Plan skiva
+ 
+![case2](images/stress.svg)
+
+E = 2.08e10, ν = 0.2 t = 0.15
+
+h = 0.1
+w = 0.3
+a = 0.05
+b = 0.25
 
 ** ---- ARBETSBLADET ÄR UNDER KONSTRUKTION --- **
+
+
