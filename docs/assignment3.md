@@ -216,14 +216,63 @@ Inlämningen skall bestå av en zip-fil (eller annat arkivformat) bestående av:
  
 ## Exempelproblem
 
+Tanken med den parametriska problembeskrivningen är att en användare på ett enkelt sätt skall kunna specificera sitt problem område i koden utan att behöva gå in i modulen för modellen. Detta visas i följande kod:
+
+    # -*- coding: utf-8 -*-
+
+    import flowmodel as fm
+
+    if __name__ == "__main__":
+        
+        inputData = fm.InputData()
+
+        inputData.w = 100.0
+        inputData.h = 10.0
+        inputData.d = 5.0
+        inputData.t = 0.5
+        inputData.kx = 20.0
+        inputData.ky = 20.0
+        
+        ...
+
+På detta sätt kan man också på ett enkelt sätt studera effekt av t ex öka djupet på sponten i grundvatten och ta reda på hur detta påverkar flödet. T ex:
+
+    # -*- coding: utf-8 -*-
+
+    import flowmodel as fm
+    import numpy as np
+
+    if __name__ == "__main__":
+        
+        dRange = np.linspace(3.0, 7.0, 10)
+        
+        for d in dRange:
+        
+            print("-------------------------------------------")    
+            print("Simulating d = ", d)
+        
+            inputData = fm.InputData()
+        
+            inputData.w = 100.0
+            inputData.h = 10.0
+            inputData.d = d
+            inputData.t = 0.5
+            inputData.kx = 20.0
+            inputData.ky = 20.0
+            
+            outputData = fm.OutputData()
+        
+            solver = fm.Solver(inputData, outputData)
+            solver.execute()
+            
+            print("Max flow = ", np.max(outputData.maxFlow))        
+
 ### Grundvattenströmning
  
 ![case2](images/gw.svg)
 
-h = 40.0
-w = 160.0
-d = 10.0
-t = 0.5
+h = 10.0, w = 100.0, d = 5.0, t = 0.5
+
 k_x = k_y = 20 m/dag
 
 ### Tvådimensionell värmeledning
