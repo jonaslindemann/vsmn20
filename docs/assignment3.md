@@ -77,7 +77,7 @@ Geometrin kommer att definieras med objekt och funktioner från **calfem.geometr
             # --- Slutligen returnerar vi den skapade geometrin
             
             return g
-
+            
 ## Uppdatering av Solver-klassen
 
 I **Solver**-klassen måste vi lägga till anrop till nätgenereraren i **calfem.mesh**, **GmshMeshGenerate**. Denna kommer att ge oss element koordinater, topologi samt variabler som kan användas för koppling mellan geometri och elementnät. Ett exempel på hur detta kan se ut i **execute()**-metodn visas nedan:
@@ -118,6 +118,62 @@ Elementgenerering och assemblering behöver inte ändras från arbetsblad 2. Dä
 
 Lösning av ekvationssystem och elementkraftsberäkning behöver inte heller ändras. Däremot behöver vi lagra den genererade variablerna **coord**, **edof**, **geometry** och andra utdatavariabler som behövs för att visualisera resultaten.
 
+> Det kan också vara bra att definiera en variabel i **InputData**-klassen för att ange max storlek på de genererade elementen t ex **elSizeFactor**, som sedan kan tilldelas till **cfm.GmshGenerator**-klassens egenskap **elSizeFactor**.              
+
+## Användning av den parametriska modellen
+
+Tanken med den parametriska problembeskrivningen är att en användare på ett enkelt sätt skall kunna specificera sitt problem område i koden utan att behöva gå in i modulen för modellen. Detta visas i följande kod:
+
+    # -*- coding: utf-8 -*-
+
+    import flowmodel as fm
+
+    if __name__ == "__main__":
+        
+        inputData = fm.InputData()
+
+        inputData.w = 100.0
+        inputData.h = 10.0
+        inputData.d = 5.0
+        inputData.t = 0.5
+        inputData.kx = 20.0
+        inputData.ky = 20.0
+        
+        ...
+
+På detta sätt kan man också på ett enkelt sätt studera effekten av t ex öka djupet på sponten i grundvatten och ta reda på hur detta påverkar flödet. T ex:
+
+    # -*- coding: utf-8 -*-
+
+    import flowmodel as fm
+    import numpy as np
+
+    if __name__ == "__main__":
+        
+        dRange = np.linspace(3.0, 7.0, 10)
+        
+        for d in dRange:
+        
+            print("-------------------------------------------")    
+            print("Simulating d = ", d)
+        
+            inputData = fm.InputData()
+        
+            inputData.w = 100.0
+            inputData.h = 10.0
+            inputData.d = d
+            inputData.t = 0.5
+            inputData.kx = 20.0
+            inputData.ky = 20.0
+            
+            outputData = fm.OutputData()
+        
+            solver = fm.Solver(inputData, outputData)
+            solver.execute()
+            
+            print("Max flow = ", np.max(outputData.maxFlow))        
+
+
 ## Report-klassen
 
 I **Report**-klassen behöver vi lägga till utskrift för geometribeskrivning, så att denna också kommer med. 
@@ -134,9 +190,7 @@ Det finns ett antal visualiseringsfunktioner i CALFEM. I detta arbetsblad skall 
  * Elementvärden - drawElementValues(...)
  * Nodvärden - drawNodalValues(...)
  
-Dokumentation för dessa rutiner finns i användarhandboken för nätgeneringsrutinerna i 
-
-http://training.lunarc.lu.se/pluginfile.php/473/mod_resource/content/1/DAE_rapport_draft06.pdf
+Dokumentation för dessa rutiner finns i användarhandboken för [nätgeneringsrutinerna](http://training.lunarc.lu.se/pluginfile.php/473/mod_resource/content/1/DAE_rapport_draft06.pdf). 
 
 Notera att dessa rutiner är integrerade i CALFEM och visvis behöver inte importeras explicit. Följande kod från manualen:
 
@@ -204,72 +258,23 @@ Följande kod visar hur klassen kan implementeras med visualiering av geometrin.
 
 Det som skall göras i detta arbetsblad är:
 
- * Ändra **InputData**-klassen så att den beskriver problemet parametriskt enligt de beskrivna exemplen. Skapa en metod **geometry()** som returnerar en **cfg.Geometry**-instans med geometri definierad utifrån parameterbeskrivningen. 
- * Uppdatera **Solver**-klassen så att denna skapar ett elementnät med hjälp av **cfm.GmshMeshGenerator** klassen.
+ * Ändra **InputData**-klassen så att den beskriver problemet parametriskt enligt de beskrivna exemplen sist i arbetsbladet. Skapa en metod **geometry()** som returnerar en **cfg.Geometry**-instans med geometri definierad utifrån parameterbeskrivningen. 
+ * Uppdatera **Solver**-klassen så att denna skapar ett elementnät med hjälp av **cfm.GmshMeshGenerator** klassen. Lagra också maxflöden/maxspänningar (von Mises) och lagra dessa i udata-klassen.
  * Slutföra implementeringen av **Visualisation**-klassen så att den kan hantera visualisera geometri, elementnät, elementflöden och nodvärden.
+ * Gör en parameter-studie där en av parametrarna varieras och maxflöde/maxspänning plottas i förhållande till den valda parametern. Skapa ett nytt huvudprogram för parameterstudien.
 
 Inlämningen skall bestå av en zip-fil (eller annat arkivformat) bestående av: 
 
  * Alla Python-filer. (.py-filer)
  * Ett exempel på en sparad json-fil.
  * Utskrift från programkörning.
+ * Utskrift från parameterstudien.
  
 ## Exempelproblem
 
-Tanken med den parametriska problembeskrivningen är att en användare på ett enkelt sätt skall kunna specificera sitt problem område i koden utan att behöva gå in i modulen för modellen. Detta visas i följande kod:
-
-    # -*- coding: utf-8 -*-
-
-    import flowmodel as fm
-
-    if __name__ == "__main__":
-        
-        inputData = fm.InputData()
-
-        inputData.w = 100.0
-        inputData.h = 10.0
-        inputData.d = 5.0
-        inputData.t = 0.5
-        inputData.kx = 20.0
-        inputData.ky = 20.0
-        
-        ...
-
-På detta sätt kan man också på ett enkelt sätt studera effekt av t ex öka djupet på sponten i grundvatten och ta reda på hur detta påverkar flödet. T ex:
-
-    # -*- coding: utf-8 -*-
-
-    import flowmodel as fm
-    import numpy as np
-
-    if __name__ == "__main__":
-        
-        dRange = np.linspace(3.0, 7.0, 10)
-        
-        for d in dRange:
-        
-            print("-------------------------------------------")    
-            print("Simulating d = ", d)
-        
-            inputData = fm.InputData()
-        
-            inputData.w = 100.0
-            inputData.h = 10.0
-            inputData.d = d
-            inputData.t = 0.5
-            inputData.kx = 20.0
-            inputData.ky = 20.0
-            
-            outputData = fm.OutputData()
-        
-            solver = fm.Solver(inputData, outputData)
-            solver.execute()
-            
-            print("Max flow = ", np.max(outputData.maxFlow))        
-
 ### Grundvattenströmning
  
-![case2](images/gw.svg)
+![case1](images/gw.svg)
 
 h = 10.0, w = 100.0, d = 5.0, t = 0.5
 
@@ -279,25 +284,18 @@ k_x = k_y = 20 m/dag
  
 ![case2](images/temp.svg)
 
-h = 0.1
-w = 0.1
-a = 0.01
-b = 0.01
-x = 0.01
-y = 0.01
+h = 0.1, w = 0.1, a = 0.01, b = 0.01, x = 0.01, y = 0.01
+
 lambda_x = lambda_y = 1.7 W/m C
 
 ### Plan skiva
  
-![case2](images/stress.svg)
+![case3](images/stress.svg)
 
-E = 2.08e10, ν = 0.2 t = 0.15
+h = 0.1, w = 0.3, a = 0.05, b = 0.25
 
-h = 0.1
-w = 0.3
-a = 0.05
-b = 0.25
+E = 2.08e10, ν = 0.2, t = 0.15
 
-** ---- ARBETSBLADET ÄR UNDER KONSTRUKTION --- **
+q = 100 kN / m
 
 
