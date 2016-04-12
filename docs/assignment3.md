@@ -292,7 +292,7 @@ lambda_x = lambda_y = 1.7 W/m C
  
 ![case3](images/stress.svg)
 
-h = 0.1, w = 0.3, a = 0.05, b = 0.25
+h = 0.1, w = 0.3, a = 0.05, b = 0.025
 
 E = 2.08e10, ν = 0.2, t = 0.15
 
