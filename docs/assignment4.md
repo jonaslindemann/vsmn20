@@ -235,7 +235,183 @@ Vi lämnar implementeringen av denna till användaren. Kopplingen av metoden gö
             self.ui.actionNew.triggered.connect(self.onActionNew)
             
 För menyhändelser är det händelsen **triggered** som skall kopplas.            
-            
+
+### Koppling av händelser för knappar
+
+För att koppla knappar är det händelsen **clicked** som skall kopplas. Följande kod visar ett exempel på detta:
+
+    class MainWindow:
+        ...
+        def __init__(self, app):
         
+            ...
+            
+            # --- Koppla kontroller till händelsemetoder
+            
+            self.ui.actionNew.triggered.connect(self.onActionNew)
+            ...
+            self.ui.showGeometryButton.clicked.connect(self.onShowGeometry) # <---
+            
+        ...
+        
+        def onShowGeometry(self):
+            """Visa geometrifönster"""
+            
+            print("onShowGeometry")
+
+## Integrering av beräkningsmodul
+
+I det förra arbetsbladet skapade vi våra **InputData**-, **OutputData**- och **Solver**-objekt i vårt huvudprogram. I det modifierade programmet är det **MainWindow** som häger alla referenser till dessa objekt. För att hantera modellen och uppdatera kontrollerna implementeras lämpligen följande metoder:
+
+ * **initModel(...)** - Skapar de nödvändiga objekten som behövs för indata, utdata och lösning av problemet. Sätter också standardvärden på de ingående parametrarna i modellen.
+ * **updateControls(...)** - Tar värden från ett **InputData**-objekt och tilldelar kontrollerna dessa värden.
+ * **updateModel(...)** - Läser av angivna värden i kontrollerna och tilldelar dessa till **InputData**-objektet.
+ 
+För att tilldela värden till kontroller används metoden **setText(...)** på textkontrollerna. Ett exempel på hur detta görs visas i följande kod:
+
+    def updateControls(self):
+        """Fyll kontrollerna med värden från modellen"""
+        
+        self.ui.wEdit.setText(str(self.inputData.w))
+        ...
+
+> Tänk på att **self.inputData** lagrar värden av typen **float** och alltså måste konverteras till teckensträngar innan **setText(...)** anropas. Detta görs i ovanstående exempel med metoden **str(...)**
+
+För att hämta värden från kontrollerna används metoden **text()** på textkontrollen. Ett exempel på hur detta kan implementeras visas i följande kod:
+
+    def updateModel(self):
+        """Hämta värden från kontroller och uppdatera modellen"""
+        
+        self.inputData.w = float(self.ui.wEdit.text())
+        ...
+        
+> Vi har den omvända problematiken här, dvs vi måste konvertera från teckensträng från kontrollen till ett **float**-värde genom att använda funktionen **float(...)**.    
+
+## Öppna och spara modeller från filer
+
+Beräkningsmodellen som implementerades i arbetsblad 2 och 3 innehåller metoderna **load(...)** och **save(...)**. Dessa skall nu användas för att implementera metoder för att öppna och spara våra modeller till disk.
+
+### Öppna fil från disk
+
+För att öppna en redan existerande fil från disk, måste vi först fråga användaren om vilken fil som skall öppnas. Detta kan göras med funktionen **QtGui.QFileDialog.getOpenFileName(...)**. Funktionen visar en stanadard fildialogruta där användaren kan välja en existerande fil. Hur den används visas i följande exempel:
+
+    def onActionOpen(self):
+        """Öppna in indata fil"""
+        
+        self.filename, _ = QtGui.QFileDialog.getOpenFileName(self.ui, 
+            "Öppna modell", "", "Modell filer (*.json *.jpg *.bmp)")
+        
+        if self.filename!="":
+            ...
+Om användaren avbrutit valet av filnamn returneras en tom sträng. Det är alltid bra att alltid använda en if-sats för att kontrollera att en fil verkligen valts.
+
+Rutinen **load(...)** kan sedan användas för att läsa in modellen från disk med det angivna filnamnet.
+
+### Spara fil till disk
+
+Om användaren vill spara en modell till disk, måste vi på samma sätt först fråga användaren om en plats och ett filnamn. För detta ändamål använder vi istället funktionen **QtGui.QFileDialog.getSaveFileName(...)**. Denna funktion visar en standard fildialogruta som frågar om ett filnamn och en katalog där filen skall sparas. Följande kod visar hur detta sker i metoden **actionSave**:
+
+    def onActionSave(self):
+        """Spara modell"""
+        
+        self.updateModel()
+        
+        if self.filename == "":
+            self.filename, _  = QtGui.QFileDialog.getSaveFileName(self.ui, 
+                "Spara modell", "", "Modell filer (*.json)")
+        
+        if self.filename!="":
+            ... 
+            
+## Exekvera beräkningsmodellen
+
+Den enklaste modellen för att exekvera beräkningsmodellen är att helt enkelt anropa **solver.execute()** i en händelsemetod. Detta har dock ett stort problem. Om beräkningsmodellen tar lång tid att exekvera kommer programmet att stå kvar i händelsemetoden och händelse-loopen kommer ej att kunna fortästt förren metoden avslutas. För en användare ser det ut som programmet låst sig, vilket inte är långt ifrån sanningen.
+
+För att lösa denne problematik placerar vi beräkningskoden i en s.k. tråd. En tråd är en parallell exekvering av en given kod. Denna exekvering ligger utanför händelse-loopen, så den inte kommer att blockera denna. 
+
+Problemet med att använda trådar är att vi måste synkronisera exekveringen av dessa, så att vi vet när beräkningen är klar. Detta görs dock enkelt i PyQt:s trådimplementering. 
+
+För att implementera vår beräkning i en tråd måste vi först skapa en speciell trådklass för vår beräkning. Lägg till följande kod längst upp i modulen:
+
+    # -*- coding: utf-8 -*-
+
+    from PyQt import QtGui, QtCore
+
+    import calfem.ui as cfui
+    import flowmodel as fm
+
+    class SolverThread(QtCore.QThread):
+        """Klass för att hantera beräkning i bakgrunden"""
+        
+        def __init__(self, solver):
+            """Klasskonstruktor"""
+            QtCore.QThread.__init__(self)
+            self.solver = solver
+            
+        def __del__(self):
+            self.wait()
+            
+        def run(self):
+            ...
+
+    class MainWindow:
+        ...
+        
+Under metoden **run(...)** skall läggs själva anropet till att starta beräkningen in.  
+
+För att starta beräkningen när man väljer **Calc/Execute** i menyn kan händelsemetoden se ut på följande sätt:
+
+    class MainWindow:
+        ...
+        def onActionExecute(self):
+            """Kör beräkningen"""
+            
+            # --- Avaktivera gränssnitt under beräkningen.        
+            
+            self.ui.setEnabled(False)
+            
+            # --- Uppdatera värden från kontroller
+            
+            self.updateModel()
+            
+            # --- Skapa en lösare
+            
+            self.solver = fm.Solver(self.inputData, self.outputData)
+            
+            # --- Starta en tråd för att köra beräkningen, så att 
+            #     gränssnittet inte fryser.
+            
+            self.solverThread = SolverThread(self.solver)        
+            self.solverThread.start()
+      
+Denna metod kommer då att starta lösaren som en separat tråd som inte påverkar händelseloopen. 
+
+För att veta när beräkningstråden avslutas måste koppla en metod till händelse **finished** på vår trådklass. Vi skapar först metoden **onSolverFinished(...)**:
+
+    class MainWindow:
+        ...
+        def onSolverFinished(self):
+            """Anropas när beräkningstråden avslutas"""
+            
+            # --- Aktivera gränssnitt igen        
+            
+            self.ui.setEnabled(True)
+            
+            # --- Generera resulatrapport.        
+
+            ...
+            
+Metoden kopplas sedan till trådobjektet med **connect(...)** ungefär på samma sätt som för kontrollerna:
+
+    class MainWindow:
+        ...
+        def onActionExecute(self):
+        
+            ...
+                        
+            self.solverThread = SolverThread(self.solver)
+            self.solverThread.finished.connect(self.onSolverFinished)   
+            self.solverThread.start()
+                        
 
 **UNDER KONSTRUKTION**
