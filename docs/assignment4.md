@@ -413,5 +413,68 @@ Metoden kopplas sedan till trådobjektet med **connect(...)** ungefär på samma
             self.solverThread.finished.connect(self.onSolverFinished)   
             self.solverThread.start()
                         
+När beräkningen avslutas kommer trådobjektet att automatiskt anropa metoden **self.onSolverFinished**.
 
-**UNDER KONSTRUKTION**
+## Uppdatering av **Visualisation**-klassen
+
+I det tidigare arbetsbladet 3 implementerade visualiseringen i klassen **Visualisation**. Vi kommer nu att utöka klassen med metoder för att selektivt anropa de olika visualiseringsvarianterna och kopplas dessa till händelsemetoder i vår **MainWindow**-klass.
+
+För att få lite bättre kontroll över de visualiseringsfönster som skall visas implemeteras en metod för varje visualiseringstyp. T ex:
+
+ * **showGeometry()** - Visar geometridefinitionen för problemet.
+ * **showMesh()** - Visar beräkningsnätet som genererats med GMSH.
+ * **showNodalValues()** - Visar beräknade nodvärden.
+ * **showElementValues()** - Visar beräknade elementvärden.
+ 
+För att visualiseringsklassen skall kunna hålla reda på vilka fönster som är öppna skapas 4 klassvariabler som skall lagra referenser till de visade figurerna.
+
+    class Visualisation(object):
+        """Klass för visualisering av resulat"""
+
+        def __init__(self, inputData, outputData):
+            """Konstruktor"""
+            
+            self.inputData = inputData
+            self.outputData = outputData
+            
+            # --- Variabler som lagrar referenser till öppnade figurer
+            
+            self.geomFig = None
+            self.meshFig = None
+            self.elValueFig = None
+            self.nodeValueFig = None
+            
+Vi sätter variablerna till **None** så att vi kan särskilja dem från tilldelade variabler.
+
+Ett exempel på hur detta kan användas visas i följande metod:
+
+    class Visualisation(object):
+        ...
+        def showGeometry(self):
+            """Visa geometri visualisering"""
+            
+            geometry = self.outputData.geometry
+            
+            self.geomFig = cfv.figure(self.geomFig)
+            cfv.clf()            
+            cfv.drawGeometry(geometry, title="Geometry")
+
+Funktionen **cfv.figure(...)** tar en existerande figurreferens som indata. Beroende på om den är tilldelad eller inte skapas returneras den existerande eller så skapas automatiskt en ny figur. **clf()** rensar innehållet i figurfönstret. 
+
+**Visualisation**-klassen skall också imeplementera en metod **closeAll(...)** som stänger alla öppna fönster och nollställer figurvariablerna.            
+
+## Inlämning och redovisning
+
+Det som skall göras i detta arbetsblad är:
+
+ * Implementera _alla_ händelsemetoder för de kontroller som används i gränssnittet.
+ * Implementera grundläggande funktioner som ny modell, spara modell, spara som och avsluta programmet.
+ * Implementera kontroller för att se till att visualiseringsmetoderna inte anropas om en beräknings inte är utförd. Använd en flagga **self.calcDone** för att ange beräkningsstatus.
+ * Slutför implementeringen av **Visualisation**-klassen, så den kan hantera alla visualiseringsfall. Skapa objektet av denna klass på nytt efter varje slutförd beräkning. Skapa en tom variabel in **MainWindow** konstruktorn, så att if-satser kan användas för att testa om det finns en aktuell instans till **Visualisation**
+ * Efter beräkningen skall **reportEdit**-kontrollen tilldelas utdata från **Report**-klassen. **reportEdit** har en metod **setPlainText(...)** just för detta ändamål. Aktuellt innehåll i kontrollen kan rensas med metoden **clear()**.
+ * Programmet skall vid detta arbetsblad slut vara ett komplett självständigt beräkningsprogram.
+
+Inlämningen skall bestå av en zip-fil (eller annat arkivformat) bestående av: 
+
+ * Alla Python-filer. (.py-filer)
+ * Ett exempel på en sparad json-fil.
