@@ -10,7 +10,6 @@ I detta arbetsblad innehåller följande moment:
  1. Skapa ett huvudprogram och klass för grafiskt gränssnitt.
  1. Skapa en trådklass för att kunna hantera beräkningar i bakgrunden.
  1. Uppdatera visualiseringsklassen för att visa enstaka fönster, samt att kunna stänga alla öppnade fönster.
-
  
 ## Grafiskt gränssnitt i Qt Designer
  
@@ -132,9 +131,11 @@ Objektstrukturen bör ha följande struktur och namngivning (Måste dock anpassa
 
 Vi har nu en komplett beskrivning av det grafiska gränssnittet. Spara filen som "mainwindow.ui". 
 
-## huvudprogram och klass för huvudfönster
+## Huvudprogram och klass för huvudfönster
 
 För att programmet skall visa vårt gränssnitt måste huvudprogrammet modifieras. Enklast är det om ni skapar en ny Python-fil och börjar från början.
+
+### Moduler som behöver importeras
 
 För att implementera det grafiska gränssnittet måste vi importera ett antal Python-moduler. 
 
@@ -142,7 +143,99 @@ För att implementera det grafiska gränssnittet måste vi importera ett antal P
  * CALFEM modulen **calfem.ui**. Denna innehåller en del specialkod för att integrera våra visualiseringrutiner och PyQt.
  * Er egen modul för ert problemområde. I detta exempel använder vi modulen **flowmodel**.
  
+Programmets import instruktioner blir då:
  
- 
+    # -*- coding: utf-8 -*-
+
+    from PyQt import QtGui, QtCore
+
+    import calfem.ui as cfui
+    import flowmodel as fm
+    
+### Huvudfönsterklass MainWindow
+
+Vårt huvudfönster implemeterar vi enklast i en egen klass **MainWindow**. Klassens uppgift är att ladda gränssnittsbeskrivningen och implementera de händelsemetoder som krävs för att programmet skall fungera. Det mest grundläggande är en **__init__**-metod som initierar klassen och läser beskrivningen samt visar fönstret på skärmen. Stommen för detta visas i följande exempel:
+
+    class MainWindow:
+        """MainWindow-klass som hanterar vårt huvudfönster"""
+
+        def __init__(self, app):
+            """Konstruktor"""
+
+            # --- Lagra en referens till applikationsinstansen i klassen
+            
+            self.app = app
+                        
+            # --- Läs in gränssnitt från fil
+            
+            self.ui = cfui.loadUiWidget('mainwindow.ui')
+            
+            # --- Se till att visa fönstret
+            
+            self.ui.show()
+            self.ui.raise_()
+            
+**self.ui** kommer att vara basen för vårt objektträd. Det är i denna variabel alla kontroller är definierade.            
+            
+### Ett nytt huvuduprogram
+
+Program som använder fönster har ofta ett annorlunda huvudprogram än t ex beräkningsprogram. Ett fönsterbaserade program använder ofta en s.k. händelse-loop som väntar på händelser från operativsystemet. Händelserna skickar loopen vidare till de underliggande klasserna som sedan hantera dessa. 
+
+Vårt nya huvudprogram visas i nedanstående kod:
+
+    if __name__ == '__main__':
+    
+        # --- Skapa en applikationsinstans
+
+        app = cfui.appInstance()   
+        app.Create()
+        
+        # --- Skapa en instans av vår MainWindow-klass.
+
+        window = MainWindow(app)
+        
+        # --- Start händelse-loopen och starta programmet
+        
+        app.Run()
+
+Metoden **app.Run()** returnerar när alla programmets fönster har stängts. 
+
+Programmet vi skapat har nu all kod som krävs för att visa vårt grafiska gränssnitt på skärmen. Under Windows kan gränssnittet se ut som i följande bild när programkoden körs:
+
+![qt_designer_1](images/qt_designer19.png)
+
+## Koppling av händelser till metoder
+
+För att programmet skall kunna köra beräkningar, öppna och spara filer måste vi koppla händelser från kontrollerna till metoder i **MainWindow**-klassen. Att koppla händelser för kontroller till metoder görs med metoden **.connect(...)** som finns definierade för alla händelser en kontroll kan hantera. 
+
+### Koppling av menyhändelser
+
+De första händelserna vi kopplar ihop är menyhändelserna. Menyhändelserna i ui-filen angavs med namn som **actionNew** och **actionOpen**. För att skapa en koppling lägger vi först till en metod som skall hantera själva händelsen:
+
+    class MainWindow:
+        ...
+        def onActionNew(self):
+            """Skapa en ny modell"""
+            print("onActionNew")
+            
+Vi lämnar implementeringen av denna till användaren. Kopplingen av metoden gör vi nu i **__init__(...)**
+
+    class MainWindow:
+        ...
+        def __init__(self, app):
+
+            ...
+            
+            # --- Läs in gränssnitt från fil
+            
+            self.ui = cfui.loadUiWidget('mainwindow.ui')
+            
+            # --- Koppla kontroller till händelsemetoder
+            
+            self.ui.actionNew.triggered.connect(self.onActionNew)
+            
+För menyhändelser är det händelsen **triggered** som skall kopplas.            
+            
+        
 
 **UNDER KONSTRUKTION**
