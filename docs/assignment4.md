@@ -55,7 +55,7 @@ En undermeny till en huvudmeny skapas kommer Qt Designer att automatiskt skapa e
 
 ![qt_designer_1](images/qt_designer5.png)
 
-Namnen på en **Action** kan ändras genom att man väljer en action in editorn och ändrar på namnet i **Property Editor* enligt följande figur:
+Namnen på en **Action** kan ändras genom att man väljer en action in editorn och ändrar på namnet i **Property Editor** enligt följande figur:
 
 ![qt_designer_1](images/qt_designer6.png)
 
@@ -64,5 +64,43 @@ Namnen som ges här motsvarar de namn som kommer att användas i Python. Försö
 Färdigställ hela menyn enligt den tidigare listan med menyfunktioner.
 
 ### Kontroller för inmatning av parametrar
+
+För att kunna redigera vår modell måste vi skapa kontroller för detta i Qt Designer. De kontroller kan använda är **QLineEdit** och **QLabel**. QLineEdit används för att kunna ange värden i textutor på skärmen. QLabel använder vi för att beskriva vad textutorna beskriver för parameter.
+
+Kontroller skapas genom att man drar kontrollen från **Widget Box** och släpper dem på formulärfönstret. Följande bild visar ett antal kontroller skapade på detta sätt med tillhörande objektnamn.
+
+![qt_designer_1](images/qt_designer7.png)
+
+![qt_designer_1](images/qt_designer8.png)
+
+Texten för **QLabel** kontrollerna ändras genom att välja kontrollen och ändra egenskapen **text** i **Property Editor** enligt följande figur:
+
+![qt_designer_1](images/qt_designer9.png)
+
+### Knappar för visualisering
+
+För att kunna visa visualiseringarna behöver vi också ett antal knappar för detta. Skapa följande knappar (**QPushButton**) till höger om de tidigare kontrollerna (Bry er inte om exakt placering. Räcker med ungefärlig placering.):
+
+ * text: **Geometry** - namn: **showGeometryButton**  
+ * text: **Mesh** - namn: **showMeshButton**  
+ * text: **Nodal values** - namn: **showNodalValuesButton**  
+ * text: **Element values** - namn: **showElementValuesButton**
+ 
+Följande figur visar ungefärligt utseende:
+ 
+![qt_designer_1](images/qt_designer10.png)
+
+### Textruta för rapport
+
+För att visa rapporten kommer vi att använda en **QPlainTextEdit**-kontroll. Denna kontroll kan hantera text bestående av flera rader. Skapa en sådan kontroll med namnet **reportEdit**. 
+
+Det färdiga fönstret bör nu se ut som i följande figur:
+
+![qt_designer_1](images/qt_designer11.png)
+
+### Ordning och reda på kontroller
+
+
+  
 
 **UNDER KONSTRUKTION**
