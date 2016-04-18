@@ -100,7 +100,49 @@ Det färdiga fönstret bör nu se ut som i följande figur:
 
 ### Ordning och reda på kontroller
 
+Fram till nu har vi placera ut kontrollerna ungefärligt. För att se till att kontrollerna placeras på ett mer ordentligt och skalbart sätt skall vi använda verktyget för grid-layout och radlayout.
 
-  
+Först skapar vi en grid-layout av etiketter, textutor och knappar. Markera dessa kontroller i Qt Designer:
+
+![qt_designer_1](images/qt_designer12.png)
+
+Klicka sedan på grid-verktyget:
+
+![qt_designer_1](images/qt_designer13.png)
+
+Nu skapar Qt Designer automatiskt en grid-layout av de valda kontrollerna:
+
+![qt_designer_1](images/qt_designer14.png)
+
+Det är lite trångt mellan textutorna och knapparna. Lägg in en "Horizontal Spacer" enligt figuren nedan:
+
+![qt_designer_1](images/qt_designer15.png)
+
+För att placera ut kontrollerna så att de fyller ut hela fönstret, markerar huvudfönstret och trycker på **Layout vertically**.
+
+![qt_designer_1](images/qt_designer16.png)
+
+Huvudfönstret bör nu se ut som i följande bild:
+
+![qt_designer_1](images/qt_designer17.png)
+
+Objektstrukturen bör ha följande struktur och namngivning (Måste dock anpassas efter problemområde och egna idéer).
+
+![qt_designer_1](images/qt_designer18.png)
+
+Vi har nu en komplett beskrivning av det grafiska gränssnittet. Spara filen som "mainwindow.ui". 
+
+## huvudprogram och klass för huvudfönster
+
+För att programmet skall visa vårt gränssnitt måste huvudprogrammet modifieras. Enklast är det om ni skapar en ny Python-fil och börjar från början.
+
+För att implementera det grafiska gränssnittet måste vi importera ett antal Python-moduler. 
+
+ * PyQT modulerna **QtGui** och **QtCore**. Dessa används för att skapa gränsnittet.
+ * CALFEM modulen **calfem.ui**. Denna innehåller en del specialkod för att integrera våra visualiseringrutiner och PyQt.
+ * Er egen modul för ert problemområde. I detta exempel använder vi modulen **flowmodel**.
+ 
+ 
+ 
 
 **UNDER KONSTRUKTION**
