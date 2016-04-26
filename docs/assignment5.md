@@ -121,6 +121,10 @@ I nästa steg skall vi skapa en metod i **Solver**-klassen, **exportVtk(...)** f
         
         polygons = (self.outputData.edof-1).tolist()
         
+        # --- För spänningsproblemet användas, se också nästa stycke:
+        
+        # polygons = (self.outputData.topo-1).tolist()
+                
         # --- Resultat från beräkningen skapas i separata objekt. Punkter i vtk.PointData och
         # --- elementdata i vtk.CellData. Nedan anger vi både vektor data och skalärvärden för elementen.
         # --- Tänk på att vektorerna måste ha 3 komponenter, så lägg till detta i beräkningsdelen.
@@ -142,6 +146,33 @@ I nästa steg skall vi skapa en metod i **Solver**-klassen, **exportVtk(...)** f
         
 ParaView kan automatiskt hantera resultaten från parameterstudien om filerna namnges **paramStudy_01.vtk**, **paramStudy_02.vtk**. Filen kan öppnas som en fil **paramStudy** i programmet.        
 
+## Uppdatering av **Solver**-klassen för spänningsproblemet
+
+För att spänningsproblement skall fungera måste vi lagra ytterligare en variabel i **OutputData**-klassen:
+
+    def execute(self):
+        """Metod för att utföra finita element beräkningen."""
+        
+        # --- Överför modell variabler till lokala referenser
+
+        ...        
+        
+        # --- Nätgenerering
+        
+        elType = 3
+        dofsPerNode= 1 
+        geometry = self.inputData.geometry()        
+        
+        meshGen = cfm.GmshMeshGenerator(geometry)
+        meshGen.elSizeFactor = elSizeFactor     # Factor that changes element sizes.
+        meshGen.elType = elType
+        meshGen.dofsPerNode = dofsPerNode
+        
+        coords, edof, dofs, bdofs, elementmarkers = meshGen.create()
+        self.outputdata = meshGen.topo
+        
+Topo innehåller nodtopologin, som kan användas med vtk.
+
 ## Uppdatering av SolverThread-klassen
 
 För att kunna köra en parameterstudie måste vi anropa den tidigare definierade metode **executeParamStudy(...)** istället för **execute(...)**. Detta gör vi genom att definiera en ytterligare metod-variabler **self.paramStudy** som anger om en parameterstudie skall köras eller en enstaka beräkning. Koden för att starta en parameterstudie visas nedan. Notera den extra parametern i **SolverThread**:s konstruktur.
@@ -157,3 +188,16 @@ För att kunna köra en parameterstudie måste vi anropa den tidigare definierad
         self.solverThread = SolverThread(self.solver, paramStudy = True)        
         self.solverThread.finished.connect(self.onSolverFinished)        
         self.solverThread.start()
+
+## Inlämning och redovisning
+
+Det som skall göras i detta arbetsblad är:
+
+ * Implementera gränssnittskontroller och knappar för parameterstudiefunktionaliteten
+ * Uppdatera **Solver**-klassen att hantera parameterstudier.
+ * Implementera funktionen **exportVtk(...)** i **Solver**-klassen.
+ * Metoden **excuteParamStudy(...)** skall för varje beräkning skriva ut en vtk-fil men samma filnamn som modellen. Dvs [filnamn]_01.vtk, [filnamn]_02.vtk.
+  
+Inlämningen skall bestå av en zip-fil (eller annat arkivformat) bestående av: 
+
+ * Alla Python-filer. (.py-filer)
