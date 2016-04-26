@@ -132,6 +132,10 @@ I nästa steg skall vi skapa en metod i **Solver**-klassen, **exportVtk(...)** f
         pointData = vtk.PointData(vtk.Scalars(self.outputData.a.tolist(), name="pressure"))
         cellData = vtk.CellData(vtk.Scalars(self.outputData.maxFlow, name="maxflow"), vtk.Vectors(self.outputData.flow, "flow"))
         
+        # --- För spänningsproblemet blir det istället (ingen pointData)
+        
+        # cellData = vtk.CellData(vtk.Scalars(self.outputData.mises, name="mises"), vtk.Vectors(self.outputData.stress1, "principal stress 1"), vtk.Vectors(self.outputData.stress2, "principal stress 2"))        
+        
         # --- Skapa strukturen för elementnätet.
         
         structure = vtk.PolyData(points = points, polygons = polygons)
@@ -139,6 +143,10 @@ I nästa steg skall vi skapa en metod i **Solver**-klassen, **exportVtk(...)** f
         # --- Lagra allting i en vtk.VtkData instans
         
         vtkData = vtk.VtkData(structure, pointData, cellData)
+        
+        # --- För spänningsfallet
+        
+        # vtkData = vtk.VtkData(structure, cellData)        
         
         # --- Spara allt till filen
         
@@ -169,7 +177,7 @@ För att spänningsproblement skall fungera måste vi lagra ytterligare en varia
         meshGen.dofsPerNode = dofsPerNode
         
         coords, edof, dofs, bdofs, elementmarkers = meshGen.create()
-        self.outputdata = meshGen.topo
+        self.outputdata.topo = meshGen.topo
         
 Topo innehåller nodtopologin, som kan användas med vtk.
 
