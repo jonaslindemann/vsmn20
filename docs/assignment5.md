@@ -197,7 +197,9 @@ Det som skall göras i detta arbetsblad är:
  * Uppdatera **Solver**-klassen att hantera parameterstudier.
  * Implementera funktionen **exportVtk(...)** i **Solver**-klassen.
  * Metoden **excuteParamStudy(...)** skall för varje beräkning skriva ut en vtk-fil men samma filnamn som modellen. Dvs [filnamn]_01.vtk, [filnamn]_02.vtk.
+ * Importera vtk-filerna i ParaView för visualisering. 
   
 Inlämningen skall bestå av en zip-fil (eller annat arkivformat) bestående av: 
 
  * Alla Python-filer. (.py-filer)
+ * Bilder från ParaView-visualiseringar.
