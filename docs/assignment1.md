@@ -23,7 +23,7 @@ Skriv ett program som konverterar en given längd i meter till tum, fot, yards o
 
 Låt p vara bankens årliga ränta. Ett insatt belopp, A, har då vuxit till: 
 
-<img src="images/interest.png" width="150">
+<img src="../images/interest.png" width="150">
 
 Efter n år. Skriv ett program som beräknar vad 1000 kr har vuxit till efter tre år med 5 % ränta.
 
@@ -31,7 +31,7 @@ Efter n år. Skriv ett program som beräknar vad 1000 kr har vuxit till efter tr
 
 Skriv ett program som skriver ut en tabell med Fahrenheit grader 0, 10, 20, …, 100 i den första kolumnen och motsvarande grader Celsius i den andra kolumnen. För att beräkna grader Celsius används följande formel.
 
-<img src="images/fahrenheit.png" width="150">
+<img src="../images/fahrenheit.png" width="150">
 
 ## Uppgift 5: Beräkna summan av tal i en fil
 
@@ -41,7 +41,7 @@ Läs in tal från en fil och beräkna den totala summan av dessa. Filen innehål
 
 Plotta funktionen
 
-<img src="images/sinx.png" width="150">
+<img src="../images/sinx.png" width="150">
 
 Inom intervallet [0,2π]
 
@@ -54,17 +54,17 @@ För denna uppgift måste import deklarationer göras:
 
 Definiera följande matriser in numpy:
 
-<img src="images/matrix.png" width="150"><br>
+<img src="../images/matrix.png" width="150"><br>
 
-<img src="images/matrix_b.png" width="90">
+<img src="../images/matrix_b.png" width="90">
 
 Beräkna och skriv ut följande uttryck:
 
-<img src="images/matrix_formulas.png" width="60">
+<img src="../images/matrix_formulas.png" width="60">
 
 Lös därefter ekvationsystemet 
 
-<img src="images/eqsys.png" width="80">
+<img src="../images/eqsys.png" width="80">
 
 En linjär ekvationslösare finns som np.linalg.solve(A, b). Följande modul importer måste 
 
