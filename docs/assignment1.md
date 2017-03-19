@@ -71,3 +71,11 @@ En linjär ekvationslösare finns som np.linalg.solve(A, b). Följande modul imp
 göras för denna uppgift:
 
     import numpy as np
+
+[img1]: "images/interest.png"
+[img2]: "images/fahrenheit.png"
+[img3]: "images/sinx.png"
+[img4]: "images/matrix.png"
+[img5]: "images/matrix_b.png"
+[img6]: "images/matrix_formulas.png"
+[img7]: "images/eqsys.png"
