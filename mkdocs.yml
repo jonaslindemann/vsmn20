@@ -1,6 +1,7 @@
 site_name: Programutveckling för Tekniska Tillämpningar
 pages:
 - Hem: index.md
+- Arbetsblad 1: assignment1.md
 - Arbetsblad 2: assignment2.md
 - Arbetsblad 3: assignment3.md
 - Arbetsblad 4: assignment4.md
