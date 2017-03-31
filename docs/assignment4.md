@@ -147,20 +147,24 @@ Programmets import instruktioner blir då:
  
     # -*- coding: utf-8 -*-
 
-    from PyQt import QtGui, QtCore
+    import sys
 
-    import calfem.ui as cfui
+    from PyQt5.QtCore import pyqtSlot, pyqtSignal, QThread
+    from PyQt5.QtWidgets import QApplication, QDialog, QWidget, QMainWindow, QFileDialog
+    from PyQt5.uic import loadUi
+
     import flowmodel as fm
     
 ### Huvudfönsterklass MainWindow
 
 Vårt huvudfönster implemeterar vi enklast i en egen klass **MainWindow**. Klassens uppgift är att ladda gränssnittsbeskrivningen och implementera de händelsemetoder som krävs för att programmet skall fungera. Det mest grundläggande är en **__init__**-metod som initierar klassen och läser beskrivningen samt visar fönstret på skärmen. Stommen för detta visas i följande exempel:
 
-    class MainWindow:
+    class MainWindow(QMainWindow):
         """MainWindow-klass som hanterar vårt huvudfönster"""
 
-        def __init__(self, app):
-            """Konstruktor"""
+        def __init__(self):
+            """Constructor"""
+            super(QMainWindow, self).__init__()
 
             # --- Lagra en referens till applikationsinstansen i klassen
             
@@ -168,7 +172,7 @@ Vårt huvudfönster implemeterar vi enklast i en egen klass **MainWindow**. Klas
                         
             # --- Läs in gränssnitt från fil
             
-            self.ui = cfui.loadUiWidget('mainwindow.ui')
+            self.ui = loadUi('mainwindow.ui', self)
             
             # --- Se till att visa fönstret
             
@@ -184,21 +188,21 @@ Program som använder fönster har ofta ett annorlunda huvudprogram än t ex ber
 Vårt nya huvudprogram visas i nedanstående kod:
 
     if __name__ == '__main__':
-    
-        # --- Skapa en applikationsinstans
 
-        app = cfui.appInstance()   
-        app.Create()
-        
-        # --- Skapa en instans av vår MainWindow-klass.
+        # --- Skapa applikationsinstans
 
-        window = MainWindow(app)
-        
-        # --- Start händelse-loopen och starta programmet
-        
-        app.Run()
+        app = QApplication(sys.argv)
 
-Metoden **app.Run()** returnerar när alla programmets fönster har stängts. 
+        # --- Skapa och visa huvudfönster
+
+        widget = MainWindow()
+        widget.show()
+
+        # --- Starta händelseloopen
+
+        sys.exit(app.exec_())
+
+Metoden **app.exec_()** returnerar när alla programmets fönster har stängts. 
 
 Programmet vi skapat har nu all kod som krävs för att visa vårt grafiska gränssnitt på skärmen. Under Windows kan gränssnittet se ut som i följande bild när programkoden körs:
 
@@ -222,13 +226,13 @@ Vi lämnar implementeringen av denna till användaren. Kopplingen av metoden gö
 
     class MainWindow:
         ...
-        def __init__(self, app):
+        def __init__(self):
 
             ...
             
             # --- Läs in gränssnitt från fil
             
-            self.ui = cfui.loadUiWidget('mainwindow.ui')
+            self.ui = loadUi('mainwindow.ui', self)
             
             # --- Koppla kontroller till händelsemetoder
             
@@ -293,12 +297,12 @@ Beräkningsmodellen som implementerades i arbetsblad 2 och 3 innehåller metoder
 
 ### Öppna fil från disk
 
-För att öppna en redan existerande fil från disk, måste vi först fråga användaren om vilken fil som skall öppnas. Detta kan göras med funktionen **QtGui.QFileDialog.getOpenFileName(...)**. Funktionen visar en stanadard fildialogruta där användaren kan välja en existerande fil. Hur den används visas i följande exempel:
+För att öppna en redan existerande fil från disk, måste vi först fråga användaren om vilken fil som skall öppnas. Detta kan göras med funktionen **QFileDialog.getOpenFileName(...)**. Funktionen visar en stanadard fildialogruta där användaren kan välja en existerande fil. Hur den används visas i följande exempel:
 
     def onActionOpen(self):
         """Öppna in indata fil"""
         
-        self.filename, _ = QtGui.QFileDialog.getOpenFileName(self.ui, 
+        self.filename, _ = QFileDialog.getOpenFileName(self.ui, 
             "Öppna modell", "", "Modell filer (*.json *.jpg *.bmp)")
         
         if self.filename!="":
@@ -317,7 +321,7 @@ Om användaren vill spara en modell till disk, måste vi på samma sätt först 
         self.updateModel()
         
         if self.filename == "":
-            self.filename, _  = QtGui.QFileDialog.getSaveFileName(self.ui, 
+            self.filename, _  = QFileDialog.getSaveFileName(self.ui, 
                 "Spara modell", "", "Modell filer (*.json)")
         
         if self.filename!="":
