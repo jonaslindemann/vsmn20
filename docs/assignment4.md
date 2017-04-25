@@ -339,17 +339,19 @@ För att implementera vår beräkning i en tråd måste vi först skapa en speci
 
     # -*- coding: utf-8 -*-
 
-    from PyQt import QtGui, QtCore
+    from PyQt5.QtCore import pyqtSlot, pyqtSignal, QThread
+    from PyQt5.QtWidgets import QApplication, QDialog, QWidget, QMainWindow, QFileDialog
+    from PyQt5.uic import loadUi
 
     import calfem.ui as cfui
     import flowmodel as fm
 
-    class SolverThread(QtCore.QThread):
+    class SolverThread(QThread):
         """Klass för att hantera beräkning i bakgrunden"""
         
-        def __init__(self, solver):
+        def __init__(self, solver, paramStudy = False):
             """Klasskonstruktor"""
-            QtCore.QThread.__init__(self)
+            QThread.__init__(self)
             self.solver = solver
             
         def __del__(self):
