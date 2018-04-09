@@ -111,10 +111,11 @@ I **Solver**-klassen måste vi lägga till anrop till nätgenereraren i **calfem
             meshGen.elSizeFactor = 0.5     # <-- Anger max area för element
             meshGen.elType = elType
             meshGen.dofsPerNode = dofsPerNode
+            meshGen.returnBoundaryElements = True
             
-            coords, edof, dofs, bdofs, elementmarkers = meshGen.create()
+            coords, edof, dofs, bdofs, elementmarkers, boundaryElements = meshGen.create()
             
-Elementgenerering och assemblering behöver inte ändras från arbetsblad 2. Däremot måste hanteringen av laster och randvillkor uppdateras, eftersom vi nu arbetar med lastmarkörer istället för frihetsgrader. Använd funktionerna **applybc(...)** och **applyforcetotal(...)** som finns i **calfem.utils** modulen.
+Elementgenerering och assemblering behöver inte ändras från arbetsblad 2. Däremot måste hanteringen av laster och randvillkor uppdateras, eftersom vi nu arbetar med lastmarkörer istället för frihetsgrader. Använd funktionerna **applybc(...)** och **applyforcetotal(...)**/**applyTractionLinearElement(...)** som finns i **calfem.utils** modulen.
 
 Lösning av ekvationssystem och elementkraftsberäkning behöver inte heller ändras. Däremot behöver vi lagra den genererade variablerna **coord**, **edof**, **geometry** och andra utdatavariabler som behövs för att visualisera resultaten.
 

@@ -111,10 +111,11 @@ In **Solver** - class, we must add the call to the mesh generator in  **calfem.m
             meshGen.elSizeFactor = 0.5     # <-- Anger max area för element
             meshGen.elType = elType
             meshGen.dofsPerNode = dofsPerNode
+            meshGen.returnBoundaryElements = True
             
-            coords, edof, dofs, bdofs, elementmarkers = meshGen.create()
+            coords, edof, dofs, bdofs, elementmarkers, boundaryElements = meshGen.create()
             
-Element Generation and assembling does not need to be changed from worksheet 2. However, one must handling of loads and boundary conditions are updated, because we are now working load markers instead of degrees of freedom. Use the functions  **applybc(...)** and **applyforcetotal(...)** available in **calfem.utils** module.
+Element Generation and assembling does not need to be changed from worksheet 2. However, one must handling of loads and boundary conditions are updated, because we are now working load markers instead of degrees of freedom. Use the functions  **applybc(...)** and **applyforcetotal(...)**/**applyTractionLinearElement(...)** available in **calfem.utils** module.
 
 Solving equations and elements of power calculation does not need to be changed. However, we need to store the generated variables **coord**, **EdoF**, **geometry** and other output variables needed to visualize the results.
 
