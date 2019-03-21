@@ -42,7 +42,7 @@ För implementeringen kommer vi att använda objekt-orienterad programmering, dv
  1. OutputData - Lagra de resultat som genereras vis lösningen av problemet.
  1. Report - Hanterar genereringen av indata- och utdatarapporter för programmet.
  
-## Klassen InputData
+## Klassen input_data
 
 Klassen InputData skall innehålla all indata som behövs för att utföra beräkningen. En första klassdefinition kan se ut som i följande kod:
 
@@ -98,7 +98,7 @@ Klassen InputData skall innehålla all indata som behövs för att utföra berä
  
  > Alla **...** anger att kod måste läggas till.
  
-## Klassen OutputData
+## Klassen output_data
 
 OutputData-klassen skall användas för att lagra resultaten som skapas under beräkningen. Eftersom Python är ett dynamiskt språk kan beräkningsklassen själv lägga till resultatvariablerna i resultatobjektet, men det är alltid bra att skapa tomma variabler i klassen, så att den kan fungera självständigt. Ett exempel på resultat-klass visas i följande kod:
 
@@ -118,17 +118,17 @@ OutputData-klassen skall användas för att lagra resultaten som skapas under be
     
 ## Klassen Solver
 
-Klassen solver är ansvarig för att utföra själva beräkningen. Klassen kommer att ha en kontruktor, __init__(...) och en metod execute() för att utföra själva beräkningen. Kontruktorn skall ha två inparametrar, **inputData** och **outputData**, vilka är instanser av klasserna **InputData** och **OutputData**. Konstruktorn får följande utseende:
+Klassen solver är ansvarig för att utföra själva beräkningen. Klassen kommer att ha en kontruktor, __init__(...) och en metod execute() för att utföra själva beräkningen. Kontruktorn skall ha två inparametrar, **input_data** och **output_data**, vilka är instanser av klasserna **input_data** och **output_data**. Konstruktorn får följande utseende:
 
     class Solver(object):
         """Klass för att hantera lösningen av vår beräkningsmodell."""
-        def __init__(self, inputData, outputData):
-            self.inputData = inputData
-            self.outputData = outputData
+        def __init__(self, input_data, output_data):
+            self.input_data = input_data
+            self.output_data = output_data
 
-Inparametrarna tilldelas två klassvariabler, **self.inputData** och **self.outputData**.
+Inparametrarna tilldelas två klassvariabler, **self.input_data** och **self.output_data**.
 
-Själva beräkningen skall utföras i metoden execute(...). Metoden hämtar indata från **self.inputData** för att ställa upp och utföra finita element beräkningen precis som ett vanliga CALFEM-program. För att förenkla hanteringen av invariabler kan lokala referenser till indata skapas enligt som visas i följande kod:
+Själva beräkningen skall utföras i metoden execute(...). Metoden hämtar indata från **self.input_data** för att ställa upp och utföra finita element beräkningen precis som ett vanliga CALFEM-program. För att förenkla hanteringen av invariabler kan lokala referenser till indata skapas enligt som visas i följande kod:
 
     class Solver(object):
 
@@ -138,17 +138,17 @@ Själva beräkningen skall utföras i metoden execute(...). Metoden hämtar inda
             
             # --- Överför modell variabler till lokala referenser
             
-            edof = self.inputData.edof
-            cond = self.inputData.cond
-            coord = self.inputData.coord
-            dof = self.inputData.dof
-            ep = self.inputData.ep
-            loads = self.inputData.loads
-            bcs = self.inputData.bcs       
+            edof = self.input_data.edof
+            cond = self.input_data.cond
+            coord = self.input_data.coord
+            dof = self.input_data.dof
+            ep = self.input_data.ep
+            loads = self.input_data.loads
+            bcs = self.input_data.bcs       
 
-Eftersom Python hanterar alla variabler som referenser är det ingen nackdel att göra dessa tilldelningar. Inga kopior på data kommer att göras. Variablerna behöver inte heller kopieras tillbaka till **self.inputData** då de lokala variablerna pekar på samma minnesinnehåll.
+Eftersom Python hanterar alla variabler som referenser är det ingen nackdel att göra dessa tilldelningar. Inga kopior på data kommer att göras. Variablerna behöver inte heller kopieras tillbaka till **self.input_data** då de lokala variablerna pekar på samma minnesinnehåll.
 
-När beräkningen har genomförts skall **self.outputData** tilldelas referenserna till resultatet av beräkningen. Den globala styvhetsmatrisen eller f-vektorn behöver inte lagras här. Intressanta variabler är förskjutningsvektorn, reaktionskraftsvektorn och elementkrafter. Följande kod visar hur det kan se ut:
+När beräkningen har genomförts skall **self.output_data** tilldelas referenserna till resultatet av beräkningen. Den globala styvhetsmatrisen eller f-vektorn behöver inte lagras här. Intressanta variabler är förskjutningsvektorn, reaktionskraftsvektorn och elementkrafter. Följande kod visar hur det kan se ut:
 
     class Solver(object):
 
@@ -164,11 +164,11 @@ När beräkningen har genomförts skall **self.outputData** tilldelas referenser
             
             # --- Överför modell variabler till lokala referenser
 
-            self.outputData.a = a
-            self.outputData.r = r
-            self.outputData.ed = ed
-            self.outputData.qs = qs
-            self.outputData.qt = qt
+            self.output_data.a = a
+            self.output_data.r = r
+            self.output_data.ed = ed
+            self.output_data.qs = qs
+            self.output_data.qt = qt
             
 ## Klassen Report
 
@@ -180,25 +180,25 @@ För att detta skall fungera behöver vi 2 extra metoder och en strängvariabel.
 
     class Report(object):
         """Klass för presentation av indata och utdata i rapportform."""
-        def __init__(self, inputData, outputData):
-            self.inputData = inputData
-            self.outputData = outputData
+        def __init__(self, input_data, output_data):
+            self.input_data = input_data
+            self.output_data = output_data
             self.report = ""
             
         def clear(self):
             self.report = ""
             
-        def addText(self, text=""):
+        def add_text(self, text=""):
             self.report+=str(text)+"\n"
                     
         def __str__(self):
             self.clear()
-            self.addText()
-            self.addText("-------------- Model input ----------------------------------")
+            self.add_text()
+            self.add_text("-------------- Model input ----------------------------------")
             ...
-            self.addText("Coordinates:")
-            self.addText()
-            self.addText(self.inputData.coord)
+            self.add_text("Coordinates:")
+            self.add_text()
+            self.add_text(self.input_data.coord)
             ...
             return self.report
                            
@@ -209,7 +209,7 @@ För att programmet skall fungera behöver vi ett huvudprogram. Följande kod vi
     # -*- coding: utf-8 -*-
 
     if __name__ == "__main__":
-        print("Denna fil exekveras direkt och importeras inte.
+        print("Denna fil exekveras direkt och importeras inte.")
 
 Om en Python-fil importeras med **import**-satsen kommer variabeln **__name__** innehålla modulens namn, dvs namnet på källkodsfilen. Om man däremot anropar filen direkt med en Python-tolk kommer **__name__** innehålla värdet **__main__**. På detta sätt kan man se till att bara viss kod utförs om filen startas direkt med Python-tolken och på samma gång använda filen som en modul. Detta koncept används ofta i Python för att skapa test-funktioner för moduler. 
 
@@ -221,16 +221,16 @@ Ett huvudprogram för vårt finita element program som använder alla våra klas
 
     if __name__ == "__main__":
         
-        inputData = fm.InputData()
-        outputData = fm.OutputData()
+        input_data = fm.input_data()
+        output_data = fm.output_data()
 
-        solver = fm.Solver(inputData, outputData)
+        solver = fm.Solver(input_data, output_data)
         solver.execute()
 
-        report = fm.Report(inputData, outputData)
+        report = fm.Report(input_data, output_data)
         print(report)
         
-I ovanstående huvudprogram importerar vi modulen **flowmodel** (flowmodel.py) som definierar våra klasser. Vi importerar den i namnrymden **fm**. Vi instantierar **InputData** och **OutputData** objekt för att hantera in- och utdata. En **Solver** instans, **solver** instantieras med objekten, **inputData** och **outputData** som indata. Beräkningen startas sedan genom att vi anropar metoder **solver.execute()**. Programmet avslutas med att vi skapar en instans av **Report** som vi sedan skriver ut på skärmen med en **print()**-sats. 
+I ovanstående huvudprogram importerar vi modulen **flowmodel** (flowmodel.py) som definierar våra klasser. Vi importerar den i namnrymden **fm**. Vi instantierar **input_data** och **output_data** objekt för att hantera in- och utdata. En **Solver** instans, **solver** instantieras med objekten, **input_data** och **output_data** som indata. Beräkningen startas sedan genom att vi anropar metoder **solver.execute()**. Programmet avslutas med att vi skapar en instans av **Report** som vi sedan skriver ut på skärmen med en **print()**-sats. 
 
 Exempel på en körning av programmet visas nedan:
 
@@ -334,9 +334,9 @@ För att implementera funktionaliteten läsa och skriva i vårt program lägger 
     import calfem.core as cfc
     import json # <--- Denna rad
     
-Vi börjar med att implementera skrivning till fil, eftersom vi har alla indata för detta ändamål. Vi lägger till en metod, **save(...)** i **InputData**-klassen:
+Vi börjar med att implementera skrivning till fil, eftersom vi har alla indata för detta ändamål. Vi lägger till en metod, **save(...)** i **input_data**-klassen:
 
-    class InputData(object):
+    class input_data(object):
         """Klass för att definiera indata för vår modell."""
         
         ...
@@ -348,22 +348,21 @@ Vi börjar med att implementera skrivning till fil, eftersom vi har alla indata 
 
 För att definiera strukturen av det som skall lagras, men också för att göra det enkelt att läsa in data, kommer vi att utgå från ett dictionary som bas för det som skall skrivas och läsas till fil. I metoden **save(...)** lägger vi till följande kod för att definiera grundstommen till vår datastruktur:
 
-            inputData = {}
-            inputData["version"] = self.version
-            inputData["t"] = self.t
-            inputData["ep"] = self.ep
+            input_data = {}
+            input_data["version"] = self.version
+            input_data["t"] = self.t
+            input_data["ep"] = self.ep
                         
-**inputData["version"]** kan vara bra att ha för att hålla koll på vilken version av filformatet man använder när man väl läser tillbaka filen.
+**input_data["version"]** kan vara bra att ha för att hålla koll på vilken version av filformatet man använder när man väl läser tillbaka filen.
 
 Ett problem vi måste hantera är att JSON modulen i Python inte kan hantera Numpy-arrayer. Detta löses dock enkelt genom att vi konverterar våra Numpy-arrayer till listor. I följande kod konverterar vi arrayen **self.coord** till en lista med metoden **.tolist(...)**.
 
-            inputData["coord"] = self.coord.tolist()
+            input_data["coord"] = self.coord.tolist()
             
-När **inputData** är definierad kan vi öppna en fil för skrivning och sedan skriva ut får JSON-fil med funktionen **json.dumps(...)**
+När **input_data** är definierad kan vi öppna en fil för skrivning och sedan skriva ut får JSON-fil med funktionen **json.dumps(...)**
 
-            ofile = open(filename, "w")
-            json.dump(inputData, ofile, sort_keys = True, indent = 4)
-            ofile.close()
+            with open(filename, "w") as ofile:
+                json.dump(input_data, ofile, sort_keys = True, indent = 4)
 
 **sort_keys** och **indent** ser till att den skrivna filen blir snyggt formaterad.
 
@@ -373,56 +372,54 @@ För att läsa in en befintlig JSON-fil gör vi i omvänd ordning. Vi läser in 
         """Läs indata från fil."""
         
         ifile = open(filename, "r")
-        inputData = json.load(ifile)
+        input_data = json.load(ifile)
         ifile.close()
 
-        self.version = inputData["version"]
-        self.t = inputData["t"]
-        self.ep = inputData["ep"]
+        self.version = input_data["version"]
+        self.t = input_data["t"]
+        self.ep = input_data["ep"]
 
 För vår coord-array måste nu konvertera tillbaka denna till en Numpy-array. Detta görs med Numpy-funktionen **np.asarray(...)**            
 
-        self.coord = np.asarray(inputData["coord"])
+        self.coord = np.asarray(input_data["coord"])
         
 De kompletta skriv- och läsfunktionerna blir då:
 
-    class InputData(object):
+    class input_data(object):
         """Klass för att definiera indata för vår modell."""
 
         def save(self, filename):
             """Spara indata till fil."""
 
-            inputData = {}
-            inputData["version"] = self.version
-            inputData["t"] = self.t
-            inputData["ep"] = self.ep
+            input_data = {}
+            input_data["version"] = self.version
+            input_data["t"] = self.t
+            input_data["ep"] = self.ep
             ...
-            inputData["coord"] = self.coord.tolist()
+            input_data["coord"] = self.coord.tolist()
             ...
 
-            ofile = open(filename, "w")
-            json.dump(inputData, ofile, sort_keys = True, indent = 4)
-            ofile.close()
+            with open(filename, "w") as ofile:
+                json.dump(input_data, ofile, sort_keys = True, indent = 4)
 
         def load(self, filename):
             """Läs indata från fil."""
-            
-            ifile = open(filename, "r")
-            inputData = json.load(ifile)
-            ifile.close()
 
-            self.version = inputData["version"]
-            self.t = inputData["t"]
-            self.ep = inputData["ep"]
+            with open(filename, "r") as ifile:
+                input_data = json.load(ifile)
+
+            self.version = input_data["version"]
+            self.t = input_data["t"]
+            self.ep = input_data["ep"]
             ...
-            self.coord = np.asarray(inputData["coord"])
+            self.coord = np.asarray(input_data["coord"])
             ...
 
 ## Inlämning och redovisning
 
 Det som skall göras i detta arbetsblad är:
 
- * Slutföra implementeringen av **InputData**-klassen med all indata som krävs för att kunna lösa det valda problemet. Rutiner för att spara och läsa från JSON-filer skall också implementeras för alla indatavariabler.
+ * Slutföra implementeringen av **input_data**-klassen med all indata som krävs för att kunna lösa det valda problemet. Rutiner för att spara och läsa från JSON-filer skall också implementeras för alla indatavariabler.
  * Slutföra implementeringen av **Solver**-klassen med en finita element lösare implementerad med de metoder som finns beskriva i CALFEM.
  * Slutföra implementeringen av **Report**-klassen med en komplett utskrift av indata- och utdata variabler med beskrivande texter.
 

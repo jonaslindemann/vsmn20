@@ -23,15 +23,15 @@ I detta arbetsblad skall vi använda lite fler CALFEM moduler Lägg till följan
     import calfem.vis as cfv       # <-- Visualisering
     import calfem.utils as cfu     # <-- Blandade rutiner
     
-## Uppdatering av InputData-klassen
+## Uppdatering av input_data-klassen
 
-**InputData**-klassen måset uppdateras för att hantera en parametriskt beskriven modell istället för att definiera problemet på elementnivå. För grundvattenproblemet har t ex parametrarna, **w**, **t**, **d** och **h** för att beskriva geometrin och **ep**, **kx** och **ky** för att beskriva element egenskaper. Variabler för laster och randvillkor kan bibehållas. Skillnaden nu är att vi istället för frihetsgrad och värde lagrar randvillkorsmarkör och värde istället.
+**input_data**-klassen måset uppdateras för att hantera en parametriskt beskriven modell istället för att definiera problemet på elementnivå. För grundvattenproblemet har t ex parametrarna, **w**, **t**, **d** och **h** för att beskriva geometrin och **ep**, **kx** och **ky** för att beskriva element egenskaper. Variabler för laster och randvillkor kan bibehållas. Skillnaden nu är att vi istället för frihetsgrad och värde lagrar randvillkorsmarkör och värde istället.
 
 Alla variabler som t ex **coord** och **edof** som beskriver indata på elementnivå skall flyttas till **Solver**-klassen eftersom dessa kommer att skapas när elementnätet genereras.
 
-Geometrin kommer att definieras med objekt och funktioner från **calfem.geometry**. För att **Solver**-klassen alltid skall få en uppdaterad geometri vid anropet av **execute()**-metoden skapar vi en metod i **InputData**, **geometry()** som skall returnera en **Geometry** instans utifrån värden i de indata variabler som vi definierade för geometrin. Denna metod anropas sedan från **execute()**, så att lösaren alltid får en uppdaterad geometribeskrivning även om indata variablern har ändrats. Ett exempel på hur denna metod kan se ut visas i följande exempel:
+Geometrin kommer att definieras med objekt och funktioner från **calfem.geometry**. För att **Solver**-klassen alltid skall få en uppdaterad geometri vid anropet av **execute()**-metoden skapar vi en metod i **input_data**, **geometry()** som skall returnera en **Geometry** instans utifrån värden i de indata variabler som vi definierade för geometrin. Denna metod anropas sedan från **execute()**, så att lösaren alltid får en uppdaterad geometribeskrivning även om indata variablern har ändrats. Ett exempel på hur denna metod kan se ut visas i följande exempel:
 
-    class InputData(object):
+    class input_data(object):
         """Klass för att definiera indata för vår modell."""
         ...
         
@@ -92,34 +92,34 @@ I **Solver**-klassen måste vi lägga till anrop till nätgenereraren i **calfem
             
             # --- Överför modell variabler till lokala referenser
             
-            version = self.inputData.version
-            ep = self.inputData.ep
+            version = self.input_data.version
+            ep = self.input_data.ep
 
             ...
             
             
-            # --- Anropa InputData för en geomtetribeskrivning
+            # --- Anropa input_data för en geomtetribeskrivning
             
-            geometry = self.inputData.geometry()        
+            geometry = self.input_data.geometry()        
             
             # --- Nätgenerering
             
-            elType = 3      # <-- Fyrnodselement flw2i4e
-            dofsPerNode= 1  # <-- Skalärt problem
+            el_type = 3        # <-- Fyrnodselement flw2i4e
+            dofs_per_node = 1  # <-- Skalärt problem
             
-            meshGen = cfm.GmshMeshGenerator(geometry)
-            meshGen.elSizeFactor = 0.5     # <-- Anger max area för element
-            meshGen.elType = elType
-            meshGen.dofsPerNode = dofsPerNode
-            meshGen.returnBoundaryElements = True
+            mesh = cfm.GmshMeshGenerator(geometry)
+            mesh.el_size_factor = 0.5     # <-- Anger max area för element
+            mesh.el_type = el_type
+            mesh.dofsPerNode = dofs_per_node
+            mesh.return_boundary_elements = True
             
-            coords, edof, dofs, bdofs, elementmarkers, boundaryElements = meshGen.create()
+            coords, edof, dofs, bdofs, elementmarkers, boundaryElements = mesh.create()
             
 Elementgenerering och assemblering behöver inte ändras från arbetsblad 2. Däremot måste hanteringen av laster och randvillkor uppdateras, eftersom vi nu arbetar med lastmarkörer istället för frihetsgrader. Använd funktionerna **applybc(...)** och **applyforcetotal(...)**/**applyTractionLinearElement(...)** som finns i **calfem.utils** modulen.
 
 Lösning av ekvationssystem och elementkraftsberäkning behöver inte heller ändras. Däremot behöver vi lagra den genererade variablerna **coord**, **edof**, **geometry** och andra utdatavariabler som behövs för att visualisera resultaten.
 
-> Det kan också vara bra att definiera en variabel i **InputData**-klassen för att ange max storlek på de genererade elementen t ex **elSizeFactor**, som sedan kan tilldelas till **cfm.GmshGenerator**-klassens egenskap **elSizeFactor**.              
+> Det kan också vara bra att definiera en variabel i **input_data**-klassen för att ange max storlek på de genererade elementen t ex **el_size_factor**, som sedan kan tilldelas till **cfm.GmshGenerator**-klassens egenskap **el_size_factor**.              
 
 ## Användning av den parametriska modellen
 
@@ -131,14 +131,14 @@ Tanken med den parametriska problembeskrivningen är att en användare på ett e
 
     if __name__ == "__main__":
         
-        inputData = fm.InputData()
+        input_data = fm.InputData()
 
-        inputData.w = 100.0
-        inputData.h = 10.0
-        inputData.d = 5.0
-        inputData.t = 0.5
-        inputData.kx = 20.0
-        inputData.ky = 20.0
+        input_data.w = 100.0
+        input_data.h = 10.0
+        input_data.d = 5.0
+        input_data.t = 0.5
+        input_data.kx = 20.0
+        input_data.ky = 20.0
         
         ...
 
@@ -158,18 +158,18 @@ På detta sätt kan man också på ett enkelt sätt studera effekten av t ex ök
             print("-------------------------------------------")    
             print("Simulating d = ", d)
         
-            inputData = fm.InputData()
+            input_data = fm.input_data()
         
-            inputData.w = 100.0
-            inputData.h = 10.0
-            inputData.d = d
-            inputData.t = 0.5
-            inputData.kx = 20.0
-            inputData.ky = 20.0
+            input_data.w = 100.0
+            input_data.h = 10.0
+            input_data.d = d
+            input_data.t = 0.5
+            input_data.kx = 20.0
+            input_data.ky = 20.0
             
             outputData = fm.OutputData()
         
-            solver = fm.Solver(inputData, outputData)
+            solver = fm.Solver(input_data, outputData)
             solver.execute()
             
             print("Max flow = ", np.max(outputData.maxFlow))        
@@ -181,7 +181,7 @@ I **Report**-klassen behöver vi lägga till utskrift för geometribeskrivning, 
 
 ## Visualisering med ny klass Visualisation
 
-I arbetsblad 2 var det enda resulatet en utskrift från vår **Report**-klass. Att tolka resultat i textform kan vara svårt. Vi skall därför använda av oss CALFEM:rutiner för visualisering i modulen **calfem.vis**. Dessa rutiner bygger på det etablerade visualiseringspaketet **visvis**. Visualiseringen skall implementeras i den nya klassen **Visualisation**. Denna klass har samma indata som **Result**-klassen, dvs referenser till instanser av **InputData** och **OutputData**. 
+I arbetsblad 2 var det enda resulatet en utskrift från vår **Report**-klass. Att tolka resultat i textform kan vara svårt. Vi skall därför använda av oss CALFEM:rutiner för visualisering i modulen **calfem.vis**. Dessa rutiner bygger på det etablerade visualiseringspaketet **visvis**. Visualiseringen skall implementeras i den nya klassen **Visualisation**. Denna klass har samma indata som **Result**-klassen, dvs referenser till instanser av **input_data** och **OutputData**. 
 
 Det finns ett antal visualiseringsfunktioner i CALFEM. I detta arbetsblad skall följande visualiseringar implementeras:
 
@@ -206,8 +206,8 @@ blir istället (med import enligt tidigare):
 Följande kod visar hur klassen kan implementeras med visualiering av geometrin.
 
     class Visualisation(object):
-        def __init__(self, inputData, outputData):
-            self.inputData = inputData
+        def __init__(self, input_data, outputData):
+            self.input_data = input_data
             self.outputData = outputData
             
         def show(self):
@@ -239,17 +239,17 @@ Följande kod visar hur klassen kan implementeras med visualiering av geometrin.
 
     if __name__ == "__main__":
         
-        inputData = fm.InputData()
+        input_data = fm.input_data()
 
         outputData = fm.OutputData()
 
-        solver = fm.Solver(inputData, outputData)
+        solver = fm.Solver(input_data, outputData)
         solver.execute()
 
-        report = fm.Report(inputData, outputData)
+        report = fm.Report(input_data, outputData)
         print(report)
         
-        vis = fm.Visualisation(inputData, outputData)
+        vis = fm.Visualisation(input_data, outputData)
         vis.show()
         vis.wait()        
 
@@ -259,7 +259,7 @@ Följande kod visar hur klassen kan implementeras med visualiering av geometrin.
 
 Det som skall göras i detta arbetsblad är:
 
- * Ändra **InputData**-klassen så att den beskriver problemet parametriskt enligt de beskrivna exemplen sist i arbetsbladet. Skapa en metod **geometry()** som returnerar en **cfg.Geometry**-instans med geometri definierad utifrån parameterbeskrivningen. 
+ * Ändra **input_data**-klassen så att den beskriver problemet parametriskt enligt de beskrivna exemplen sist i arbetsbladet. Skapa en metod **geometry()** som returnerar en **cfg.Geometry**-instans med geometri definierad utifrån parameterbeskrivningen. 
  * Uppdatera **Solver**-klassen så att denna skapar ett elementnät med hjälp av **cfm.GmshMeshGenerator** klassen. Lagra också maxflöden/maxspänningar (von Mises) och lagra dessa i udata-klassen.
  * Slutföra implementeringen av **Visualisation**-klassen så att den kan hantera visualisera geometri, elementnät, elementflöden och nodvärden.
  * Gör en parameter-studie där en av parametrarna varieras och maxflöde/maxspänning plottas i förhållande till den valda parametern. Skapa ett nytt huvudprogram för parameterstudien.
