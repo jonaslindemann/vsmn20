@@ -151,7 +151,7 @@ In this way, one can also easily study the effect of, for example, increase the 
 
     if __name__ == "__main__":
         
-        dRange = np.linspace(3.0, 7.0, 10)
+        dRange = np.linspace(3.0, 7.0, 10).tolist()
         
         for d in dRange:
         
