@@ -151,7 +151,7 @@ På detta sätt kan man också på ett enkelt sätt studera effekten av t ex ök
 
     if __name__ == "__main__":
         
-        dRange = np.linspace(3.0, 7.0, 10)
+        dRange = np.linspace(3.0, 7.0, 10).tolist()
         
         for d in dRange:
         
