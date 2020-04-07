@@ -24,7 +24,7 @@ In this submission, the backbone of the calculation program is created. A proble
 
  * Thermal Conductivity
  * Groundwater Flow
- * Voltage Calculation (Plan voltage)
+ * Stress calculation (Plane stress)
  
 is selected. The selected problem will then be used for all future work sheets. You do not need to implement a program that handles all problem types.
 
