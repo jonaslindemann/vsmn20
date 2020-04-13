@@ -20,7 +20,7 @@ I detta arbetsblad skall vi använda lite fler CALFEM moduler Lägg till följan
     import calfem.core as cfc
     import calfem.geometry as cfg  # <-- Geometrirutiner
     import calfem.mesh as cfm      # <-- Nätgenerering
-    import calfem.vis as cfv       # <-- Visualisering
+    import calfem.vis_mpl as cfv       # <-- Visualisering
     import calfem.utils as cfu     # <-- Blandade rutiner
     
 ## Uppdatering av input_data-klassen
@@ -31,7 +31,7 @@ Alla variabler som t ex **coord** och **edof** som beskriver indata på elementn
 
 Geometrin kommer att definieras med objekt och funktioner från **calfem.geometry**. För att **Solver**-klassen alltid skall få en uppdaterad geometri vid anropet av **execute()**-metoden skapar vi en metod i **input_data**, **geometry()** som skall returnera en **Geometry** instans utifrån värden i de indata variabler som vi definierade för geometrin. Denna metod anropas sedan från **execute()**, så att lösaren alltid får en uppdaterad geometribeskrivning även om indata variablern har ändrats. Ett exempel på hur denna metod kan se ut visas i följande exempel:
 
-    class input_data(object):
+    class InputData(object):
         """Klass för att definiera indata för vår modell."""
         ...
         
@@ -110,7 +110,7 @@ I **Solver**-klassen måste vi lägga till anrop till nätgenereraren i **calfem
             mesh = cfm.GmshMeshGenerator(geometry)
             mesh.el_size_factor = 0.5     # <-- Anger max area för element
             mesh.el_type = el_type
-            mesh.dofsPerNode = dofs_per_node
+            mesh.dofs_per_node = dofs_per_node
             mesh.return_boundary_elements = True
             
             coords, edof, dofs, bdofs, elementmarkers, boundaryElements = mesh.create()
@@ -119,7 +119,7 @@ Elementgenerering och assemblering behöver inte ändras från arbetsblad 2. Dä
 
 Lösning av ekvationssystem och elementkraftsberäkning behöver inte heller ändras. Däremot behöver vi lagra den genererade variablerna **coord**, **edof**, **geometry** och andra utdatavariabler som behövs för att visualisera resultaten.
 
-> Det kan också vara bra att definiera en variabel i **input_data**-klassen för att ange max storlek på de genererade elementen t ex **el_size_factor**, som sedan kan tilldelas till **cfm.GmshGenerator**-klassens egenskap **el_size_factor**.              
+> Det kan också vara bra att definiera en variabel i **InputData**-klassen för att ange max storlek på de genererade elementen t ex **el_size_factor**, som sedan kan tilldelas till **cfm.GmshGenerator**-klassens egenskap **el_size_factor**.              
 
 ## Användning av den parametriska modellen
 
@@ -185,11 +185,11 @@ I arbetsblad 2 var det enda resulatet en utskrift från vår **Report**-klass. A
 
 Det finns ett antal visualiseringsfunktioner i CALFEM. I detta arbetsblad skall följande visualiseringar implementeras:
 
- * Geometri - drawGeometry(...)
- * Genererat nät - drawMesh(...)
- * Deformerat nät - drawMesh(...) (för spänningsexemplet)
- * Elementvärden - drawElementValues(...)
- * Nodvärden - drawNodalValues(...)
+ * Geometri - draw_geometry(...)
+ * Genererat nät - draw_mesh(...)
+ * Deformerat nät - draw_mesh(...) (för spänningsexemplet)
+ * Elementvärden - draw_element_values(...)
+ * Nodvärden - draw_nodal_values(...)
  
 Dokumentation för dessa rutiner finns i användarhandboken för [nätgeneringsrutinerna](http://training.lunarc.lu.se/pluginfile.php/473/mod_resource/content/1/DAE_rapport_draft06.pdf). 
 
@@ -201,7 +201,7 @@ Notera att dessa rutiner är integrerade i CALFEM och visvis behöver inte impor
 blir istället (med import enligt tidigare):
 
     cfv.figure()
-    cfv.drawMesh(coords=coords, edof=edof, dofsPerNode=dofsPerNode, elType=elType, filled=True, title="Mesh")
+    cfv.draw_mesh(coords=coords, edof=edof, dofs_per_node=dofs_per_node, el_type=el_type, filled=True, title="Mesh")
     
 Följande kod visar hur klassen kan implementeras med visualiering av geometrin.
 
@@ -214,14 +214,14 @@ Följande kod visar hur klassen kan implementeras med visualiering av geometrin.
             
             geometry = self.outputData.geometry
             a = self.outputData.a
-            maxFlow = self.outputData.maxFlow
+            max_flow = self.outputData.max_flow
             coords = self.outputData.coords
             edof = self.outputData.edof
-            dofsPerNode = self.outputData.dofsPerNode
-            elType = self.outputData.elType
+            dofs_per_node = self.outputData.dofsPerNode
+            el_type = self.outputData.elType
             
             cfv.figure() 
-            cfv.drawGeometry(geometry, title="Geometry")
+            cfv.draw_geometry(geometry, title="Geometry")
             
             ...
                        

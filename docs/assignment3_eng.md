@@ -104,16 +104,16 @@ In **Solver** - class, we must add the call to the mesh generator in  **calfem.m
             
             # --- Nätgenerering
             
-            elType = 3      # <-- Fyrnodselement flw2i4e
-            dofsPerNode= 1  # <-- Skalärt problem
+            el_type = 3      # <-- Fyrnodselement flw2i4e
+            dofs_per_node = 1  # <-- Skalärt problem
             
             meshGen = cfm.GmshMeshGenerator(geometry)
-            meshGen.elSizeFactor = 0.5     # <-- Anger max area för element
-            meshGen.elType = elType
-            meshGen.dofsPerNode = dofsPerNode
-            meshGen.returnBoundaryElements = True
+            meshGen.el_size_factor = 0.5     # <-- Anger max area för element
+            meshGen.el_type = el_type
+            meshGen.dofs_per_node = dofs_per_node
+            meshGen.return_boundary_elements = True
             
-            coords, edof, dofs, bdofs, elementmarkers, boundaryElements = meshGen.create()
+            coords, edof, dofs, bdofs, element_markers, boundary_elements = meshGen.create()
             
 Element Generation and assembling does not need to be changed from worksheet 2. However, one must handling of loads and boundary conditions are updated, because we are now working load markers instead of degrees of freedom. Use the functions  **applybc(...)** and **applyforcetotal(...)**/**applyTractionLinearElement(...)** available in **calfem.utils** module.
 
@@ -185,11 +185,11 @@ In worksheet 2 was the only resulatet a printout from our **Report** - class. To
 
 There are a number of visualization features in Calfem. In this sheet, the following visualizations are implemented:
 
- * Geometry - drawGeometry (...)
- * Generated network - Draw mesh (...)
- * Deformed networks - draw mesh (...) (for example voltage)
- * Element Values ​​- drawElementValues ​​(...)
- * Node values ​​- drawNodalValues ​​(...)
+ * Geometry - draw_geometry(...)
+ * Generated network - draw_mesh(...)
+ * Deformed networks - draw_mesh(...) (for example voltage)
+ * Element Values ​​- draw_element_values​​(...)
+ * Node values ​​- draw_nodal_values​(...)
  
 Documentation for these procedures, see the user manual for [nätgeneringsrutinerna] (http://training.lunarc.lu.se/pluginfile.php/473/mod_resource/content/1/DAE_rapport_draft06.pdf).
 
@@ -201,7 +201,7 @@ Note that these routines are integrated in Calfem and visvis do not need to be i
 becomes instead (med import enligt tidigare):
 
     cfv.figure()
-    cfv.drawMesh(coords=coords, edof=edof, dofsPerNode=dofsPerNode, elType=elType, filled=True, title="Mesh")
+    cfv.draw_mesh(coords=coords, edof=edof, dofs_per_node=dofs_per_node, el_type=el_type, filled=True, title="Mesh")
     
 The following code shows how the class can be implemented with the visualization of the geometry.
 
@@ -214,14 +214,14 @@ The following code shows how the class can be implemented with the visualization
             
             geometry = self.outputData.geometry
             a = self.outputData.a
-            maxFlow = self.outputData.maxFlow
+            max_flow = self.outputData.max_flow
             coords = self.outputData.coords
             edof = self.outputData.edof
-            dofsPerNode = self.outputData.dofsPerNode
-            elType = self.outputData.elType
+            dofs_per_node = self.outputData.dofs_per_node
+            el_type = self.outputData.el_type
             
             cfv.figure() 
-            cfv.drawGeometry(geometry, title="Geometry")
+            cfv.draw_geometry(geometry, title="Geometry")
             
             ...
                        
