@@ -158,7 +158,7 @@ På detta sätt kan man också på ett enkelt sätt studera effekten av t ex ök
             print("-------------------------------------------")    
             print("Simulating d = ", d)
         
-            input_data = fm.input_data()
+            input_data = fm.InputData()
         
             input_data.w = 100.0
             input_data.h = 10.0
@@ -167,12 +167,12 @@ På detta sätt kan man också på ett enkelt sätt studera effekten av t ex ök
             input_data.kx = 20.0
             input_data.ky = 20.0
             
-            outputData = fm.OutputData()
+            output_data = fm.OutputData()
         
-            solver = fm.Solver(input_data, outputData)
+            solver = fm.Solver(input_data, output_data)
             solver.execute()
             
-            print("Max flow = ", np.max(outputData.maxFlow))        
+            print("Max flow = ", np.max(output_data.maxFlow))        
 
 
 ## Report-klassen
@@ -206,19 +206,19 @@ blir istället (med import enligt tidigare):
 Följande kod visar hur klassen kan implementeras med visualiering av geometrin.
 
     class Visualisation(object):
-        def __init__(self, input_data, outputData):
+        def __init__(self, input_data, output_data):
             self.input_data = input_data
-            self.outputData = outputData
+            self.output_data = output_data
             
         def show(self):
             
-            geometry = self.outputData.geometry
-            a = self.outputData.a
-            max_flow = self.outputData.max_flow
-            coords = self.outputData.coords
-            edof = self.outputData.edof
-            dofs_per_node = self.outputData.dofsPerNode
-            el_type = self.outputData.elType
+            geometry = self.output_data.geometry
+            a = self.output_data.a
+            max_flow = self.output_data.max_flow
+            coords = self.output_data.coords
+            edof = self.output_data.edof
+            dofs_per_node = self.output_data.dofsPerNode
+            el_type = self.output_data.elType
             
             cfv.figure() 
             cfv.draw_geometry(geometry, title="Geometry")
@@ -229,7 +229,7 @@ Följande kod visar hur klassen kan implementeras med visualiering av geometrin.
             """Denna metod ser till att fönstren hålls uppdaterade och kommer att returnera
             När sista fönstret stängs"""
 
-            cfv.showAndWait()
+            cfv.show_and_wait()
             
 **Visualisation**-klassen läggs sedan till i huvudprogrammet som koden nedan visar:
 
@@ -241,15 +241,15 @@ Följande kod visar hur klassen kan implementeras med visualiering av geometrin.
         
         input_data = fm.input_data()
 
-        outputData = fm.OutputData()
+        output_data = fm.OutputData()
 
-        solver = fm.Solver(input_data, outputData)
+        solver = fm.Solver(input_data, output_data)
         solver.execute()
 
-        report = fm.Report(input_data, outputData)
+        report = fm.Report(input_data, output_data)
         print(report)
         
-        vis = fm.Visualisation(input_data, outputData)
+        vis = fm.Visualisation(input_data, output_data)
         vis.show()
         vis.wait()        
 

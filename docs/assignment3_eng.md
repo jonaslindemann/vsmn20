@@ -92,15 +92,15 @@ In **Solver** - class, we must add the call to the mesh generator in  **calfem.m
             
             # --- Överför modell variabler till lokala referenser
             
-            version = self.inputData.version
-            ep = self.inputData.ep
+            version = self.input_data.version
+            ep = self.input_data.ep
 
             ...
             
             
             # --- Anropa InputData för en geomtetribeskrivning
             
-            geometry = self.inputData.geometry()        
+            geometry = self.input_data.geometry()        
             
             # --- Nätgenerering
             
@@ -131,14 +131,14 @@ The idea of the parametric description of the problem is that a user easily be a
 
     if __name__ == "__main__":
         
-        inputData = fm.InputData()
+        input_data = fm.InputData()
 
-        inputData.w = 100.0
-        inputData.h = 10.0
-        inputData.d = 5.0
-        inputData.t = 0.5
-        inputData.kx = 20.0
-        inputData.ky = 20.0
+        input_data.w = 100.0
+        input_data.h = 10.0
+        input_data.d = 5.0
+        input_data.t = 0.5
+        input_data.kx = 20.0
+        input_data.ky = 20.0
         
         ...
 
@@ -158,21 +158,21 @@ In this way, one can also easily study the effect of, for example, increase the 
             print("-------------------------------------------")    
             print("Simulating d = ", d)
         
-            inputData = fm.InputData()
+            input_data = fm.InputData()
         
-            inputData.w = 100.0
-            inputData.h = 10.0
-            inputData.d = d
-            inputData.t = 0.5
-            inputData.kx = 20.0
-            inputData.ky = 20.0
+            input_data.w = 100.0
+            input_data.h = 10.0
+            input_data.d = d
+            input_data.t = 0.5
+            input_data.kx = 20.0
+            input_data.ky = 20.0
             
-            outputData = fm.OutputData()
+            output_data = fm.OutputData()
         
-            solver = fm.Solver(inputData, outputData)
+            solver = fm.Solver(input_data, output_data)
             solver.execute()
             
-            print("Max flow = ", np.max(outputData.maxFlow))        
+            print("Max flow = ", np.max(output_data.maxFlow))        
 
 
 ## Report class
@@ -206,19 +206,19 @@ becomes instead (med import enligt tidigare):
 The following code shows how the class can be implemented with the visualization of the geometry.
 
     class Visualisation(object):
-        def __init__(self, inputData, outputData):
-            self.inputData = inputData
-            self.outputData = outputData
+        def __init__(self, input_data, output_data):
+            self.input_data = input_data
+            self.output_data = output_data
             
         def show(self):
             
-            geometry = self.outputData.geometry
-            a = self.outputData.a
-            max_flow = self.outputData.max_flow
-            coords = self.outputData.coords
-            edof = self.outputData.edof
-            dofs_per_node = self.outputData.dofs_per_node
-            el_type = self.outputData.el_type
+            geometry = self.output_data.geometry
+            a = self.output_data.a
+            max_flow = self.output_data.max_flow
+            coords = self.output_data.coords
+            edof = self.output_data.edof
+            dofs_per_node = self.output_data.dofs_per_node
+            el_type = self.output_data.el_type
             
             cfv.figure() 
             cfv.draw_geometry(geometry, title="Geometry")
@@ -239,17 +239,17 @@ Visualization ** ** - class is then added to the main program in the code shown:
 
     if __name__ == "__main__":
         
-        inputData = fm.InputData()
+        input_data = fm.InputData()
 
-        outputData = fm.OutputData()
+        output_data = fm.OutputData()
 
-        solver = fm.Solver(inputData, outputData)
+        solver = fm.Solver(input_data, output_data)
         solver.execute()
 
-        report = fm.Report(inputData, outputData)
+        report = fm.Report(input_data, output_data)
         print(report)
         
-        vis = fm.Visualisation(inputData, outputData)
+        vis = fm.Visualisation(input_data, output_data)
         vis.show()
         vis.wait()        
 
