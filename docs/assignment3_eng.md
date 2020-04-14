@@ -18,10 +18,10 @@ In this worksheet, we will update our classes to manage a geometric model that i
 In this worksheet we use a little more Calfem modules Add the following modules in the module where your classes are defined:
 
     import calfem.core as cfc
-    import calfem.geometry as cfg  # <-- Geometrirutiner
-    import calfem.mesh as cfm      # <-- Nätgenerering
-    import calfem.vis as cfv       # <-- Visualisering
-    import calfem.utils as cfu     # <-- Blandade rutiner
+    import calfem.geometry as cfg  # <-- Geometry routines
+    import calfem.mesh as cfm      # <-- Mesh generation
+    import calfem.vis_mpl as cfv   # <-- Visualisation
+    import calfem.utils as cfu     # <-- Misc routines
     
 ## Updating the InputData class
 
