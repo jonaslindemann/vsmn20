@@ -96,7 +96,8 @@ Klassen InputData skall innehålla all indata som behövs för att utföra berä
                 [2, -15.0]
             ]
  
- > Alla **...** anger att kod måste läggas till.
+!!! note 
+    Alla **...** anger att kod måste läggas till.
  
 ## Klassen output_data
 
