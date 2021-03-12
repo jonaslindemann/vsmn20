@@ -99,9 +99,9 @@ Klassen InputData skall innehålla all indata som behövs för att utföra berä
 !!! note 
     Alla **...** anger att kod måste läggas till.
  
-## Klassen output_data
+## Klassen OutputData
 
-OutputData-klassen skall användas för att lagra resultaten som skapas under beräkningen. Eftersom Python är ett dynamiskt språk kan beräkningsklassen själv lägga till resultatvariablerna i resultatobjektet, men det är alltid bra att skapa tomma variabler i klassen, så att den kan fungera självständigt. Ett exempel på resultat-klass visas i följande kod:
+**OutputData**-klassen skall användas för att lagra resultaten som skapas under beräkningen. Eftersom Python är ett dynamiskt språk kan beräkningsklassen själv lägga till resultatvariablerna i resultatobjektet, men det är alltid bra att skapa tomma variabler i klassen, så att den kan fungera självständigt. Ett exempel på resultat-klass visas i följande kod:
 
     class OutputData(object):
         """Klass för att lagra resultaten från beräkningen."""
@@ -112,10 +112,11 @@ OutputData-klassen skall användas för att lagra resultaten som skapas under be
             self.qs = None
             self.qt = None
             
-**None** kan användas som en generisk datatyp som kan användas för att kunna skapa variabler utan innehåll. Det är också möjligt att testa om en variabel är tilldelad genom en if-sats:
+!!! note
+    **None** kan användas som en generisk datatyp som kan användas för att kunna skapa variabler utan innehåll. Det är också möjligt att testa om en variabel är tilldelad genom en if-sats:
 
-    if self.a == None:
-        self.a = np.array(...) # Tilldela en riktigt datatyp om self.a == None 
+        if self.a == None:
+            self.a = np.array(...) # Tilldela en riktigt datatyp om self.a == None 
     
 ## Klassen Solver
 
