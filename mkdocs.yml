@@ -14,3 +14,6 @@ pages:
 - Slutinlämning: assignment6.md
 theme: readthedocs
 #markdown_extensions: [codehilite]
+
+markdown_extensions:
+  - admonition
