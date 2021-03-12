@@ -42,7 +42,7 @@ För implementeringen kommer vi att använda objekt-orienterad programmering, dv
  1. OutputData - Lagra de resultat som genereras vis lösningen av problemet.
  1. Report - Hanterar genereringen av indata- och utdatarapporter för programmet.
  
-## Klassen input_data
+## Klassen InputData
 
 Klassen InputData skall innehålla all indata som behövs för att utföra beräkningen. En första klassdefinition kan se ut som i följande kod:
 
