@@ -120,7 +120,7 @@ Klassen InputData skall innehålla all indata som behövs för att utföra berä
     
 ## Klassen Solver
 
-Klassen solver är ansvarig för att utföra själva beräkningen. Klassen kommer att ha en kontruktor, __init__(...) och en metod execute() för att utföra själva beräkningen. Kontruktorn skall ha två inparametrar, **input_data** och **output_data**, vilka är instanser av klasserna **input_data** och **output_data**. Konstruktorn får följande utseende:
+Klassen solver är ansvarig för att utföra själva beräkningen. Klassen kommer att ha en kontruktor, __init__(...) och en metod execute() för att utföra själva beräkningen. Kontruktorn skall ha två inparametrar, **input_data** och **output_data**, vilka är instanser av klasserna **InputData** och **OutputData**. Konstruktorn får följande utseende:
 
     class Solver(object):
         """Klass för att hantera lösningen av vår beräkningsmodell."""
@@ -223,8 +223,8 @@ Ett huvudprogram för vårt finita element program som använder alla våra klas
 
     if __name__ == "__main__":
         
-        input_data = fm.input_data()
-        output_data = fm.output_data()
+        input_data = fm.InputData()
+        output_data = fm.OutputData()
 
         solver = fm.Solver(input_data, output_data)
         solver.execute()
@@ -232,7 +232,7 @@ Ett huvudprogram för vårt finita element program som använder alla våra klas
         report = fm.Report(input_data, output_data)
         print(report)
         
-I ovanstående huvudprogram importerar vi modulen **flowmodel** (flowmodel.py) som definierar våra klasser. Vi importerar den i namnrymden **fm**. Vi instantierar **input_data** och **output_data** objekt för att hantera in- och utdata. En **Solver** instans, **solver** instantieras med objekten, **input_data** och **output_data** som indata. Beräkningen startas sedan genom att vi anropar metoder **solver.execute()**. Programmet avslutas med att vi skapar en instans av **Report** som vi sedan skriver ut på skärmen med en **print()**-sats. 
+I ovanstående huvudprogram importerar vi modulen **flowmodel** (flowmodel.py) som definierar våra klasser. Vi importerar den i namnrymden **fm**. Vi instantierar **InputData** och **OutputData** objekt för att hantera in- och utdata. En **Solver** instans, **solver** instantieras med objekten, **input_data** och **output_data** som indata. Beräkningen startas sedan genom att vi anropar metoder **solver.execute()**. Programmet avslutas med att vi skapar en instans av **Report** som vi sedan skriver ut på skärmen med en **print()**-sats. 
 
 Exempel på en körning av programmet visas nedan:
 
@@ -421,7 +421,7 @@ De kompletta skriv- och läsfunktionerna blir då:
 
 Det som skall göras i detta arbetsblad är:
 
- * Slutföra implementeringen av **input_data**-klassen med all indata som krävs för att kunna lösa det valda problemet. Rutiner för att spara och läsa från JSON-filer skall också implementeras för alla indatavariabler.
+ * Slutföra implementeringen av **InputData**-klassen med all indata som krävs för att kunna lösa det valda problemet. Rutiner för att spara och läsa från JSON-filer skall också implementeras för alla indatavariabler.
  * Slutföra implementeringen av **Solver**-klassen med en finita element lösare implementerad med de metoder som finns beskriva i CALFEM.
  * Slutföra implementeringen av **Report**-klassen med en komplett utskrift av indata- och utdata variabler med beskrivande texter.
 
@@ -430,7 +430,7 @@ Inlämningen skall bestå av en zip-fil (eller annat arkivformat) bestående av:
  * Alla Python-filer. (.py-filer)
  * Ett exempel på en sparad json-fil.
  * Utskrift från programkörning.
- * Jämförande beräkning i CALFEM
+ * Jämförande beräkning i CALFEM för MATLAB.
 
 ## Elementtyper
 
