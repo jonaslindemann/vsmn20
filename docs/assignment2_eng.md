@@ -118,13 +118,13 @@ Output data class to be used to store the results generated during the calculati
     
 ## Klassen Solver
 
-The class solver is responsible for performing the actual calculation. The class will have a kontruktor, __init __ (...) and a method execute () to perform the actual calculation. Constructor must have two input parameters, input data ** ** and ** ** output data, which are instances of classes ** ** Data Input and Output Data ** **. The constructor will look like the following:
+The class solver is responsible for performing the actual calculation. The class will have a kontruktor, __init__(...) and a method execute() to perform the actual calculation. Constructor must have two input parameters, **input_data** and **output_data**, which are instances of the classes **InputData** and **OutputData**. The constructor will look like the following:
 
     class Solver(object):
         """Klass för att hantera lösningen av vår beräkningsmodell."""
-        def __init__(self, inputData, outputData):
-            self.inputData = inputData
-            self.outputData = outputData
+        def __init__(self, input_data, output_data):
+            self.input_data = input_data
+            self.output_data = output_data
 
 The input parameters are assigned two class variables, self.inputData ** ** and ** ** self.outputData.
 
@@ -136,17 +136,17 @@ The calculation to be performed in the execute (...). The method retrieves input
             
             # --- Överför modell variabler till lokala referenser
             
-            edof = self.inputData.edof
-            cond = self.inputData.cond
-            coord = self.inputData.coord
-            dof = self.inputData.dof
-            ep = self.inputData.ep
-            loads = self.inputData.loads
-            bcs = self.inputData.bcs       
+            edof = self.input_data.edof
+            cond = self.input_data.cond
+            coord = self.input_data.coord
+            dof = self.input_data.dof
+            ep = self.input_data.ep
+            loads = self.input_data.loads
+            bcs = self.input_data.bcs       
 
-Because Python handles all the variables that references it is no disadvantage to make these assignments. No copies of the data will be made. The variables need not be copied back to self.inputData ** ** then the local variables pointing to the same memory contents.
+Because Python handles all the variables that references it is no disadvantage to make these assignments. No copies of the data will be made. The variables need not be copied back to **self.input_data** then the local variables pointing to the same memory contents.
 
-After the calculation is completed, the self.outputData ** ** awarded credentials to the result of the calculation. The global stiffness matrix or vector f need not be stored here. Hot variables is the displacement vector, the reaction force vector and the element forces. The following code shows how this might look like:
+After the calculation is completed, the **self.output_data** is assigned the result of the calculation. The global stiffness matrix, **K** or the load vector **f** need not be stored here. Hot variables is the displacement vector, the reaction force vector and the element forces. The following code shows how this might look like:
 
     class Solver(object):
 
@@ -162,11 +162,11 @@ After the calculation is completed, the self.outputData ** ** awarded credential
             
             # --- Överför modell variabler till lokala referenser
 
-            self.outputData.a = a
-            self.outputData.r = r
-            self.outputData.ed = ed
-            self.outputData.qs = qs
-            self.outputData.qt = qt
+            self.output_data.a = a
+            self.output_data.r = r
+            self.output_data.ed = ed
+            self.output_data.qs = qs
+            self.output_data.qt = qt
             
 ## The class Report
 
@@ -178,9 +178,9 @@ For this to work, we need two additional methods and a string variable. The stri
 
     class Report(object):
         """Klass för presentation av indata och utdata i rapportform."""
-        def __init__(self, inputData, outputData):
-            self.inputData = inputData
-            self.outputData = outputData
+        def __init__(self, input_data, output_data):
+            self.input_data = input_data
+            self.output_data = output_data
             self.report = ""
             
         def clear(self):
@@ -196,7 +196,7 @@ For this to work, we need two additional methods and a string variable. The stri
             ...
             self.addText("Coordinates:")
             self.addText()
-            self.addText(self.inputData.coord)
+            self.addText(self.input_data.coord)
             ...
             return self.report
                            
@@ -219,13 +219,13 @@ A main program of our finite element program that uses all of our classes can th
 
     if __name__ == "__main__":
         
-        inputData = fm.InputData()
-        outputData = fm.OutputData()
+        input_data = fm.InputData()
+        output_data = fm.OutputData()
 
-        solver = fm.Solver(inputData, outputData)
+        solver = fm.Solver(input_data, output_data)
         solver.execute()
 
-        report = fm.Report(inputData, outputData)
+        report = fm.Report(input_data, output_data)
         print(report)
         
 In the above main program, we import the module ** ** Flow model (flowmodel.py) that define our classes. We import the namespace ** sc **. We instantiates ** Input Data ** and ** ** Output Data Objects to manage input and output. A ** ** solver instance, the solver ** ** instantiated with the items, input data ** ** and ** ** output data as input. The calculation is then started by calling the methods we solver.execute ** () **. The program ends with that we create an instance of ** Report ** which we then print on the screen with a ** print () ** - kit.
@@ -429,7 +429,7 @@ The submission shall consist of a zip file (or other archive format) consisting 
   * All the Python files. (.py Files)
   * An example of a saved file JSON.
   * Printing from applications run.
-  * Comparative calculation of Calfem
+  * Comparative calculation of Calfem for MATLAB.
 
 ## Element types
 
