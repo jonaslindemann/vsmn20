@@ -12,6 +12,7 @@ pages:
 - Arbetsblad 5: assignment5.md
 - Arbetsblad 5 (ENG): assignment5_eng.md
 - Slutinlämning: assignment6.md
+- Skapa tabeller med Tabulate: data_in_tables.md
 theme: readthedocs
 #markdown_extensions: [codehilite]
 
