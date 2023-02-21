@@ -1,4 +1,4 @@
-# Programutveckling för Tekniska Tillämpningar - Arbetsblad 5
+# Arbetsblad 5
 
 ## Allmänt
 

@@ -1,4 +1,4 @@
-# Programutveckling för Tekniska Tillämpningar - Slutinlämning
+# Slutinlämning
 
 Slutinlämningen skall bestå av:
 
