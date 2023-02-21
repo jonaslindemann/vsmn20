@@ -1,20 +1,59 @@
 site_name: Programutveckling för Tekniska Tillämpningar
-pages:
+nav:
 - Hem: index.md
-- Arbetsblad 1: assignment1.md
-- Arbetsblad 1 (ENG): assignment1_eng.md
-- Arbetsblad 2: assignment2.md
-- Arbetsblad 2 (ENG): assignment2_eng.md
-- Arbetsblad 3: assignment3.md
-- Arbetsblad 3 (ENG): assignment3_eng.md
-- Arbetsblad 4: assignment4.md
-- Arbetsblad 4 (ENG): assignment4_eng.md
-- Arbetsblad 5: assignment5.md
-- Arbetsblad 5 (ENG): assignment5_eng.md
-- Slutinlämning: assignment6.md
-- Skapa tabeller med Tabulate: data_in_tables.md
-theme: readthedocs
-#markdown_extensions: [codehilite]
+- Arbetsblad (Swedish):
+  - Arbetsblad 1: assignment1.md
+  - Arbetsblad 2: assignment2.md
+  - Arbetsblad 3: assignment3.md
+  - Arbetsblad 4: assignment4.md
+  - Arbetsblad 5: assignment5.md
+  - Slutinlämning: assignment6.md
+- Worksheets (English):
+  - Worksheet 1: assignment1_eng.md
+  - Worksheet 2: assignment2_eng.md
+  - Worksheet 3: assignment3_eng.md
+  - Worksheet 4: assignment4_eng.md
+  - Worksheet 5: assignment5_eng.md
+  - Final hand-in: assignment6.md
+- Guides:
+  - Creating tables with Tabulate: data_in_tables.md
+- Links: links.md
+
+theme: 
+  name: material
+  palette:
+    scheme: youtube
+    #primary: LU
+    #accent: LU
+  font:
+    text: Roboto
+    code: Roboto Mono
+  features:
+    - navigation.instant    
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.top
+    - header.autohide
+extra_css:
+  - stylesheets/extra.css   
+
+extra_javascript:
+  - https://unpkg.com/tablesort@5.3.0/dist/tablesort.min.js
+  - javascripts/tablesort.js 
 
 markdown_extensions:
   - admonition
+  - attr_list
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true 
+  - admonition
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - meta

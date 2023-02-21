@@ -1,13 +1,8 @@
-# Programutveckling för Tekniska Tillämpningar - Arbetsblad 1
+# Arbetsblad 1
 
-Detta arbetsblad består av ett antal uppgifter som skall lösas med hjälp av Python och Numpy. För att lösa uppgifter kan följande länkar vara av nytta:
+Detta arbetsblad består av ett antal uppgifter som skall lösas med hjälp av Python och Numpy. För att lösa uppgifter kan länkarna [här](links.md) vara till nytta.
 
- * How to Think Like a Computer Scientist
- * http://interactivepython.org/courselib/static/thinkcspy/toc.html
- * http://docs.python.org/tutorial/  
- * http://www.scipy.org/Tentative_NumPy_Tutorial
-
-Gå gärna igenom avsnitten fram till “Recursion” i online boken ”How To Think Like a Computer Scientist” innan du börjar med uppgifterna.
+Läs också avsnitten fram till “Recursion” i online boken [”How To Think Like a Computer Scientist”](https://runestone.academy/ns/books/published/thinkcspy/index.html) innan du börjar med uppgifterna.
 
 Alla uppgifterna sparas som separata python-filer (filer med ändelsen .py).
 
@@ -47,8 +42,10 @@ Inom intervallet [0,2π]
 
 För denna uppgift måste import deklarationer göras:
 
-    import numpy as np
-    import pylab as pl
+``` py
+import numpy as np
+import pylab as pl
+```
 
 ## Uppgift 7: Beräkna matriser
 
@@ -70,7 +67,9 @@ En linjär ekvationslösare finns som np.linalg.solve(A, b). Följande modul imp
 
 göras för denna uppgift:
 
+``` py
     import numpy as np
+```
 
 [img1]: "images/interest.png"
 [img2]: "images/fahrenheit.png"

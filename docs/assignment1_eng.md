@@ -1,15 +1,10 @@
-# Software development for Technical Applications - Worksheet 1
+# Worksheet 1
 
-This worksheet consists of a number of tasks to be solved using Python and NumPy. To solve tasks may find the following links useful:
+This worksheet consists of a number of tasks to be solved using Python and NumPy. To solve the task the links [here](links.md) can be useful.
 
- * How to Think Like a Computer Scientist
- * http://interactivepython.org/courselib/static/thinkcspy/toc.html
- * http://docs.python.org/tutorial/  
- * http://www.scipy.org/Tentative_NumPy_Tutorial
+Please go through the sections until the "Recursion" in the online book ["How To Think Like a Computer Scientist"](https://runestone.academy/ns/books/published/thinkcspy/index.html) before you start with the worksheet.
 
-Please go through the sections until the "Recursion" in the online book "How To Think Like a Computer Scientist" before you start with the data.
-
-All data are stored as separate python files (files with the extension .py).
+All source files should be stored as separate python files (files with the extension .py).
 
 ## Task 1: Write a "hello, world" program
 
@@ -47,8 +42,10 @@ Within the range [0,2π]
 
 For this task, the import declarations made:
 
-    import numpy as np
-    import pylab as pl
+``` py
+import numpy as np
+import pylab as pl
+```
 
 ## Task 7: Calculate the matrices
 
@@ -68,5 +65,8 @@ Solve then the system of equations
 
 A linear equation solver is as np.linalg.solve (A, B). The following module imports must made for this task:
 
+``` py
     import numpy as np
+```
+
 

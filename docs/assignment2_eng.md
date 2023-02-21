@@ -1,234 +1,259 @@
-# Program for Technical Applications - Worksheet 2
+# Worksheet 2
 
-> ** Remember: ** When ** ... ** appears in the program examples, this indicates that there is no code that you yourselves must add. Variables and data structures are only examples. Depending on the type of problem you may need other data structures than those described in the code examples.
+!!! note "Important"
+
+    When ** ... ** appears in the program examples, this indicates that there is no code that you yourselves must add. Variables and data structures are only examples. Depending on the type of problem you may need other data structures than those described in the code examples.
 
 ## Structuring of code
 
-Software development is a time consuming job. It is therefore important that the program code out-shaped such that modification and further development facilitated. This means that software program must be structured and have good readability. A calculation process can generally be divided into different logical parts. When programming, the program is assigned appropriately divided into subroutines. Transfer of data is done via the parameters in the declaration and call. The choice of parameters to be thought out, so that redundant parameters are not taken. Transfer of parameters to global variables should be avoided, as these often causes the parameters not used in the current program comes with, which impairs transparency.
+Software development is a time-consuming job. It is therefore important that the program code is designed in such a way that modification and further development can be facilitated. This means that software programs must be structured and have good readability. A calculation process can generally be divided into different logical parts. When programming, the program is assigned appropriately divided into subroutines. Transfer of data is done via the parameters in the declaration and call. The choice of parameters is to be thought out so that redundant parameters are avoided. 
 
-To give the program readability, the choice of names for variables and subroutines done with care, so that the name says something about the function. To further improve readability used comment kits to each subroutine describe the purpose, meaning and parameters of the various computational steps. If a program is designed in accordance with the above, it is easy to modify it or to use parts of it for other purposes than the original.
+To give the program readability, the choice of names for variables and subroutines is done with care, so that the name says something about the function. To further improve readability comments should be used in each subroutine to describe the purpose, meaning and parameters of the various computational steps. If a program is designed following the above, it is easy to modify it or to use parts of it for other purposes than the original.
 
-## Strucuture of a finite element application
+## Structure of a finite element application
 
 A finite element analysis can usually be divided into three different steps:
 
- 1. Input of input
+ 1. Defining input data
  1. Calculation
  1. Presentation of results
 
-Each such step is often performed by a separate program. The data is then transferred between the programs by using the files. Sometimes they choose to, instead of dividing the analysis into three separate applications, allowing two or all three of the steps performed by the same program.
+Each such step is often performed by a separate program. The data is then transferred between the programs by using the files. Sometimes they choose to, instead of dividing the analysis into three separate applications, allow two or all three of the steps performed by the same program.
 
-At the beginning of the course we have chosen to focus on step 2 above. Easier input are defined directly in Python to simplify troubleshooting in the implementation of the calculation part.
+At the beginning of the course, we have chosen to focus on step 2 above. Easier inputs are defined directly in Python to simplify troubleshooting in the implementation of the calculation part.
 
-In this submission, the backbone of the calculation program is created. A problem of the types:
+In this worksheet, the backbone of the calculation program is implemented. The following problem types can be chosen (only one is to be implemented):
 
  * Thermal Conductivity
  * Groundwater Flow
  * Stress calculation (Plane stress)
  
-is selected. The selected problem will then be used for all future work sheets. You do not need to implement a program that handles all problem types.
+The selected problem will then be used for all further worksheets. You do not need to implement a program that handles all problem types.
 
-We begin by defining a python-mode, for example flowmodel.py, which will include estimating portion of the program. Give the file a name that fits the problem area you have chosen. At the beginning of the file, the following declarations for the modules to be used:
+We begin by defining a python-module, flowmodel.py (chose a name depending on the selected problem type), which will include the calculation part of the program. At the beginning of the file, the following declarations for the modules to be used:
 
-    # -*- coding: utf-8 -*-
+``` py
+# -*- coding: utf-8 -*-
+
+import numpy as np
+import calfem.core as cfc
+```
     
-    import numpy as np
-    import calfem.core as cfc
-    
-For the implementation, we will use object-oriented programming, ie, divide the program into logical objects that can be reused and allow for expansion and reuse of code. 4 logical classes can be identified for the calculation model:
+For the implementation, we will use object-oriented programming, ie, divide the program into logical objects that can be reused and allow for the expansion and reuse of code. 4 logical classes can be identified for the calculation model:
 
-  1. Input Data - Stores the input variables required for calculation.
-  1. Solver - Implements routine solution for the problem.
-  1. Output Data - Storing the results generated thus solving the problem.
-  1. Report - Manages the generation of input and output reports for the program.
+  * **ModelParams** - Stores the input variables required for calculation.
+  * **ModelSolver** - Implements routine solution for the problem.
+  * **ModelResult** - Storing the results generated thus solving the problem.
+  * **ModelReport** - Manages the generation of input and output reports for the program.
 
-## The class InputData
+## The ModelParams-class
 
-The class input data must contain all inputs required to perform the calculation. A first class definition may look like the following code:
+The class input data must contain all inputs required to perform the calculation. Our first class definition may look like the following code:
 
-    # -*- coding: utf-8 -*-
+``` py
+# -*- coding: utf-8 -*-
 
-    import numpy as np
-    import calfem.core as cfc
-    import json
+import numpy as np
+import calfem.core as cfc
+import json
 
-    class InputData(object):
-        """Klass för att definiera indata för vår modell."""
-        def __init__(self):
-            
-            self.version = 1
-            
-            self.t = 1
-            self.ep = [self.t]
-
-            # --- Elementegenskaper
-            
-            ...
-            
-            # --- Skapa indata för testexempel
-            
-            self.coord = np.array([
-                [0.0, 0.0],
-                [0.0, 0.12],
-                ...
-                [0.24, 0.12]
-            ])
-
-            # --- Elementtopolgi
-                
-            self.edof = np.array([
-                [...],
-                ...
-                [...]
-            ])
-
-            # --- Laster
-
-            self.loads = [
-                [5, 6.0],
-                [6, 6.0]
-            ]
-
-            # --- Randvillkor
-
-            self.bcs = [
-                [1, -15.0],
-                [2, -15.0]
-            ]
- 
-> All ** ... ** indicates that the code must be added.
-
-## The class OutputData
-
-Output data class to be used to store the results generated during the calculation. Because Python is a dynamic language can calculate the class itself add to the result variables in the result object, but it's always good to create empty variables in the class, so that it can function independently. An example of results-class is shown in the following code:
-
-    class OutputData(object):
-        """Klass för att lagra resultaten från beräkningen."""
-        def __init__(self):
-            self.a = None
-            self.r = None
-            self.ed = None
-            self.qs = None
-            self.qt = None
-            
-** None ** can be used as a generic data type that can be used to create variables without content. It is also possible to test if a variable is assigned by an if statement:
-
-    if self.a == None:
-        self.a = np.array(...) # Tilldela en riktigt datatyp om self.a == None 
-    
-## Klassen Solver
-
-The class solver is responsible for performing the actual calculation. The class will have a kontruktor, __init__(...) and a method execute() to perform the actual calculation. Constructor must have two input parameters, **input_data** and **output_data**, which are instances of the classes **InputData** and **OutputData**. The constructor will look like the following:
-
-    class Solver(object):
-        """Klass för att hantera lösningen av vår beräkningsmodell."""
-        def __init__(self, input_data, output_data):
-            self.input_data = input_data
-            self.output_data = output_data
-
-The input parameters are assigned two class variables, self.inputData ** ** and ** ** self.outputData.
-
-The calculation to be performed in the execute (...). The method retrieves input from self.inputData ** ** to set up and perform finite element calculations just like a regular Calfem programs. To simplify management of input variables can be local references to the input data is created according to the following code:    class Solver(object):
-
-        ...
-            
-        def execute(self):
-            
-            # --- Överför modell variabler till lokala referenser
-            
-            edof = self.input_data.edof
-            cond = self.input_data.cond
-            coord = self.input_data.coord
-            dof = self.input_data.dof
-            ep = self.input_data.ep
-            loads = self.input_data.loads
-            bcs = self.input_data.bcs       
-
-Because Python handles all the variables that references it is no disadvantage to make these assignments. No copies of the data will be made. The variables need not be copied back to **self.input_data** then the local variables pointing to the same memory contents.
-
-After the calculation is completed, the **self.output_data** is assigned the result of the calculation. The global stiffness matrix, **K** or the load vector **f** need not be stored here. Hot variables is the displacement vector, the reaction force vector and the element forces. The following code shows how this might look like:
-
-    class Solver(object):
-
-        ...
-            
-        def execute(self):
+class ModelParams:
+    """Klass för att definiera indata för vår modell."""
+    def __init__(self):
         
-            # --- Överför modell variabler till lokala referenser
-            
+        self.version = 1
+        
+        self.t = 1
+        self.ep = [self.t]
+
+        # --- Elementegenskaper
+        
+        ...
+        
+        # --- Skapa indata för testexempel
+        
+        self.coord = np.array([
+            [0.0, 0.0],
+            [0.0, 0.12],
             ...
+            [0.24, 0.12]
+        ])
 
-            ... Beräkningskod ...
+        # --- Elementtopolgi
             
-            # --- Överför modell variabler till lokala referenser
-
-            self.output_data.a = a
-            self.output_data.r = r
-            self.output_data.ed = ed
-            self.output_data.qs = qs
-            self.output_data.qt = qt
-            
-## The class Report
-
-When beräkingen is completed, a report of input data and results generated, this is done by the class ** Report **. The class will have the same input data ** ** solver.
-
-For the generation of the report, we will use Python's built-in method ** __ str __ () **. This method is used to implement what should happen when using print ** (...) ** on an instance of the class or the function str ** (...) ** is used to convert the class content to a string .
-
-For this to work, we need two additional methods and a string variable. The string variable we will fill with the text description of the class. The extra methods used to clean and fill the string of content. The following code shows the implementation of ** Report ** class:
-
-    class Report(object):
-        """Klass för presentation av indata och utdata i rapportform."""
-        def __init__(self, input_data, output_data):
-            self.input_data = input_data
-            self.output_data = output_data
-            self.report = ""
-            
-        def clear(self):
-            self.report = ""
-            
-        def addText(self, text=""):
-            self.report+=str(text)+"\n"
-                    
-        def __str__(self):
-            self.clear()
-            self.addText()
-            self.addText("-------------- Model input ----------------------------------")
+        self.edof = np.array([
+            [...],
             ...
-            self.addText("Coordinates:")
-            self.addText()
-            self.addText(self.input_data.coord)
-            ...
-            return self.report
+            [...]
+        ])
+
+        # --- Laster
+
+        self.loads = [
+            [5, 6.0],
+            [6, 6.0]
+        ]
+
+        # --- Randvillkor
+
+        self.bcs = [
+            [1, -15.0],
+            [2, -15.0]
+        ]
+```
+
+!!! note "Important"
+
+    All ** ... ** indicates that the code must be added.
+
+## The ModelResult-class
+
+**ModelResult**-class to be used to store the results generated during the calculation. Because Python is a dynamic language that can calculate the class itself and add to the result variables in the result object, but it's always good to create empty variables in the class so that it can function independently. An example of the **ModelResult** class is shown in the following code:
+
+``` py
+class ModelResult:
+    """Klass för att lagra resultaten från beräkningen."""
+    def __init__(self):
+        self.a = None
+        self.r = None
+        self.ed = None
+        self.qs = None
+        self.qt = None
+``` 
+
+!!! note "Good to know"
+
+    ** None ** can be used as a generic data type that can be used to create variables without content. It is also possible to test if a variable is assigned by an if statement:
+
+        if self.a == None:
+            self.a = np.array(...) # Tilldela en riktigt datatyp om self.a == None 
+    
+## The ModelSolver-class
+
+The class **ModelpSolver** is responsible for performing the actual calculation. The class will have a kontruktor, __init__(...) and a method execute() to perform the actual calculation. Constructor must have two input parameters, **model_params** and **model_result**, which are instances of the classes **ModelParams** and **ModelResult**. The constructor will look like the following:
+
+``` py
+class Solver:
+    """Klass för att hantera lösningen av vår beräkningsmodell."""
+    def __init__(self, model_params, model_result):
+        self.model_params = model_params
+        self.model_result = model_result
+```
+
+The input parameters are assigned two class variables, **self.model_params** ** and **self.model_result**.
+
+The calculation to be performed in the execute (...). The method retrieves input from **self.model_params** to set up and perform finite element calculations just like a regular Calfem programs. To simplify management of input variables can be local references to the input data is created according to the following code:    class Solver:
+
+``` py
+    ...
+        
+    def execute(self):
+        
+        # --- Överför modell variabler till lokala referenser
+        
+        edof = self.model_params.edof
+        cond = self.model_params.cond
+        coord = self.model_params.coord
+        dof = self.model_params.dof
+        ep = self.model_params.ep
+        loads = self.model_params.loads
+        bcs = self.model_params.bcs       
+```
+
+Because Python handles all the variables that references it is no disadvantage to make these assignments. No copies of the data will be made. The variables need not be copied back to **self.model_params** then the local variables pointing to the same memory contents.
+
+After the calculation is completed, the **self.model_result** is assigned the result of the calculation. The global stiffness matrix, **K** or the load vector **f** need not be stored here. Hot variables is the displacement vector, the reaction force vector and the element forces. The following code shows how this might look like:
+
+``` py
+class Solver:
+
+    ...
+        
+    def execute(self):
+    
+        # --- Överför modell variabler till lokala referenser
+        
+        ...
+
+        ... Beräkningskod ...
+        
+        # --- Överför modell variabler till lokala referenser
+
+        self.model_result.a = a
+        self.model_result.r = r
+        self.model_result.ed = ed
+        self.model_result.qs = qs
+        self.model_result.qt = qt
+```
+            
+## The ModelReport-class
+
+When the calculation has been completed, a report of input parameters and results is generated, this is done by the **ModelReport**-class. The class will have the same input parameters as the **ModelSolver**-class.
+
+For the generation of the report, we will use Python's built-in method ** __ str __ () **. This method is used to implement what should happen when using print ** (...) ** on an instance of the class or the function str ** (...) ** is used to convert the class content to a string.
+
+For this to work, we need two additional methods and a string variable. The string variable we will fill with the text description of the class. The extra methods are used to clean and fill the string with content. The following code shows the implementation of ** Report ** class:
+
+``` py
+class ModelReport:
+    """Klass för presentation av indata och utdata i rapportform."""
+    def __init__(self, model_params, model_result):
+        self.model_params = model_params
+        self.model_result = model_result
+        self.report = ""
+        
+    def clear(self):
+        self.report = ""
+        
+    def addText(self, text=""):
+        self.report+=str(text)+"\n"
+                
+    def __str__(self):
+        self.clear()
+        self.addText()
+        self.addText("-------------- Model input ----------------------------------")
+        ...
+        self.addText("Coordinates:")
+        self.addText()
+        self.addText(self.model_params.coord)
+        ...
+        return self.report
+```
+
                            
 ## Main program
 
-For the program to work, we need a main program. The following code shows how often do define a main program in Python:
+For the program to work, we need a main program. The following code shows how to implement a main program in Python:
 
-    # -*- coding: utf-8 -*-
+``` py
+# -*- coding: utf-8 -*-
 
-    if __name__ == "__main__":
-        print("Denna fil exekveras direkt och importeras inte.
+if __name__ == "__main__":
+    print("Denna fil exekveras direkt och importeras inte.")
+```
 
-If a Python file is imported with the import ** ** - the kit will variable ** __ name __ ** include the module name, ie the name of the source file. However, if you call the file directly with a Python interpreter is ** __ name __ ** contain the value ** __ main __ **. In this way you can ensure that only certain code is executed if the file is started directly with the Python interpreter and at the same time use the file as a module. This concept is often used in Python to create test functions for modules.
+If a Python file is imported with the **import** statement, the variable ** __ name __ ** will contain the module name, ie the name of the source file. However, if you call the file directly with a Python interpreter ** __ name__ ** will contain the value ** __ main __ **. In this way, you can ensure that only certain code is executed if the file is started directly with the Python interpreter and at the same time use the file as a module. This concept is often used in Python to create test functions for modules.
 
 A main program of our finite element program that uses all of our classes can then look like this:
 
-    # -*- coding: utf-8 -*-
+``` py
+# -*- coding: utf-8 -*-
 
-    import flowmodel as fm
+import flowmodel as fm
 
-    if __name__ == "__main__":
+if __name__ == "__main__":
+    
+    model_params = fm.ModelParams()
+    model_result = fm.ModelResult()
+
+    solver = fm.ModelSolver(model_params, model_result)
+    solver.execute()
+
+    report = fm.ModelReport(model_params, model_result)
+    print(report)
+```
         
-        input_data = fm.InputData()
-        output_data = fm.OutputData()
-
-        solver = fm.Solver(input_data, output_data)
-        solver.execute()
-
-        report = fm.Report(input_data, output_data)
-        print(report)
-        
-In the above main program, we import the module ** ** Flow model (flowmodel.py) that define our classes. We import the namespace ** sc **. We instantiates ** Input Data ** and ** ** Output Data Objects to manage input and output. A ** ** solver instance, the solver ** ** instantiated with the items, input data ** ** and ** ** output data as input. The calculation is then started by calling the methods we solver.execute ** () **. The program ends with that we create an instance of ** Report ** which we then print on the screen with a ** print () ** - kit.
+In the above main program, we import the module **flowmodel** (flowmodel.py) that defines our classes. We import the module as **fm**. We instantiates **fm.ModelParams** and **fm.ModelResult** objects to manage our input parameters and results. A **ModelSolver**-instance, the **fm.ModelSolver** is instantiated with the parameters, **model_params** and **model_results** as input. The calculation is then started by calling the methods **solver.execute()**. We end the program by creating a **fm.ModelReport** object which we display on the screen with the **print()** statement. 
 
 Example of a running program is shown below:
 
@@ -316,113 +341,131 @@ Example of a running program is shown below:
 
 An important part of a calculation program is being able to read and write input files. In most cases, the problems are so large that they can not be defined in the program code. In this program, we will use JSON (JavaScript Object Notation) as the format of the files we will write. The following code is an example of how a JSON file might look like.
 
-    {"employees":[
-        {"firstName":"John", "lastName":"Doe"},
-        {"firstName":"Anna", "lastName":"Smith"},
-        {"firstName":"Peter", "lastName":"Jones"}
-    ]}
+``` json
+{"employees":[
+    {"firstName":"John", "lastName":"Doe"},
+    {"firstName":"Anna", "lastName":"Smith"},
+    {"firstName":"Peter", "lastName":"Jones"}
+]}
+```
     
-The file is very similar to the syntax that Python uses dictionaries. What makes the format attractive is that we ourselves do not need to write it to the file without Python has a built-in library to read and write files of this type.
+The file is very similar to the syntax that Python uses dictionaries. What makes the format attractive is that we do not need to write it to the file ourselves as Python has a built-in library to read and write files of this type.
 
-To implement the functionality to read and write in our program, we conducted the following imports ** ** - set at the beginning of our module file:
+To implement the functionality to read and write JSON-files in our program, we add the following imports at the beginning of our module file:
 
-    # -*- coding: utf-8 -*-
+``` py hl_lines="5"
+# -*- coding: utf-8 -*-
 
-    import numpy as np
-    import calfem.core as cfc
-    import json # <--- Denna rad
+import numpy as np
+import calfem.core as cfc
+import json 
+```
+
+We start by implementing writing to a file as we have all input parameters required for this. We add a method **save()** in the **ModelParams**-class:
     
-We begin to implement writing to a file, because we have all the input data for this purpose. We add a method, save ** (...) ** of ** Input Data ** - class:
+``` py 
+class ModelParams:
+    """Klass för att definiera indata för vår modell."""
+    
+    ...
 
-    class InputData(object):
-        """Klass för att definiera indata för vår modell."""
+    def save(self, filename):
+        """Spara indata till fil."""
         
         ...
+```
 
-        def save(self, filename):
-            """Spara indata till fil."""
-            
-            ...
+To define the structure of that which is to be stored, but also to make it easy to read data, we will start from a dictionary as the base for what should be written and read to File. In the **save()**-method we add the following code to define a parameter dictionary:
 
-To define the structure of that which is to be stored, but also to make it easy to read data, we will start from a dictionary as a base for what should be written and read to File. The method ** save (...) ** we add the following code to define the backbone of our data structure:
-
-            inputData = {}
-            inputData["version"] = self.version
-            inputData["t"] = self.t
-            inputData["ep"] = self.ep
+``` py
+        model_params = {}
+        model_params["version"] = self.version
+        model_params["t"] = self.t
+        model_params["ep"] = self.ep
+```
                         
-** Input data ['version'] ** can be good to have to keep track of which version of the file format to use once you read the file back.
+The **model_params["version"]** entry is a good way of keeping track of the version of the file format that is written. This can later be used to read a different version of the file correctly.
 
-One problem we have to manage is the JSON module in Python can not handle numpy arrays. This is solved, however, simply because we convert our numpy arrays to lists. In the following code we convert the array self.coord ** ** to a list of method **. Tolist (...) **.
+One problem we need to handle is that the JSON module can't handle NumPy arrays. This is solved by converting our numpy arrays to lists. In the following code, we convert the array **self.coord** to a list using the **.tolist()** method in NumPy.
 
-            inputData["coord"] = self.coord.tolist()
+``` py
+        model_params["coord"] = self.coord.tolist()
+```
             
-When the input data ** ** is defined, we can open a file for writing and then printing may JSON file with the function json.dumps ** (...) **
+When the input parameters have been defined, we can open a file for writing and writing the dictionary to file using the **json.dumps(...)** function.
 
-            ofile = open(filename, "w")
-            json.dump(inputData, ofile, sort_keys = True, indent = 4)
-            ofile.close()
+``` py
+        ofile = open(filename, "w")
+        json.dump(model_params, ofile, sort_keys = True, indent = 4)
+        ofile.close()
+```
 
-** Sort_keys ** and ** ** indent ensures that the file is written nicely formatted.
+**sort_keys** and **indent** ensure that the file written is nicely formatted.
 
-To load an existing JSON file we do in reverse. We read the entire file into a string of characters which we then convert back to a dictionary function json.load ** (...) **
+To load an existing JSON file we do the proecdure in reverse. We read the entire file into a string of characters which we then convert back to a dictionary function using the **json.load(...)**-function.
+
+``` py
+    def load(self, filename):
+        """Läs indata från fil."""
+        
+        ifile = open(filename, "r")
+        model_params = json.load(ifile)
+        ifile.close()
+
+        self.version = model_params["version"]
+        self.t = model_params["t"]
+        self.ep = model_params["ep"]
+```
+
+The **self.coord**-array must now be converted back to a numpy array. This is done with the numpy function **np.asarray(...)**.
+
+``` py
+        self.coord = np.asarray(model_params["coord"])
+```
+        
+The complete **ModelParams** class with read and write functionality is shown below:
+
+``` py
+class ModelParams:
+    """Klass för att definiera indata för vår modell."""
+
+    def save(self, filename):
+        """Spara indata till fil."""
+
+        model_params = {}
+        model_params["version"] = self.version
+        model_params["t"] = self.t
+        model_params["ep"] = self.ep
+        ...
+        model_params["coord"] = self.coord.tolist()
+        ...
+
+        ofile = open(filename, "w")
+        json.dump(model_params, ofile, sort_keys = True, indent = 4)
+        ofile.close()
 
     def load(self, filename):
         """Läs indata från fil."""
         
         ifile = open(filename, "r")
-        inputData = json.load(ifile)
+        model_params = json.load(ifile)
         ifile.close()
 
-        self.version = inputData["version"]
-        self.t = inputData["t"]
-        self.ep = inputData["ep"]
-
-For our coord array must now convert this back to a numpy array. This is done with numpy function ** np.asarray (...) **
-
-        self.coord = np.asarray(inputData["coord"])
-        
-The complete writing and reading functions becomes:
-
-    class InputData(object):
-        """Klass för att definiera indata för vår modell."""
-
-        def save(self, filename):
-            """Spara indata till fil."""
-
-            inputData = {}
-            inputData["version"] = self.version
-            inputData["t"] = self.t
-            inputData["ep"] = self.ep
-            ...
-            inputData["coord"] = self.coord.tolist()
-            ...
-
-            ofile = open(filename, "w")
-            json.dump(inputData, ofile, sort_keys = True, indent = 4)
-            ofile.close()
-
-        def load(self, filename):
-            """Läs indata från fil."""
-            
-            ifile = open(filename, "r")
-            inputData = json.load(ifile)
-            ifile.close()
-
-            self.version = inputData["version"]
-            self.t = inputData["t"]
-            self.ep = inputData["ep"]
-            ...
-            self.coord = np.asarray(inputData["coord"])
-            ...
+        self.version = model_params["version"]
+        self.t = model_params["t"]
+        self.ep = model_params["ep"]
+        ...
+        self.coord = np.asarray(model_params["coord"])
+        ...
+```
 
 ## Submission and accounting
 
-It is to be done in this worksheet are:
+To complete the worksheet you must:
 
-  * Completing the implementation of the Data Input ** ** - class with all the required input to solve the chosen problem. Procedures to save and read from JSON files will also be implemented for all input variables.
-  * Completing the implementation of the solver ** ** - class with a finite element solver implemented with the methods that are described in Calfem.
-  * Completing the implementation of the ** Report ** - class with a complete transcript of the input and output variables with descriptive texts.
+  * Complete the implementation of the **ModelParams**-class with all the required input to solve the chosen problem. Procedures to save and read from JSON files will also be implemented for all input variables.
+  * Complete the implementation of the **ModelSolver**-class with a finite element solver implemented with the methods that are described in CALFEM.
+  * Complete the implementation of the **ModelReport**-class with a complete transcript of the input and output variables with descriptive texts.
 
 The submission shall consist of a zip file (or other archive format) consisting of:
 
