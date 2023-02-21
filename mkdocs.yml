@@ -17,7 +17,7 @@ nav:
   - Final hand-in: assignment6.md
 - Guides:
   - Creating tables with Tabulate: data_in_tables.md
-- Links: links.md
+- Links: links.md 
 
 theme: 
   name: material
