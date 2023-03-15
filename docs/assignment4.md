@@ -144,40 +144,44 @@ För att implementera det grafiska gränssnittet måste vi importera ett antal P
  * Er egen modul för ert problemområde. I detta exempel använder vi modulen **flowmodel**.
  
 Programmets import instruktioner blir då:
- 
-    # -*- coding: utf-8 -*-
 
-    import sys
+``` py 
+# -*- coding: utf-8 -*-
 
-    from PyQt5.QtCore import pyqtSlot, pyqtSignal, QThread
-    from PyQt5.QtWidgets import QApplication, QDialog, QWidget, QMainWindow, QFileDialog
-    from PyQt5.uic import loadUi
+import os, sys
 
-    import flowmodel as fm
-    
+from qtpy.QtCore import QThread
+from qtpy.QtWidgets import QApplication, QDialog, QWidget, QMainWindow, QFileDialog
+from qtpy import uic
+
+import flowmodel as fm
+``` 
+
 ### Huvudfönsterklass MainWindow
 
 Vårt huvudfönster implemeterar vi enklast i en egen klass **MainWindow**. Klassens uppgift är att ladda gränssnittsbeskrivningen och implementera de händelsemetoder som krävs för att programmet skall fungera. Det mest grundläggande är en **__init__**-metod som initierar klassen och läser beskrivningen samt visar fönstret på skärmen. Stommen för detta visas i följande exempel:
 
-    class MainWindow(QMainWindow):
-        """MainWindow-klass som hanterar vårt huvudfönster"""
+``` py
+class MainWindow(QMainWindow):
+    """MainWindow-klass som hanterar vårt huvudfönster"""
 
-        def __init__(self):
-            """Constructor"""
-            super(QMainWindow, self).__init__()
+    def __init__(self):
+        """Constructor"""
+        super(QMainWindow, self).__init__()
 
-            # --- Lagra en referens till applikationsinstansen i klassen
-            
-            self.app = app
-                        
-            # --- Läs in gränssnitt från fil
-            
-            self.ui = loadUi('mainwindow.ui', self)
-            
-            # --- Se till att visa fönstret
-            
-            self.ui.show()
-            self.ui.raise_()
+        # --- Lagra en referens till applikationsinstansen i klassen
+        
+        self.app = app
+                    
+        # --- Läs in gränssnitt från fil
+        
+        uic.loadUi('mainwindow.ui', self)
+        
+        # --- Se till att visa fönstret
+        
+        self.show()
+        self.raise_()
+```
             
 **self.ui** kommer att vara basen för vårt objektträd. Det är i denna variabel alla kontroller är definierade.            
             
@@ -187,20 +191,22 @@ Program som använder fönster har ofta ett annorlunda huvudprogram än t ex ber
 
 Vårt nya huvudprogram visas i nedanstående kod:
 
-    if __name__ == '__main__':
+``` py
+if __name__ == '__main__':
 
-        # --- Skapa applikationsinstans
+    # --- Skapa applikationsinstans
 
-        app = QApplication(sys.argv)
+    app = QApplication(sys.argv)
 
-        # --- Skapa och visa huvudfönster
+    # --- Skapa och visa huvudfönster
 
-        widget = MainWindow()
-        widget.show()
+    window = MainWindow()
+    window.show()
 
-        # --- Starta händelseloopen
+    # --- Starta händelseloopen
 
-        sys.exit(app.exec_())
+    sys.exit(app.exec_())
+```
 
 Metoden **app.exec_()** returnerar när alla programmets fönster har stängts. 
 
@@ -216,27 +222,31 @@ För att programmet skall kunna köra beräkningar, öppna och spara filer måst
 
 De första händelserna vi kopplar ihop är menyhändelserna. Menyhändelserna i ui-filen angavs med namn som **actionNew** och **actionOpen**. För att skapa en koppling lägger vi först till en metod som skall hantera själva händelsen:
 
-    class MainWindow:
-        ...
-        def onActionNew(self):
-            """Skapa en ny modell"""
-            print("onActionNew")
+``` py
+class MainWindow:
+    ...
+    def on_new_action(self):
+        """Skapa en ny modell"""
+        print("on_new_action")
+```
             
 Vi lämnar implementeringen av denna till användaren. Kopplingen av metoden gör vi nu i **__init__(...)**
 
-    class MainWindow:
-        ...
-        def __init__(self):
+``` py
+class MainWindow:
+    ...
+    def __init__(self):
 
-            ...
-            
-            # --- Läs in gränssnitt från fil
-            
-            self.ui = loadUi('mainwindow.ui', self)
-            
-            # --- Koppla kontroller till händelsemetoder
-            
-            self.ui.actionNew.triggered.connect(self.onActionNew)
+        ...
+        
+        # --- Läs in gränssnitt från fil
+        
+        uic.loadUi("mainwindow.ui", self)
+        
+        # --- Koppla kontroller till händelsemetoder
+        
+        self.new_action.triggered.connect(self.on_new_action)
+```
             
 För menyhändelser är det händelsen **triggered** som skall kopplas.            
 
@@ -244,50 +254,56 @@ För menyhändelser är det händelsen **triggered** som skall kopplas.
 
 För att koppla knappar är det händelsen **clicked** som skall kopplas. Följande kod visar ett exempel på detta:
 
-    class MainWindow:
-        ...
-        def __init__(self, app):
-        
-            ...
-            
-            # --- Koppla kontroller till händelsemetoder
-            
-            self.ui.actionNew.triggered.connect(self.onActionNew)
-            ...
-            self.ui.showGeometryButton.clicked.connect(self.onShowGeometry) # <---
-            
+``` py
+class MainWindow:
+    ...
+    def __init__(self, app):
+    
         ...
         
-        def onShowGeometry(self):
-            """Visa geometrifönster"""
-            
-            print("onShowGeometry")
+        # --- Koppla kontroller till händelsemetoder
+        
+        self.new_action.triggered.connect(self.on_new_action)
+        ...
+        self.show_geometry_button.clicked.connect(self.on_show_geometry) # <---
+        
+    ...
+    
+    def on_show_geometry(self):
+        """Visa geometrifönster"""
+        
+        print("on_show_geometry")
+```
 
 ## Integrering av beräkningsmodul
 
-I det förra arbetsbladet skapade vi våra **InputData**-, **OutputData**- och **Solver**-objekt i vårt huvudprogram. I det modifierade programmet är det **MainWindow** som häger alla referenser till dessa objekt. För att hantera modellen och uppdatera kontrollerna implementeras lämpligen följande metoder:
+I det förra arbetsbladet skapade vi våra **ModelParams**-, **ModelResults**- och **ModelSolver**-objekt i vårt huvudprogram. I det modifierade programmet är det **MainWindow** som häger alla referenser till dessa objekt. För att hantera modellen och uppdatera kontrollerna implementeras lämpligen följande metoder:
 
- * **initModel(...)** - Skapar de nödvändiga objekten som behövs för indata, utdata och lösning av problemet. Sätter också standardvärden på de ingående parametrarna i modellen.
- * **updateControls(...)** - Tar värden från ett **InputData**-objekt och tilldelar kontrollerna dessa värden.
- * **updateModel(...)** - Läser av angivna värden i kontrollerna och tilldelar dessa till **InputData**-objektet.
+ * **init_model(...)** - Skapar de nödvändiga objekten som behövs för indata, utdata och lösning av problemet. Sätter också standardvärden på de ingående parametrarna i modellen.
+ * **update_controls(...)** - Tar värden från ett **ModelParams**-objekt och tilldelar kontrollerna dessa värden.
+ * **update_model(...)** - Läser av angivna värden i kontrollerna och tilldelar dessa till **ModelParams**-objektet.
  
 För att tilldela värden till kontroller används metoden **setText(...)** på textkontrollerna. Ett exempel på hur detta görs visas i följande kod:
 
-    def updateControls(self):
-        """Fyll kontrollerna med värden från modellen"""
-        
-        self.ui.wEdit.setText(str(self.inputData.w))
-        ...
+``` py
+def update_controls(self):
+    """Fyll kontrollerna med värden från modellen"""
+    
+    self.w_edit.setText(str(self.model_params.w))
+    ...
+```
 
 > Tänk på att **self.inputData** lagrar värden av typen **float** och alltså måste konverteras till teckensträngar innan **setText(...)** anropas. Detta görs i ovanstående exempel med metoden **str(...)**
 
 För att hämta värden från kontrollerna används metoden **text()** på textkontrollen. Ett exempel på hur detta kan implementeras visas i följande kod:
 
-    def updateModel(self):
-        """Hämta värden från kontroller och uppdatera modellen"""
-        
-        self.inputData.w = float(self.ui.wEdit.text())
-        ...
+``` py
+def update_model(self):
+    """Hämta värden från kontroller och uppdatera modellen"""
+    
+    self.model_params.w = float(self.w_edit.text())
+    ...
+```
         
 > Vi har den omvända problematiken här, dvs vi måste konvertera från teckensträng från kontrollen till ett **float**-värde genom att använda funktionen **float(...)**.    
 
@@ -299,14 +315,17 @@ Beräkningsmodellen som implementerades i arbetsblad 2 och 3 innehåller metoder
 
 För att öppna en redan existerande fil från disk, måste vi först fråga användaren om vilken fil som skall öppnas. Detta kan göras med funktionen **QFileDialog.getOpenFileName(...)**. Funktionen visar en stanadard fildialogruta där användaren kan välja en existerande fil. Hur den används visas i följande exempel:
 
-    def onActionOpen(self):
+``` py
+    def on_open_action(self):
         """Öppna in indata fil"""
         
-        self.filename, _ = QFileDialog.getOpenFileName(self.ui, 
+        self.filename, _ = QFileDialog.getOpenFileName(self, 
             "Öppna modell", "", "Modell filer (*.json *.jpg *.bmp)")
         
         if self.filename!="":
             ...
+```
+
 Om användaren avbrutit valet av filnamn returneras en tom sträng. Det är alltid bra att alltid använda en if-sats för att kontrollera att en fil verkligen valts.
 
 Rutinen **load(...)** kan sedan användas för att läsa in modellen från disk med det angivna filnamnet.
@@ -315,17 +334,19 @@ Rutinen **load(...)** kan sedan användas för att läsa in modellen från disk 
 
 Om användaren vill spara en modell till disk, måste vi på samma sätt först fråga användaren om en plats och ett filnamn. För detta ändamål använder vi istället funktionen **QtGui.QFileDialog.getSaveFileName(...)**. Denna funktion visar en standard fildialogruta som frågar om ett filnamn och en katalog där filen skall sparas. Följande kod visar hur detta sker i metoden **actionSave**:
 
-    def onActionSave(self):
-        """Spara modell"""
-        
-        self.updateModel()
-        
-        if self.filename == "":
-            self.filename, _  = QFileDialog.getSaveFileName(self.ui, 
-                "Spara modell", "", "Modell filer (*.json)")
-        
-        if self.filename!="":
-            ... 
+``` py
+def on_save_action(self):
+    """Spara modell"""
+    
+    self.update_model()
+    
+    if self.filename == "":
+        self.filename, _  = QFileDialog.getSaveFileName(self, 
+            "Spara modell", "", "Modell filer (*.json)")
+    
+    if self.filename!="":
+        ... 
+```
             
 ## Exekvera beräkningsmodellen
 
@@ -337,133 +358,146 @@ Problemet med att använda trådar är att vi måste synkronisera exekveringen a
 
 För att implementera vår beräkning i en tråd måste vi först skapa en speciell trådklass för vår beräkning. Lägg till följande kod längst upp i modulen:
 
-    # -*- coding: utf-8 -*-
+``` py
+# -*- coding: utf-8 -*-
 
-    from PyQt5.QtCore import pyqtSlot, pyqtSignal, QThread
-    from PyQt5.QtWidgets import QApplication, QDialog, QWidget, QMainWindow, QFileDialog
-    from PyQt5.uic import loadUi
+import os, sys
 
-    import calfem.ui as cfui
-    import flowmodel as fm
+from qtpy.QtCore import QThread
+from qtpy.QtWidgets import QApplication, QDialog, QWidget, QMainWindow, QFileDialog
+from qtpy import uic
 
-    class SolverThread(QThread):
-        """Klass för att hantera beräkning i bakgrunden"""
+import flowmodel as fm
+
+class SolverThread(QThread):
+    """Klass för att hantera beräkning i bakgrunden"""
+    
+    def __init__(self, solver, param_study = False):
+        """Klasskonstruktor"""
+        QThread.__init__(self)
+        self.solver = solver
         
-        def __init__(self, solver, paramStudy = False):
-            """Klasskonstruktor"""
-            QThread.__init__(self)
-            self.solver = solver
-            
-        def __del__(self):
-            self.wait()
-            
-        def run(self):
-            ...
-
-    class MainWindow:
+    def __del__(self):
+        self.wait()
+        
+    def run(self):
         ...
-        
+
+class MainWindow:
+    ...
+```
+
 Under metoden **run(...)** skall läggs själva anropet till att starta beräkningen in.  
 
 För att starta beräkningen när man väljer **Calc/Execute** i menyn kan händelsemetoden se ut på följande sätt:
 
-    class MainWindow:
-        ...
-        def onActionExecute(self):
-            """Kör beräkningen"""
-            
-            # --- Avaktivera gränssnitt under beräkningen.        
-            
-            self.ui.setEnabled(False)
-            
-            # --- Uppdatera värden från kontroller
-            
-            self.updateModel()
-            
-            # --- Skapa en lösare
-            
-            self.solver = fm.Solver(self.inputData, self.outputData)
-            
-            # --- Starta en tråd för att köra beräkningen, så att 
-            #     gränssnittet inte fryser.
-            
-            self.solverThread = SolverThread(self.solver)        
-            self.solverThread.start()
+``` py
+class MainWindow:
+    ...
+    def on_execute_action(self):
+        """Kör beräkningen"""
+        
+        # --- Avaktivera gränssnitt under beräkningen.        
+        
+        self.setEnabled(False)
+        
+        # --- Uppdatera värden från kontroller
+        
+        self.update_model()
+        
+        # --- Skapa en lösare
+        
+        self.solver = fm.ModelSolver(self.model_params, self.model_results)
+        
+        # --- Starta en tråd för att köra beräkningen, så att 
+        #     gränssnittet inte fryser.
+        
+        self.solver_thread = SolverThread(self.solver)        
+        self.solver_thread.start()
+```
       
 Denna metod kommer då att starta lösaren som en separat tråd som inte påverkar händelseloopen. 
 
-För att veta när beräkningstråden avslutas måste koppla en metod till händelse **finished** på vår trådklass. Vi skapar först metoden **onSolverFinished(...)**:
+För att veta när beräkningstråden avslutas måste koppla en metod till händelse **finished** på vår trådklass. Vi skapar först metoden **on_solver_finished(...)**:
 
-    class MainWindow:
+``` py
+class MainWindow:
+    ...
+    def on_solver_finished(self):
+        """Anropas när beräkningstråden avslutas"""
+        
+        # --- Aktivera gränssnitt igen        
+        
+        self.setEnabled(True)
+        
+        # --- Generera resulatrapport.        
+
         ...
-        def onSolverFinished(self):
-            """Anropas när beräkningstråden avslutas"""
-            
-            # --- Aktivera gränssnitt igen        
-            
-            self.ui.setEnabled(True)
-            
-            # --- Generera resulatrapport.        
-
-            ...
+```
             
 Metoden kopplas sedan till trådobjektet med **connect(...)** ungefär på samma sätt som för kontrollerna:
 
-    class MainWindow:
+``` py
+class MainWindow:
+    ...
+    def on_execute_action(self):
+    
         ...
-        def onActionExecute(self):
-        
-            ...
+                    
+        self.solver_thread = SolverThread(self.solver)
+        self.solver_thread.finished.connect(self.on_solver_finished)   
+        self.solver_thread.start()
+```
                         
-            self.solverThread = SolverThread(self.solver)
-            self.solverThread.finished.connect(self.onSolverFinished)   
-            self.solverThread.start()
-                        
-När beräkningen avslutas kommer trådobjektet att automatiskt anropa metoden **self.onSolverFinished**.
+När beräkningen avslutas kommer trådobjektet att automatiskt anropa metoden **self.on_solver_finished**.
 
-## Uppdatering av **Visualisation**-klassen
+## Uppdatering av **ModelVisualisation**-klassen
 
-I det tidigare arbetsbladet 3 implementerade visualiseringen i klassen **Visualisation**. Vi kommer nu att utöka klassen med metoder för att selektivt anropa de olika visualiseringsvarianterna och kopplas dessa till händelsemetoder i vår **MainWindow**-klass.
+I det tidigare arbetsbladet 3 implementerade visualiseringen i klassen **ModelVisualisation**. Vi kommer nu att utöka klassen med metoder för att selektivt anropa de olika visualiseringsvarianterna och kopplas dessa till händelsemetoder i vår **MainWindow**-klass.
 
 För att få lite bättre kontroll över de visualiseringsfönster som skall visas implemeteras en metod för varje visualiseringstyp. T ex:
 
- * **showGeometry()** - Visar geometridefinitionen för problemet.
- * **showMesh()** - Visar beräkningsnätet som genererats med GMSH.
- * **showNodalValues()** - Visar beräknade nodvärden.
- * **showElementValues()** - Visar beräknade elementvärden.
+ * **show_geometry()** - Visar geometridefinitionen för problemet.
+ * **show_mesh()** - Visar beräkningsnätet som genererats med GMSH.
+ * **show_nodal_values()** - Visar beräknade nodvärden.
+ * **show_element_values()** - Visar beräknade elementvärden.
  
 För att visualiseringsklassen skall kunna hålla reda på vilka fönster som är öppna skapas 4 klassvariabler som skall lagra referenser till de visade figurerna.
 
-    class Visualisation(object):
-        """Klass för visualisering av resulat"""
+``` py
+class ModelVisualisation(object):
+    """Klass för visualisering av resulat"""
 
-        def __init__(self, inputData, outputData):
-            """Konstruktor"""
-            
-            self.inputData = inputData
-            self.outputData = outputData
-            
-            # --- Variabler som lagrar referenser till öppnade figurer
-            
-            self.geomFig = None
-            self.meshFig = None
-            self.elValueFig = None
-            self.nodeValueFig = None
+    def __init__(self, model_params, model_results):
+        """Konstruktor"""
+        
+        self.model_params = model_params
+        self.model_results = model_results
+        
+        # --- Variabler som lagrar referenser till öppnade figurer
+        
+        self.geom_fig = None
+        self.mesh_fig = None
+        self.el_value_fig = None
+        self.node_value_fig = None
+```
             
 Vi sätter variablerna till **None** så att vi kan särskilja dem från tilldelade variabler.
 
 Ett exempel på hur detta kan användas visas i följande metod:
 
-    class Visualisation(object):
-        ...
-        def showGeometry(self):
-            """Visa geometri visualisering"""
-            
-            geometry = self.outputData.geometry
-            
-            self.geomFig = cfv.figure(self.geomFig)
-            cfv.clf()            
-            cfv.drawGeometry(geometry, title="Geometry")
+``` py
+class ModelVisualisation(object):
+    ...
+    def show_geometry(self):
+        """Visa geometri visualisering"""
+        
+        geometry = self.model_results.geometry
+        
+        self.geom_fig = cfv.figure(self.geom_fig)
+        cfv.clf()            
+        cfv.draw_geometry(geometry, title="Geometry")
+```
 
 Funktionen **cfv.figure(...)** tar en existerande figurreferens som indata. Beroende på om den är tilldelad eller inte skapas returneras den existerande eller så skapas automatiskt en ny figur. **clf()** rensar innehållet i figurfönstret. 
 
