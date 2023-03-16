@@ -1,56 +1,58 @@
 # Program for Technical Applications - Worksheet 4
 
- ** Remember: ** When ** ... ** appears in the program examples, this indicates that there is no code that you yourself have to add. Variables and data structures are just examples. Depending on the type of problem you may need other data structures than those described in the code examples.
+!!! note "Please note"
+
+    When ... appears in the program examples, this indicates that there is code that you have to provide yourself. Variables and data structures are just examples. Depending on the type of problem you may need other data structures than those described in the code examples.
 
 ## General
 
 This worksheet contains the following tasks:
 
-  1. Create interface in Qt Designer.
-  1. Create a master program and class for graphical interfaces.
-  1. Create a thread class to handle calculations in the background.
-  1. Update the visualization class to display single windows, and to close all opened windows.
+  1. Implement an interface in Qt Designer.
+  1. Implement a main program and class for graphical interfaces.
+  1. Implement a thread class to handle calculations in the background.
+  1. Update the **ModelVisualisation**-class to display in a single window, and close all opened windows.
  
 ## Graphical User Interface in Qt Designer
  
-The graphical interface is created in the Qt Designer software. This program creates a description of the interface in XML that will be read by our program.
+The graphical interface is implemented in the Qt Designer application. This program creates a description of the interface in XML (.ui) that will be read by our application to create the user interface controls.
 
-Qt Designer can be started directly from Spyder by clicking ** Tools / External tools / Qt Designer ** in the menu. The program looks like in the following figure:
+Qt Designer can be started directly from Spyder by clicking **Tools / External tools / Qt Designer** in the menu or by typing **designer** in the Anaconda prompt. The application is shown in the following figure:
 
 ![qt_designer_1](images/qt_designer1.png)
 
-When the program is started, a dialog box appears to select the type of form to be created. For our main window, select ** Main Window ** and click ** Create **.
+When the program is started, a dialog box appears asking for the type of form to be created. For our application, select **Main Window** and click **Create**.
 
-At the bottom of the window there is now a window with the name ** MainWindow - untitled ** as shown below:
+At the bottom of the window, there is now a window with the name **MainWindow - untitled** as shown below:
 
 ![qt_designer_1](images/qt_designer2.png)
 
 Qt Designer is divided into 5 main views:
 
-  * ** Widget Box ** on the left of the window shows all available controls we can use to design the interface.
-  * ** Design Area ** The center of the window is used to select and edit the created controls.
-  * ** Object Inspector ** displays a hierarchical tree of all controls in the project. This tree also corresponds to the object structure that will be created when the description is loaded into the Python code.
-  * ** Property Editor ** shows the properties of a selected control in the interface. Here, the appearance and other features of the controls can be controlled.
-  * ** Signal / Slot Editor ** Handles how the controls are purely incidentally linked. In this task, we will not use this, as this connection will be made in our Python Code.
+ * The widget** Box** on the left of the window shows all available controls we can use to implement the interface.
+ * **Design Area** The center of the window is used to select and edit the created controls.
+ * **Object Inspector** displays a hierarchical tree of all controls in the application. This tree also corresponds to the object structure that will be created when the description is loaded from Python.
+ * **Property Editor** shows the properties of a selected control in the interface. Here, the appearance and other properties of the controls can be set.
+ * **Signal / Slot Editor** Handles how the controls are connected. In this worksheet, we will not use this, as these connections will done by our own code.
 
 ### Main menu
 
 The first thing to do is create a menu bar for our program. In the menu bar we add features like:
 
-  1. Create New Model - ** File / New **
-  1. Open Existing Model - ** File / Open **
-  1. Save Model - ** File / Save **
-  1. Save the model with another file name - ** File / Save as ... **
-  1. Exit Program - ** File / Exit **
-  1. Start a calculation - ** Calc / Execute **
+  1. Create New Model - **File / New**
+  1. Open Existing Model - **File / Open**
+  1. Save Model - **File / Save**
+  1. Save the model with another file name - **File / Save as ...**
+  1. Exit Program - **File / Exit**
+  1. Start a calculation - **Calc / Execute**
  
-Menus are created by clicking ** Type here ** in the main window and enter the name of the main menu. The following example defines the main menu ** File **.
+Menus are created by clicking **Type here** in the main window and entering the name of the main menu. The following example defines the main menu ** File **.
  
 ![qt_designer_1](images/qt_designer3.png)
 
 ![qt_designer_1](images/qt_designer4.png)
 
-A submenu for a main menu will be created, Qt Designer will automatically create a so-called. Action. These are displayed in ** Action Editor ** at the bottom right of the window.
+A submenu for a main menu will be created, Qt Designer will automatically create a so-called. Action. These are displayed in **Action Editor** at the bottom right of the window.
 
 ![qt_designer_1](images/qt_designer5.png)
 
@@ -64,34 +66,38 @@ Complete the entire menu according to the previous list of menu functions.
 
 ### Input controls
 
-In order to edit our model, we need to create controls for this in Qt Designer. The controls can use are ** QLineEdit ** and ** QLabel **. QLineEdit is used to enter values in text boxes on the screen. QLabel we use to describe what the text boxes describe for parameter.
+In order to edit our model, we need to create controls for this in Qt Designer. The controls can use are **QLineEdit** and **QLabel**. **QLineEdit** is used to enter values in text boxes in the window. **QLabel** we use to give descriptive information on the different controls.
 
-Controls are created by dragging the control from ** Widget Box ** and releasing them on the form window. The following image shows a number of controls created in this way with associated object names.
+Controls are created by dragging them from the **Widget Box** and releasing them on the form window. The following image shows a number of controls created in this way with associated object names.
 
 ![qt_designer_1](images/qt_designer7.png)
 
 ![qt_designer_1](images/qt_designer8.png)
 
-The text for ** QLabel ** controls is changed by selecting the control and changing the ** text ** property in ** Property Editor ** as follows:
+The text for **QLabel** controls is changed by selecting the control and changing the **text** property in **Property Editor** as follows:
 
 ![qt_designer_1](images/qt_designer9.png)
 
+!!! note "Tip"
+
+    A good way of naming controls in Qt Designer is to give them a suffix that describes what kind of control it is. For example, a **QLineEdit**-control for the model variable **b** can be given the name **b_edit**. A corresponding **QLabel**-control for the variable could be given the name **b_label**. 
+
 ### Buttons for visualisation
 
-To view the visualizations, we also need a number of buttons for this. Create the following buttons (** QPushButton **) to the right of the previous controls (Do not worry about exact location.) Approximate location.):
+To view the visualizations, we also need a set of buttons for this purpose. Create the following buttons (**QPushButton**) to the right of the previous controls (Do not worry about the exact location.):
 
-  * text: ** Geometry ** - name: ** showGeometryButton **
-  * text: ** Mesh ** - Name: ** showMeshButton **
-  * text: ** Nodal values ** - name: ** showNodalValuesButton **
-  * text: ** Element values ** - name: ** showElementValuesButton **
+  * text: **Geometry** - name: ** show_geometry_button **
+  * text: **Mesh** - Name: ** show_mesh_button **
+  * text: **Nodal values** - name: ** show_nodal_values_button **
+  * text: **Element values** - name: ** show_element_values_button **
  
-The following figure shows approximate appearance:
+The following figure shows the approximate appearance:
  
 ![qt_designer_1](images/qt_designer10.png)
 
 ### Text browser for the report output
 
-To view the report we will use a ** QPlainTextEdit ** control. This check can handle text consisting of multiple rows. Create such a check with the name ** reportEdit **.
+To view the report we will use a **QPlainTextEdit** control. This check can handle text consisting of multiple rows. Create such a check with the name** report_edit**.
 
 The finished window should now look like in the following figure:
 
@@ -99,7 +105,7 @@ The finished window should now look like in the following figure:
 
 ### Organizing controls
 
-Until now, we have placed the controls approximately. To ensure that the controls are placed in a more proper and scalable way, we will use the grid layout and row layout tool.
+Until now, we have placed the controls at approximate locations. To ensure that the controls are placed in a more proper and scalable way, we will use the grid layout and row layout tools.
 
 First, we create a grid layout of labels, text boxes and buttons. Select these controls in Qt Designer:
 
@@ -117,364 +123,404 @@ It is a little crowded between the text boxes and the buttons. Insert a "Horizon
 
 ![qt_designer_1](images/qt_designer15.png)
 
-To position the controls to fill out the entire window, select the main window and press ** Layout vertically **.
+To position the controls to fill out the entire window, select the main window and press **Layout vertically**.
 
 ![qt_designer_1](images/qt_designer16.png)
 
-The main window should now look like in the following image:
+The main window should now look like the following figure:
 
 ![qt_designer_1](images/qt_designer17.png)
 
-The object structure should have the following structure and naming (However, it must be adapted to the problem area and own ideas).
+The object structure should have approximately the following structure and naming (However, it must be adapted to the problem area and own ideas).
 
 ![qt_designer_1](images/qt_designer18.png)
 
-We now have a complete description of the graphical interface. Save the file as "mainwindow.ui".
+We now have a complete description of the graphical interface. Save the file as **mainwindow.ui**.
 
-## Huvudprogram och klass för huvudfönster
+## Main program and window class
 
 In order for the program to show our interface, the main application must be modified. Simply, if you create a new Python file, start from the beginning.
 
-### Moduler som behöver importeras
+### Required modules
 
-To implement the graphical interface, we must import a number of Python modules.
+To implement the graphical interface, we must import several Python modules.
 
-  * PyQT modules ** QtGui ** and ** QtCore **. These are used to create the boundary.
-  * CALFEM modules ** calfem.ui **. This contains some special code to integrate our visualization routines and PyQt.
-  * Is your own module for your problem area. In this example, we use the ** flow model ** module.
+  * PyQt modules **QtGui** and **QtCore**. These are used to create the boundary.
+  * CALFEM modules **calfem.ui**. This contains some special code to integrate our visualization routines and PyQt.
+  * Your module for your problem. In this example, we use the **flowmodel** module.
  
 The program's import instructions will then be:
  
-    # -*- coding: utf-8 -*-
+``` py
+# -*- coding: utf-8 -*-
 
-    import sys
+import sys
 
-    from PyQt5.QtCore import pyqtSlot, pyqtSignal, QThread
-    from PyQt5.QtWidgets import QApplication, QDialog, QWidget, QMainWindow, QFileDialog
-    from PyQt5.uic import loadUi
+from qtpy.QtCore import pyqtSlot, pyqtSignal, QThread
+from qtpy.QtWidgets import QApplication, QDialog, QWidget, QMainWindow, QFileDialog
+from qtpy.uic import loadUi
 
-    import flowmodel as fm
-    
+import flowmodel as fm
+```
+
+!!! note "Why qtpy and not PyQt?"
+
+    The reason for using the strange module **qtpy** instead of PyQt is to make the code less dependent on a specific Python Qt-binding. The **qtpy**-module hides this for us and we can use the **PyQt**, **PySide** or **Qt for Python** bindings transparently. 
+
 ### Main window class
 
-Our main window is most easily implemented in a separate class ** MainWindow **. The task of the class is to load the interface description and implement the event methods required for the program to work. The most basic is a ** __ init __ ** method that initiates the class and reads the description as well as displays the window on the screen. The basis for this is shown in the following example:
+Our main window is best implemented in a separate class **MainWindow**. The responsibility of this class is to load the interface description and implement the event methods required for the program to work. The most important is an **__init__** method that initializes the class and reads the ui-description as well as shows the window on the screen. The basis for this is shown in the following example:
 
-    class MainWindow(QMainWindow):
-        """MainWindow-klass som hanterar vårt huvudfönster"""
+``` py
+class MainWindow(QMainWindow):
+    """MainWindow-klass som hanterar vårt huvudfönster"""
 
-        def __init__(self):
-            """Constructor"""
-            super(QMainWindow, self).__init__()
+    def __init__(self):
+        """Constructor"""
+        super(QMainWindow, self).__init__()
 
-            # --- Lagra en referens till applikationsinstansen i klassen
-            
-            self.app = app
-                        
-            # --- Läs in gränssnitt från fil
-            
-            self.ui = loadUi('mainwindow.ui', self)
-            
-            # --- Se till att visa fönstret
-            
-            self.ui.show()
-            self.ui.raise_()
-            
-** self.ui ** will be the base of our object tree. It is in this variable all controls are defined.         
+        # --- Store a reference to the application class
+        
+        self.app = app
+                    
+        # --- Load user interface description
+        
+        uic.loadUi('mainwindow.ui', self)
+        
+        # --- Show the window
+        
+        self.ui.show()
+        self.ui.raise_()
+```
+
+The **uic.loadUi()**-method loads and creates the objects in the ui-file directly in the class. For example, an object, **a_text**, in the ui-file can be accessed directly in the main instance as the class attribute **self.a_text**.         
             
 ### A new main program
 
-Programs that use windows often have a different main program than, for example, calculation programs. A window-based application often uses a so-called Event loop that awaits events from the operating system. The events send the loop to the underlying classes which then handle them.
+Window-based programs often have a different main program than computational codes. Window-based applications often use an event loop that listens for events from the operating system. The events are sent from the loop to the underlying classes which then handle them.
 
 Our new main program is shown in the following code:
 
-    if __name__ == '__main__':
+``` py
+if __name__ == '__main__':
 
-        # --- Skapa applikationsinstans
+    # --- Skapa applikationsinstans
 
-        app = QApplication(sys.argv)
+    app = QApplication(sys.argv)
 
-        # --- Skapa och visa huvudfönster
+    # --- Skapa och visa huvudfönster
 
-        widget = MainWindow()
-        widget.show()
+    widget = MainWindow()
+    widget.show()
 
-        # --- Starta händelseloopen
+    # --- Starta händelseloopen
 
-        sys.exit(app.exec_())
+    sys.exit(app.exec_())
+```
 
-Metoden **app.exec_()** returnerar när alla programmets fönster har stängts. 
+The **app.exec_()**-method returns when all the application windows have been closed. 
 
-The program we created now has all the code required to display our graphical interface on the screen. Under Windows, the interface may look like the following image when the program code is running:
+The program we created now has all the code required to display our user  interface on the screen. Under Windows, the interface may look like the following image when the program code is running:
 
 ![qt_designer_1](images/qt_designer19.png)
 
 ## Connecting methods to events
 
-In order for the program to run calculations, open and save files, we must link events from controls to methods in the ** MainWindow ** class. Linking events for checks to methods is done using the **. Connect (...) ** method that is defined for all events a control can handle.
+For the program to run calculations, open and save files, events must be linked from controls to methods in the **MainWindow** class. Connecting events to methods is done using the **.connect(...)**-method that is defined for all events provided by a control.
 
 ### Connecting menu events
 
-The first events we associate are menu events. The menu events in the ui file were named with ** actionNew ** and ** actionOpen **. To create a link, we first add a method to handle the event itself:
+The first events we need to connect are from the menu. The menu-action in the ui-file are named **new_action** and **open_action**. To create a connection, we first add a method to handle the event itself:
 
-    class MainWindow:
-        ...
-        def onActionNew(self):
-            """Skapa en ny modell"""
-            print("onActionNew")
+``` py
+class MainWindow:
+    ...
+    def on_new_action(self):
+        """Skapa en ny modell"""
+        print("on_new_action")
+```
             
-We leave the implementation of this to the user. The coupling of the method we now do in ** __ init __ (...) **
+We leave the implementation of this to the user. The coupling of the method we now do in **__init__(...)**
 
-    class MainWindow:
-        ...
-        def __init__(self):
+``` py
+class MainWindow:
+    ...
+    def __init__(self):
 
-            ...
-            
-            # --- Läs in gränssnitt från fil
-            
-            self.ui = loadUi('mainwindow.ui', self)
-            
-            # --- Koppla kontroller till händelsemetoder
-            
-            self.ui.actionNew.triggered.connect(self.onActionNew)
-            
-For menu events, it is ** triggered ** to be connected.
-
-### Koppling av händelser för knappar
-
-To connect buttons, it is the ** clicked ** event to be connected. The following code shows an example of this:
-
-    class MainWindow:
-        ...
-        def __init__(self, app):
-        
-            ...
-            
-            # --- Koppla kontroller till händelsemetoder
-            
-            self.ui.actionNew.triggered.connect(self.onActionNew)
-            ...
-            self.ui.showGeometryButton.clicked.connect(self.onShowGeometry) # <---
-            
         ...
         
-        def onShowGeometry(self):
-            """Visa geometrifönster"""
+        # --- Läs in gränssnitt från fil
+        
+        uic.loadUi('mainwindow.ui', self)
+        
+        # --- Koppla kontroller till händelsemetoder
+        
+        self.new_action.triggered.connect(self.on_new_action)
+```
             
-            print("onShowGeometry")
+For menu-action, it is the **triggered** signal that need to be connected.
+
+### Connection signals from buttons
+
+To connect buttons, it is the **clicked** signal that needs to be connected. The following code shows an example of this:
+
+``` py
+class MainWindow:
+    ...
+    def __init__(self, app):
+    
+        ...
+        
+        # --- Koppla kontroller till händelsemetoder
+        
+        self.new_action.triggered.connect(self.on_new_action)
+        ...
+        self.show_geometry_button.clicked.connect(self.on_show_geometry) # <---
+        
+    ...
+    
+    def on_show_geometry(self):
+        """Visa geometrifönster"""
+        
+        print("on_show_geometry")
+```
 
 ## Integrating the computational model
 
-In the previous worksheet, we created our ** InputData ** -, ** OutputData ** - and ** Solver ** - Objects in our main program. In the modified program, it is ** MainWindow ** that reverts all references to these objects. In order to handle the model and update the controls, the following methods are suitably implemented:
+In the previous worksheet, we created our **ModelParams** -, **ModelResults** - and **ModelSolver** - Objects in our main program. In the modified program, it is **MainWindow** that reverts all references to these objects. In order to handle the model and update the controls, the following methods are suitably implemented:
 
-  * ** initModel (...) ** - Creates the necessary items needed for input, output and resolution of the problem. Also sets default values for the parameters in the model.
-  * ** updateControls (...) ** - Takes values from a ** InputData ** object and assigns the controls to these values.
-  * ** updateModel (...) ** - Reads the specified values in the controls and assigns them to the ** InputData ** object.
+  * **init_model(...)** - Creates the necessary items needed for input, output and resolution of the problem. Also sets default values for the parameters in the model.
+  * **update_controls(...)** - Takes values from a **ModelParams** object and assigns the controls to these values.
+  * **update_model(...)** - Reads the specified values in the controls and assigns them to the **ModelParams** object.
  
-To assign values to controls, the ** setText (...) ** method is used on the text controls. An example of how this is done is shown in the following code:
+To assign values to controls, the **setText(...)** method is used on the text controls. An example of how this is done is shown in the following code:
 
-    def updateControls(self):
-        """Fyll kontrollerna med värden från modellen"""
-        
-        self.ui.wEdit.setText(str(self.inputData.w))
-        ...
+``` py
+def updateControls(self):
+    """Fyll kontrollerna med värden från modellen"""
+    
+    self.ui.wEdit.setText(str(self.inputData.w))
+    ...
+```
 
-> Please note that ** self.inputData ** stores ** float ** values and must be converted to character strings before ** setText (...) ** is called. This is done in the above example with the ** str (...) ** method
+!!! note "Please note"
 
-To retrieve values from the controls, the ** text () ** method is used in the text control. An example of how this can be implemented is shown in the following code:
+    Please note that **self.model_params** stores **float** values and must be converted to character strings before **.setText(...)** is called. This is done in the above example with the ** str(...)** method
 
-    def updateModel(self):
-        """Hämta värden från kontroller och uppdatera modellen"""
-        
-        self.inputData.w = float(self.ui.wEdit.text())
-        ...
-        
-> We have the reverse problem here, ie we have to convert from character string from control to a ** float ** value by using the ** float (...) ** function.
+To retrieve values from the controls, the **text()** method is used in the text control. An example of how this can be implemented is shown in the following code:
+
+``` py
+def update_model(self):
+    """Hämta värden från kontroller och uppdatera modellen"""
+    
+    self.model_params.w = float(self.w_edit.text())
+    ...
+```
+
+!!! note        
+
+    We have the reverse problem here, ie we have to convert from character string from control to a **float** value by using the **float(...)** function.
 
 ## Opening and saving files from disk
 
-The calculation model implemented in Worksheets 2 and 3 includes the ** load (...) ** and ** save (...) ** methods. Disse vil nu bli brukt til at implementere metoder for å åpne og lagre våre modeller til disk.
+The calculation model implemented in Worksheets 2 and 3 includes the **load (...)** and **save(...)**-methods. These methods will be implemented to enable loading and saving a model from a file.
 
 ### Open file from disk
 
-To open an already existing file from disk, we must first ask the user about which file to open. This can be done with the function ** QFileDialog.getOpenFileName (...) **. The function shows a stanadard file dialog where the user can select an existing file. How it is used is shown in the following example:
+To open an already existing file from disk, we must first ask the user about which file to open. This can be done using the function **QFileDialog.getOpenFileName(...)**. The function shows a stanadard file dialog where the user can select an existing file. How it is used is shown in the following example:
 
-    def onActionOpen(self):
-        """Öppna in indata fil"""
-        
-        self.filename, _ = QFileDialog.getOpenFileName(self.ui, 
-            "Öppna modell", "", "Modell filer (*.json *.jpg *.bmp)")
-        
-        if self.filename!="":
-            ...
-If the user interrupted the selection of filenames, an empty string is returned. It's always good to always use an if-rate to make sure a file is actually selected.
+``` py
+def on_open_action(self):
+    """Öppna in indata fil"""
+    
+    self.filename, _ = QFileDialog.getOpenFileName(self.ui, 
+        "Öppna modell", "", "Modell filer (*.json *.jpg *.bmp)")
+    
+    if self.filename!="":
+        ...
+```
 
-The routine ** load (...) ** can then be used to load the model from disk with the specified file name.
+If the user interrupted the selection of filenames, an empty string is returned. It's always good to always use an if-statemenet to make sure a file is actually selected.
+
+The routine **load(...)** can then be used to load the model from disk with the specified file name.
 
 ### Save file to disk
 
 Similarly, if the user wants to save a model to disk, we must first ask the user about a location and a filename. For this purpose, we use the ** QtGui.QFileDialog.getSaveFileName (...) ** function instead. This feature displays a default file dialog asking for a file name and a directory where the file is to be saved. The following code shows how this happens in the ** actionSave **:
 
-    def onActionSave(self):
-        """Spara modell"""
-        
-        self.updateModel()
-        
-        if self.filename == "":
-            self.filename, _  = QFileDialog.getSaveFileName(self.ui, 
-                "Spara modell", "", "Modell filer (*.json)")
-        
-        if self.filename!="":
-            ... 
+``` py
+def on_save_action(self):
+    """Spara modell"""
+    
+    self.update_model()
+    
+    if self.filename == "":
+        self.filename, _  = QFileDialog.getSaveFileName(self.ui, 
+            "Spara modell", "", "Modell filer (*.json)")
+    
+    if self.filename!="":
+        ... 
+```
             
 ## Executing computational model
 
-The simplest model to execute the calculation model is simply to call ** solver.execute () ** in an event method. However, this has a big problem. If the calculation model takes a long time to execute, the program will remain in the event mode and the event loop will not be able to be recovered before the method ends. For a user, it appears that the program locked, which is not far from the truth.
+The simplest way to execute the calculation is simply to call **solver.execute()** in an event method. However, this has a big drawback. If the calculation model takes a long time to execute, the program will block the event loop and the application can't respond to any events. For a user, it appears that the program locked up, which is not far from the truth.
 
-To solve this problem, we put the calculation code into a so-called wire. A thread is a parallel execution of a given code. This execution is outside of the event loop so it will not block this.
+To solve this, we move the calculation code into a so-called thread. A thread is a parallel execution of a given code. This execution is performed outside of the event loop so it will not block this.
 
-The problem of using threads is that we need to synchronize the execution of these,
-So that we know when the calculation is complete. However, this is easily done in PyQt's thread implementation.
+The problem of using threads is that we need to synchronize the execution of these, so that we know when the calculation is complete. This is easily done in PyQt's thread implementation.
 
-To implement our calculation in a thread, we must first create a special thread class for our calculation. Add the following code at the top of the module:
+To implement our calculation in a thread, we first create a special thread class for our calculation. Add the following code at the top of the module:
 
-    # -*- coding: utf-8 -*-
+``` py
+# -*- coding: utf-8 -*-
 
-    from PyQt5.QtCore import pyqtSlot, pyqtSignal, QThread
-    from PyQt5.QtWidgets import QApplication, QDialog, QWidget, QMainWindow, QFileDialog
-    from PyQt5.uic import loadUi
+from qtpy.QtCore import pyqtSlot, pyqtSignal, QThread
+from qtpy.QtWidgets import QApplication, QDialog, QWidget, QMainWindow, QFileDialog
+from qtpy.uic import loadUi
 
-    import calfem.ui as cfui
-    import flowmodel as fm
+import calfem.ui as cfui
+import flowmodel as fm
 
-    class SolverThread(QThread):
-        """Klass för att hantera beräkning i bakgrunden"""
+class SolverThread(QThread):
+    """Klass för att hantera beräkning i bakgrunden"""
+    
+    def __init__(self, solver, paramStudy = False):
+        """Klasskonstruktor"""
+        QThread.__init__(self)
+        self.solver = solver
         
-        def __init__(self, solver, paramStudy = False):
-            """Klasskonstruktor"""
-            QThread.__init__(self)
-            self.solver = solver
-            
-        def __del__(self):
-            self.wait()
-            
-        def run(self):
-            ...
-
-    class MainWindow:
+    def __del__(self):
+        self.wait()
+        
+    def run(self):
         ...
+
+class MainWindow:
+    ...
+```
         
-Under the ** run (...) ** method, the actual call is added to start the calculation.
+Under the **run(...)** method, the actual calculation code is called.
 
 To start the calculation when selecting ** Calc / Execute ** in the menu, the event method may look as follows:
 
-    class MainWindow:
-        ...
-        def onActionExecute(self):
-            """Kör beräkningen"""
-            
-            # --- Avaktivera gränssnitt under beräkningen.        
-            
-            self.ui.setEnabled(False)
-            
-            # --- Uppdatera värden från kontroller
-            
-            self.updateModel()
-            
-            # --- Skapa en lösare
-            
-            self.solver = fm.Solver(self.inputData, self.outputData)
-            
-            # --- Starta en tråd för att köra beräkningen, så att 
-            #     gränssnittet inte fryser.
-            
-            self.solverThread = SolverThread(self.solver)        
-            self.solverThread.start()
-      
-This method will then start the looser as a separate thread that does not affect the event loop.
-
-To know when the calculation thread ends, connect a method to event ** finished ** on our thread class. We first create the ** ** onSolverFinished method (...) **:
-
-    class MainWindow:
-        ...
-        def onSolverFinished(self):
-            """Anropas när beräkningstråden avslutas"""
-            
-            # --- Aktivera gränssnitt igen        
-            
-            self.ui.setEnabled(True)
-            
-            # --- Generera resulatrapport.        
-
-            ...
-            
-The method is then connected to the thread object with ** connect (...) ** approximately the same as for the controls:
-
-    class MainWindow:
-        ...
-        def onActionExecute(self):
+``` py
+class MainWindow:
+    ...
+    def onActionExecute(self):
+        """Kör beräkningen"""
         
-            ...
-                        
-            self.solverThread = SolverThread(self.solver)
-            self.solverThread.finished.connect(self.onSolverFinished)   
-            self.solverThread.start()
-                        
-When the calculation ends, the thread object will automatically invoke the ** self.onSolverFinished ** method.
+        # --- Avaktivera gränssnitt under beräkningen.        
+        
+        self.ui.setEnabled(False)
+        
+        # --- Uppdatera värden från kontroller
+        
+        self.updateModel()
+        
+        # --- Skapa en lösare
+        
+        self.solver = fm.ModelSolver(self.inputData, self.outputData)
+        
+        # --- Starta en tråd för att köra beräkningen, så att 
+        #     gränssnittet inte fryser.
+        
+        self.solverThread = ModelSolverThread(self.solver)        
+        self.solverThread.start()
+```
+      
+This method will then start the computation as a separate thread that does not affect the event loop.
 
-## Updating the **Visualisation** class
+To know when the calculation thread ends, we connect a method to the signal **finished** on our thread class. First we create the **on_mode_solver_finished (...)**-method:
 
-In the previous worksheet 3, visualization was implemented in the class ** Visualization **. We will now expand the class of methods to selectively call the different visualization variants and link them to event methods in our ** MainWindow ** class.
+``` py
+class MainWindow:
+    ...
+    def onModelSolverFinished(self):
+        """Anropas när beräkningstråden avslutas"""
+        
+        # --- Aktivera gränssnitt igen        
+        
+        self.ui.setEnabled(True)
+        
+        # --- Generera resulatrapport.        
+
+        ...
+```
+            
+The method is then connected to the thread object with **connect(...)** in approximately the same as for the controls:
+
+``` py
+class MainWindow:
+    ...
+    def on_execute_action(self):
+    
+        ...
+                    
+        self.solver_thread = ModelSolverThread(self.solver)
+        self.solver_thread.finished.connect(self.on_model_solver_finished)   
+        self.solver_thread.start()
+```
+                        
+When the calculation ends, the thread object will automatically invoke the **self.on_model_solver_finished()** method.
+
+## Updating the **ModelVisualisation** class
+
+In the previous worksheet 3, visualization was implemented in the class **ModelVisualization**. We will now expand the class of methods to selectively call the different visualization variants and link them to event methods in our **MainWindow** class.
 
 To get some better control over the visualization windows to be displayed, a method for each visualization type is implemented. For example:
 
-  * ** showGeometry () ** - Displays the geometry definition for the problem.
-  * ** showMesh () ** - Displays the computation network generated with GMSH.
-  * ** showNodalValues () ** - Shows calculated nodes.
-  * ** showElementValues () ** - Shows calculated element values.
+  * **show_geometry()** - Displays the geometry definition for the problem.
+  * **show_mesh()** - Displays the computation network generated with GMSH.
+  * **show_nodalValues()** - Shows calculated nodes.
+  * **show_elementValues()** - Shows calculated element values.
  
 In order for the visualization class to keep track of which windows are open, 4 class variables are created to store references to the displayed figures.
 
-    class Visualisation(object):
-        """Klass för visualisering av resulat"""
+``` py
+class Visualisation(object):
+    """Klass för visualisering av resulat"""
 
-        def __init__(self, inputData, outputData):
-            """Konstruktor"""
+    def __init__(self, inputData, outputData):
+        """Konstruktor"""
+        
+        self.inputData = inputData
+        self.outputData = outputData
+        
+        # --- Variabler som lagrar referenser till öppnade figurer
+        
+        self.geomFig = None
+        self.meshFig = None
+        self.elValueFig = None
+        self.nodeValueFig = None
+```
             
-            self.inputData = inputData
-            self.outputData = outputData
-            
-            # --- Variabler som lagrar referenser till öppnade figurer
-            
-            self.geomFig = None
-            self.meshFig = None
-            self.elValueFig = None
-            self.nodeValueFig = None
-            
-We set the variables to ** None ** so that we can distinguish them from assigned variables.
+We set the variables to **None** so that we can distinguish them from assigned variables.
 
 Ett exempel på hur detta kan användas visas i följande metod:
 
-    class Visualisation(object):
-        ...
-        def showGeometry(self):
-            """Visa geometri visualisering"""
-            
-            geometry = self.outputData.geometry
-            
-            self.geomFig = cfv.figure(self.geomFig)
-            cfv.clf()            
-            cfv.drawGeometry(geometry, title="Geometry")
+``` py
+class ModelVisualisation(object):
+    ...
+    def showGeometry(self):
+        """Visa geometri visualisering"""
+        
+        geometry = self.outputData.geometry
+        
+        self.geomFig = cfv.figure(self.geomFig)
+        cfv.clf()            
+        cfv.drawGeometry(geometry, title="Geometry")
+```
 
-The ** cfv.figure (...) ** function takes an existing figure reference as input. Depending on whether it is assigned or not created, it returns the existing one or automatically creates a new figure. ** clf () ** clears the contents of the image window.
+The **cfv.figure(...)** function takes an existing figure reference as input. Depending on whether it is assigned or not created, it returns the existing one or automatically creates a new figure. **clf()** clears the contents of the image window.
 
-** Visualization ** - The class should also implement a method ** closeAll (...) ** that closes all open windows and resets the character variables.
+ The **ModelVisualisation**-class should also implement a method **close_all(...)** that closes all open windows and resets the character variables.
 
 ## Submission and reporting
 
 What to do in this worksheet is:
 
- * Implement _alla_ event methods for the controls used in the interface.
+ * Implement _all_ event methods for the controls used in the interface.
  * Implement basic features like new model, save model, save as and exit program.
  * Implement controls to ensure that visualization methods are not called if a calculation is not performed. Use a flag ** self.calcDone ** to enter the calculation status.
  * Complete the implementation of the ** Visualization ** class so it can handle all visualization cases. Re-create the object of this class after each completed calculation. Create an empty variable ** MainWindow ** constructor, so if-rates can be used to test if there is a current instance for ** Visualization **

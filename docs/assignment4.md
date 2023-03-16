@@ -1,6 +1,9 @@
 # Arbetsblad 4
 
-> **Att tänka på:** När **...** visas i programexemplen anger detta att det saknas kod som ni själva måste lägga till. Variabler och datastrukturer är bara exempel. Beroende på problemtyp kan man behöva andra datastrukturer än de som är beskrivna i kodexemplen.
+
+!!! note "Viktigt"
+    
+    När **...** visas i programexemplen anger detta att det saknas kod som ni själva måste lägga till. Variabler och datastrukturer är bara exempel. Beroende på problemtyp kan man behöva andra datastrukturer än de som är beskrivna i kodexemplen.
 
 ## Allmänt
 
@@ -15,7 +18,7 @@ I detta arbetsblad innehåller följande moment:
  
 Det grafiska gränssnittet skapas i programmet Qt Designer. I detta program skapas en beskrivning av gränssnittet i XML som kommer att läsas in av vårt program. 
 
-Qt Designer kan startas direkt från Spyder genom att klicka på **Tools/External tools/Qt Designer** i menyn. Programmet ser ut som i följande figur:
+Qt Designer kan startas direkt från Spyder genom att klicka på **Tools/External tools/Qt Designer** i menyn. Det går också att starta Qt Designer från kommandoprompten genom att ange kommandot **designer**. Programmet ser ut som i följande figur:
 
 ![qt_designer_1](images/qt_designer1.png)
 
@@ -76,14 +79,18 @@ Texten för **QLabel** kontrollerna ändras genom att välja kontrollen och änd
 
 ![qt_designer_1](images/qt_designer9.png)
 
+!!! note "Att tänka på"
+
+    Ett bra sätt att namnge kontroller in Qt Designer är att ge ett suffix som beskriver vad det är för typ av kontroll. T ex en **QLineEdit**-kontroll för variabeln **b** kan ges namnet **b_edit**. En motsvarande **QLabel**-kontroll kan ges namnet **b_label**.
+
 ### Knappar för visualisering
 
 För att kunna visa visualiseringarna behöver vi också ett antal knappar för detta. Skapa följande knappar (**QPushButton**) till höger om de tidigare kontrollerna (Bry er inte om exakt placering. Räcker med ungefärlig placering.):
 
- * text: **Geometry** - namn: **showGeometryButton**  
- * text: **Mesh** - namn: **showMeshButton**  
- * text: **Nodal values** - namn: **showNodalValuesButton**  
- * text: **Element values** - namn: **showElementValuesButton**
+ * text: **Geometry** - namn: **show_geometry_button**  
+ * text: **Mesh** - namn: **show_mesh_button**  
+ * text: **Nodal values** - namn: **show_nodal_values_button**  
+ * text: **Element values** - namn: **show_element_values_button**
  
 Följande figur visar ungefärligt utseende:
  
@@ -91,7 +98,7 @@ Följande figur visar ungefärligt utseende:
 
 ### Textruta för rapport
 
-För att visa rapporten kommer vi att använda en **QPlainTextEdit**-kontroll. Denna kontroll kan hantera text bestående av flera rader. Skapa en sådan kontroll med namnet **reportEdit**. 
+För att visa rapporten kommer vi att använda en **QPlainTextEdit**-kontroll. Denna kontroll kan hantera text bestående av flera rader. Skapa en sådan kontroll med namnet **report_edit**. 
 
 Det färdiga fönstret bör nu se ut som i följande figur:
 
@@ -139,7 +146,7 @@ För att programmet skall visa vårt gränssnitt måste huvudprogrammet modifier
 
 För att implementera det grafiska gränssnittet måste vi importera ett antal Python-moduler. 
 
- * PyQT modulerna **QtGui** och **QtCore**. Dessa används för att skapa gränsnittet.
+ * PyQt modulerna **QtGui** och **QtCore**. Dessa används för att skapa gränsnittet.
  * CALFEM modulen **calfem.ui**. Denna innehåller en del specialkod för att integrera våra visualiseringrutiner och PyQt.
  * Er egen modul för ert problemområde. I detta exempel använder vi modulen **flowmodel**.
  
@@ -156,6 +163,10 @@ from qtpy import uic
 
 import flowmodel as fm
 ``` 
+
+!!! note "Varför använder vi qtpy istället för PyQt?"
+
+    Det finns idag ett antal olika Qt implementeringar för Python. T ex **PyQt**, **PySide** och **Qt for Python**. För att göra programmet mindre beroende på en viss implementering använder vi modulen **qtpy** som automatiskt väljer den implementering som är tillgänglig. 
 
 ### Huvudfönsterklass MainWindow
 
@@ -183,7 +194,7 @@ class MainWindow(QMainWindow):
         self.raise_()
 ```
             
-**self.ui** kommer att vara basen för vårt objektträd. Det är i denna variabel alla kontroller är definierade.            
+Funktionen **uic.loadUi()** läser in och skapar objekten som är beskrivna i ui-filen direkt mot **MainWindow**-instansen. T ex ett objekt som har namnet **a_text** i ui-filen kan nås direkt genom klass-variabeln, **self.a_text**.
             
 ### Ett nytt huvuduprogram
 
@@ -220,7 +231,7 @@ För att programmet skall kunna köra beräkningar, öppna och spara filer måst
 
 ### Koppling av menyhändelser
 
-De första händelserna vi kopplar ihop är menyhändelserna. Menyhändelserna i ui-filen angavs med namn som **actionNew** och **actionOpen**. För att skapa en koppling lägger vi först till en metod som skall hantera själva händelsen:
+De första händelserna vi kopplar ihop är menyhändelserna. Menyhändelserna i ui-filen angavs med namn som **new_action** och **open_action**. För att skapa en koppling lägger vi först till en metod som skall hantera själva händelsen:
 
 ``` py
 class MainWindow:
@@ -510,8 +521,8 @@ Det som skall göras i detta arbetsblad är:
  * Implementera _alla_ händelsemetoder för de kontroller som används i gränssnittet.
  * Implementera grundläggande funktioner som ny modell, spara modell, spara som och avsluta programmet.
  * Implementera kontroller för att se till att visualiseringsmetoderna inte anropas om en beräknings inte är utförd. Använd en flagga **self.calcDone** för att ange beräkningsstatus.
- * Slutför implementeringen av **Visualisation**-klassen, så den kan hantera alla visualiseringsfall. Skapa objektet av denna klass på nytt efter varje slutförd beräkning. Skapa en tom variabel in **MainWindow** konstruktorn, så att if-satser kan användas för att testa om det finns en aktuell instans till **Visualisation**
- * Efter beräkningen skall **reportEdit**-kontrollen tilldelas utdata från **Report**-klassen. **reportEdit** har en metod **setPlainText(...)** just för detta ändamål. Aktuellt innehåll i kontrollen kan rensas med metoden **clear()**.
+ * Slutför implementeringen av **ModelVisualisation**-klassen, så den kan hantera alla visualiseringsfall. Skapa objektet av denna klass på nytt efter varje slutförd beräkning. Skapa en tom variabel in **MainWindow** konstruktorn, så att if-satser kan användas för att testa om det finns en aktuell instans till **ModelVisualisation**
+ * Efter beräkningen skall **repoert_edit**-kontrollen tilldelas utdata från **ModelReport**-klassen. **report_edit** har en metod **setPlainText(...)** just för detta ändamål. Aktuellt innehåll i kontrollen kan rensas med metoden **clear()**.
  * Programmet skall vid detta arbetsblad slut vara ett komplett självständigt beräkningsprogram.
 
 Inlämningen skall bestå av en zip-fil (eller annat arkivformat) bestående av: 
