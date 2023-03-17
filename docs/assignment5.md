@@ -5,8 +5,8 @@
 I detta arbetsblad innehåller följande moment:
 
  1. Utöka gränssnittet med kontroller för att kunna göra parameterstudier.
- 1. Lägga till input-parametrar i InputData-klassen för att kunna hantera parameterstudierna.
- 1. Implementera en rutin i Solver-klassen för att hantera parameterstudier.
+ 1. Lägga till input-parametrar i ModelParams-klassen för att kunna hantera parameterstudierna.
+ 1. Implementera en rutin i **ModelSolver**-klassen för att hantera parameterstudier.
  1. Implementera en rutin för att exportera resultaten från en körning till en Visualisation Toolkit (.vtk) fil med hjälp av pyvtk.
  
 ## Kontroller för parameterstudier
@@ -23,78 +23,82 @@ Följande kontroller och tillhörande namn har lagts till:
 
 Sätt bra standard värden på alla kontroller, så att det går att utföra en beräkning utan behöva fylla i alla värden.
 
-Koppla en händelsemetod, **onExecuteParamStudy** till **Param study**-knappen. För att kunna hantera parameterstudier i vår modell måste vi lägga till ett antal extra inparametrar i vår **InputData**-klass:
+Koppla en händelsemetod, **on_execute_param_study** till **Param study**-knappen. För att kunna hantera parameterstudier i vår modell måste vi lägga till ett antal extra inparametrar i vår **ModelParams**-klass:
 
- * **paramD** - Flagga som anger om parametern d skall varieras.
- * **paramT** - Flagga som anger om parametern t skall varieras.
- * **dStart** - Startvärde på d.
- * **dEnd** - Slutvärde på d.
- * **tStart** - Startvärde på t.
- * **tEnd** - Slutvärde på t.
- * **paramFilename** - Variabel som bestämmer hur filnamnen skall namnges.
- * **paramSteps** - Variable som anger antalet steg i studein.
+ * **param_d** - Flagga som anger om parametern d skall varieras.
+ * **param_t** - Flagga som anger om parametern t skall varieras.
+ * **d_start** - Startvärde på d.
+ * **d_end** - Slutvärde på d.
+ * **t_start** - Startvärde på t.
+ * **t_end** - Slutvärde på t.
+ * **param_filename** - Variabel som bestämmer hur filnamnen skall namnges.
+ * **param_steps** - Variable som anger antalet steg i studein.
  
  
- **onExecuteParamStudy** skall ha ungefär ha samma struktur som **onActionExecute**. I början av metoden lägger vi till tilldelning av de nya parametrarna utifrån de nya kontrollerna. Följande kod visar hur detta kan se ut: 
+ **on_execute_param_study** skall ha ungefär ha samma struktur som **on_action_execute**. I början av metoden lägger vi till tilldelning av de nya parametrarna utifrån de nya kontrollerna. Följande kod visar hur detta kan se ut: 
 
-    def onExecuteParamStudy(self):
-        """Exekvera parameterstudie"""
 
-        # --- Hämta värden från grafiskt gränssnitt.
-        
-        self.inputData.paramD = self.ui.paramVaryDRadio.isChecked()
-        self.inputData.paramT = self.ui.paramVaryTRadio.isChecked()
-        
-        if self.inputData.paramD:
-            self.inputData.dStart = float(self.ui.dEdit.text())
-            self.inputData.dEnd = float(self.ui.dEndEdit.text())
-        elif self.inputData.paramT:
-            self.inputData.tStart = float(self.ui.tEdit.text())
-            self.inputData.tEnd = float(self.ui.tEndEdit.text())
+``` py
+def on_execute_param_study(self):
+    """Exekvera parameterstudie"""
 
-        self.inputData.paramFilename = "paramStudy"
-        self.inputData.paramSteps = int(self.ui.paramStep.value())
- 
-## Uppdatera Solver-klassen för att hantera parameterstudier
+    # --- Hämta värden från grafiskt gränssnitt.
+    
+    self.model_params.param_d = self.param_vary_d_radio.isChecked()
+    self.model_params.param_t = self.param_vary_t_radio.isChecked()
+    
+    if self.model_params.param_d:
+        self.model_params.d_start = float(self.d_edit.text())
+        self.model_params.d_end = float(self.d_end_edit.text())
+    elif self.model_params.param_t:
+        self.model_params.t_start = float(self.t_edit.text())
+        self.model_params.t_end = float(self.t_end_edit.text())
 
-I **Solver**-klassen måste vi nu lägga till en rutin, **executeParamStudy(...)**, som implementerar mekaniken att exekvera parameterstudien.
+    self.model_params.param_filename = "param_study"
+    self.model_params.param_steps = int(self.param_step.value())
+``` 
 
-    def executeParamStudy(self):
-        """Kör parameter studie"""
-        
-        # -- Lagra tidigare värden på d
-        
-        old_d = self.inputData.d
-        old_t = self.inputData.t
-        
-        i = 1
-        
-        if self.inputData.paramD:
-        
-            # --- Skapa värden att simulera över
-        
-            dRange = np.linspace(self.inputData.dStart, self.inputData.dEnd,
-                self.inputData.paramSteps)
-                
-            # --- Starta parameterstudien
-                
-            for d in dRange:
-                print("Executing for d = %g..." % d)
-                
-                # --- Sätt önskad parameter i InputData-instansen
-                ...
-                # --- Kör beräkningen 
-                ...
-                # --- Exportera vtk-fil
-                ...
-                
-        elif self.inputData.paramT:
+## Uppdatera ModelSolver-klassen för att hantera parameterstudier
+
+I **ModelSolver**-klassen måste vi nu lägga till en rutin, **execute_param_study(...)**, som implementerar mekaniken att exekvera parameterstudien.
+
+``` py
+def execute_param_study(self):
+    """Kör parameter studie"""
+    
+    # -- Lagra tidigare värden på d
+    
+    old_d = self.model_params.d
+    old_t = self.model_params.t
+    
+    i = 1
+    
+    if self.model_params.param_d:
+    
+        # --- Skapa värden att simulera över
+    
+        d_range = np.linspace(self.model_params.d_start, self.model_params.d_end, self.model_params.paramSteps)
+            
+        # --- Starta parameterstudien
+            
+        for d in d_range:
+            print("Executing for d = %g..." % d)
+            
+            # --- Sätt önskad parameter i ModelParams-instansen
             ...
-                
-        # --- Återställ ursprungsvärden
-        
-        self.inputData.d = old_d
-        self.inputData.t = old_t
+            # --- Kör beräkningen 
+            ...
+            # --- Exportera vtk-fil
+            ...
+            
+    elif self.model_params.param_t:
+        ...
+            
+    # --- Återställ ursprungsvärden
+    
+    self.model_params.d = old_d
+    self.model_params.t = old_t
+```
         
 ## Export av resultat till VTK-filer
 
@@ -102,100 +106,108 @@ I detta arbetsblad kommer vi att exportera resultaten och visa dessa i ett etabl
 
 Först lägger vi till import-direktivet längst upp i vår modul:
 
-    import pyvtk as vtk
+``` py
+import pyvtk as vtk
+```
 
 I nästa steg skall vi skapa en metod i **Solver**-klassen, **exportVtk(...)** för att utföra själa exporten.
 
 **pyvtk** har en mängd datatyper. Vi kommer att utgå från primitiven **vtk.PolyData**. Denna datatype lämpar sig bra till att hantera ostrukturerade element som vi har i denna tillämpning. För att definiera uppritning av denna datatyp behövs punkter och topologi. Av en händelse har vi detta som ett resultat av beräkningen. **pyvtk** hanterar dock inte NumPy-arrayer, så vi får göra lite tricks för att konvertera dessa till rätt format:
 
-    def exportVtk(self, filename):
-        """Export results to VTK"""        
+``` py
+def export_vtk(self, filename):
+    """Export results to VTK"""        
+    
+    print("Exporting results to %s." % filename)
+    
+    # --- Skapa punkter och polygon definitioner från vårt nät
+    
+    points = self.model_results.coords.tolist()
+    
+    # --- Tänk på att topologin i VTK är 0-baserad varför vi måste minskar **edof** med 1.
+    
+    polygons = (self.model_results.edof-1).tolist()
+    
+    # --- För spänningsproblemet användas, se också nästa stycke:
+    
+    # polygons = (self.model_results.topo-1).tolist()
+            
+    # --- Resultat från beräkningen skapas i separata objekt. Punkter i vtk.PointData och
+    # --- elementdata i vtk.CellData. Nedan anger vi både vektor data och skalärvärden för elementen.
+    # --- Tänk på att vektorerna måste ha 3 komponenter, så lägg till detta i beräkningsdelen.
+    
+    point_data = vtk.PointData(vtk.Scalars(self.model_results.a.tolist(), name="pressure"))
+    cell_data = vtk.CellData(vtk.Scalars(self.model_results.maxFlow, name="maxflow"), vtk.Vectors(self.model_results.flow, "flow"))
+    
+    # --- För spänningsproblemet blir det istället (ingen pointData)
+    
+    # cell_data = vtk.CellData(vtk.Scalars(self.model_results.mises, name="mises"), vtk.Vectors(self.model_results.stress1, "principal stress 1"), vtk.Vectors(self.model_results.stress2, "principal stress 2"))        
+    
+    # --- Skapa strukturen för elementnätet.
+    
+    structure = vtk.PolyData(points = points, polygons = polygons)
+    
+    # --- Lagra allting i en vtk.VtkData instans
+    
+    vtk_data = vtk.VtkData(structure, point_data, cell_data)
+    
+    # --- För spänningsfallet
+    
+    # vtk_data = vtk.VtkData(structure, cell_data)        
+    
+    # --- Spara allt till filen
+    
+    vtk_data.tofile(filename, "ascii")
+```
         
-        print("Exporting results to %s." % filename)
-        
-        # --- Skapa punkter och polygon definitioner från vårt nät
-        
-        points = self.outputData.coords.tolist()
-        
-        # --- Tänk på att topologin i VTK är 0-baserad varför vi måste minskar **edof** med 1.
-        
-        polygons = (self.outputData.edof-1).tolist()
-        
-        # --- För spänningsproblemet användas, se också nästa stycke:
-        
-        # polygons = (self.outputData.topo-1).tolist()
-                
-        # --- Resultat från beräkningen skapas i separata objekt. Punkter i vtk.PointData och
-        # --- elementdata i vtk.CellData. Nedan anger vi både vektor data och skalärvärden för elementen.
-        # --- Tänk på att vektorerna måste ha 3 komponenter, så lägg till detta i beräkningsdelen.
-        
-        pointData = vtk.PointData(vtk.Scalars(self.outputData.a.tolist(), name="pressure"))
-        cellData = vtk.CellData(vtk.Scalars(self.outputData.maxFlow, name="maxflow"), vtk.Vectors(self.outputData.flow, "flow"))
-        
-        # --- För spänningsproblemet blir det istället (ingen pointData)
-        
-        # cellData = vtk.CellData(vtk.Scalars(self.outputData.mises, name="mises"), vtk.Vectors(self.outputData.stress1, "principal stress 1"), vtk.Vectors(self.outputData.stress2, "principal stress 2"))        
-        
-        # --- Skapa strukturen för elementnätet.
-        
-        structure = vtk.PolyData(points = points, polygons = polygons)
-        
-        # --- Lagra allting i en vtk.VtkData instans
-        
-        vtkData = vtk.VtkData(structure, pointData, cellData)
-        
-        # --- För spänningsfallet
-        
-        # vtkData = vtk.VtkData(structure, cellData)        
-        
-        # --- Spara allt till filen
-        
-        vtkData.tofile(filename, "ascii")
-        
-ParaView kan automatiskt hantera resultaten från parameterstudien om filerna namnges **paramStudy_01.vtk**, **paramStudy_02.vtk**. Filen kan öppnas som en fil **paramStudy** i programmet.        
+ParaView kan automatiskt hantera resultaten från parameterstudien om filerna namnges **param_study_01.vtk**, **param_study_02.vtk**. Filen kan öppnas som en fil **param_study** i programmet.        
 
-## Uppdatering av **Solver**-klassen för spänningsproblemet
+## Uppdatering av **ModelSolver**-klassen för spänningsproblemet
 
 För att spänningsproblement skall fungera måste vi lagra ytterligare en variabel i **OutputData**-klassen:
 
-    def execute(self):
-        """Metod för att utföra finita element beräkningen."""
-        
-        # --- Överför modell variabler till lokala referenser
+``` py
+def execute(self):
+    """Metod för att utföra finita element beräkningen."""
+    
+    # --- Överför modell variabler till lokala referenser
 
-        ...        
-        
-        # --- Nätgenerering
-        
-        elType = 3
-        dofsPerNode= 1 
-        geometry = self.inputData.geometry()        
-        
-        meshGen = cfm.GmshMeshGenerator(geometry)
-        meshGen.elSizeFactor = elSizeFactor     # Factor that changes element sizes.
-        meshGen.elType = elType
-        meshGen.dofsPerNode = dofsPerNode
-        
-        coords, edof, dofs, bdofs, elementmarkers = meshGen.create()
-        self.outputdata.topo = meshGen.topo
+    ...        
+    
+    # --- Nätgenerering
+    
+    el_type = 3
+    dofs_per_node= 1 
+    geometry = self.model_params.geometry()        
+    
+    mesh_gen = cfm.GmshMeshGenerator(geometry)
+    mesh_gen.el_size_factor = el_size_factor     # Factor that changes element sizes.
+    mesh_gen.el_type = el_type
+    mesh_gen.dofs_per_node = dofs_per_node
+    
+    coords, edof, dofs, bdofs, elementmarkers = meshGen.create()
+    self.model_results.topo = meshGen.topo
+```
         
 Topo innehåller nodtopologin, som kan användas med vtk.
 
 ## Uppdatering av SolverThread-klassen
 
-För att kunna köra en parameterstudie måste vi anropa den tidigare definierade metode **executeParamStudy(...)** istället för **execute(...)**. Detta gör vi genom att definiera en ytterligare metod-variabler **self.paramStudy** som anger om en parameterstudie skall köras eller en enstaka beräkning. Koden för att starta en parameterstudie visas nedan. Notera den extra parametern i **SolverThread**:s konstruktur.
+För att kunna köra en parameterstudie måste vi anropa den tidigare definierade metode **execute_param_study(...)** istället för **execute(...)**. Detta gör vi genom att definiera en ytterligare metod-variabler **self.param_study** som anger om en parameterstudie skall köras eller en enstaka beräkning. Koden för att starta en parameterstudie visas nedan. Notera den extra parametern i **SolverThread**:s konstruktur.
 
-    def onExecuteParamStudy(self):
-        """Exekvera parameterstudie"""
-        
-        ...
+``` py
+def on_execute_param_study(self):
+    """Exekvera parameterstudie"""
+    
+    ...
 
-        # --- Starta en tråd för att köra beräkningen, så att 
-        #     gränssnittet inte fryser.
-        
-        self.solverThread = SolverThread(self.solver, paramStudy = True)        
-        self.solverThread.finished.connect(self.onSolverFinished)        
-        self.solverThread.start()
+    # --- Starta en tråd för att köra beräkningen, så att 
+    #     gränssnittet inte fryser.
+    
+    self.solver_thread = SolverThread(self.solver, param_study = True)        
+    self.solver_thread.finished.connect(self.on_solver_finished)        
+    self.solver_thread.start()
+```
 
 ## Inlämning och redovisning
 

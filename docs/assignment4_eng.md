@@ -474,42 +474,42 @@ To get some better control over the visualization windows to be displayed, a met
   * **show_mesh()** - Displays the computation network generated with GMSH.
   * **show_nodalValues()** - Shows calculated nodes.
   * **show_elementValues()** - Shows calculated element values.
- 
-In order for the visualization class to keep track of which windows are open, 4 class variables are created to store references to the displayed figures.
+  
+  For the visualization class to keep track of which windows are open, 4 class variables are created to store references to the displayed figures.
 
 ``` py
 class Visualisation(object):
     """Klass för visualisering av resulat"""
 
-    def __init__(self, inputData, outputData):
+    def __init__(self, model_params, model_results):
         """Konstruktor"""
         
-        self.inputData = inputData
-        self.outputData = outputData
+        self.model_params = model_params
+        self.model_results = model_results
         
         # --- Variabler som lagrar referenser till öppnade figurer
         
-        self.geomFig = None
-        self.meshFig = None
-        self.elValueFig = None
-        self.nodeValueFig = None
+        self.geom_fig = None
+        self.mesh_fig = None
+        self.el_value_fig = None
+        self.node_value_fig = None
 ```
             
-We set the variables to **None** so that we can distinguish them from assigned variables.
+We set the variables to **None** so that we can distinguish them from the assigned variables.
 
 Ett exempel på hur detta kan användas visas i följande metod:
 
 ``` py
-class ModelVisualisation(object):
+class ModelVisualisation:
     ...
-    def showGeometry(self):
+    def show_geometry(self):
         """Visa geometri visualisering"""
         
-        geometry = self.outputData.geometry
+        geometry = self.model_results.geometry
         
-        self.geomFig = cfv.figure(self.geomFig)
+        self.geom_fig = cfv.figure(self.geom_fig)
         cfv.clf()            
-        cfv.drawGeometry(geometry, title="Geometry")
+        cfv.draw_geometry(geometry, title="Geometry")
 ```
 
 The **cfv.figure(...)** function takes an existing figure reference as input. Depending on whether it is assigned or not created, it returns the existing one or automatically creates a new figure. **clf()** clears the contents of the image window.
@@ -522,12 +522,12 @@ What to do in this worksheet is:
 
  * Implement _all_ event methods for the controls used in the interface.
  * Implement basic features like new model, save model, save as and exit program.
- * Implement controls to ensure that visualization methods are not called if a calculation is not performed. Use a flag ** self.calcDone ** to enter the calculation status.
+ * Implement controls to ensure that visualization methods are not called if a calculation is not performed. Use a flag **self.calc_done** to enter the calculation status.
  * Complete the implementation of the ** Visualization ** class so it can handle all visualization cases. Re-create the object of this class after each completed calculation. Create an empty variable ** MainWindow ** constructor, so if-rates can be used to test if there is a current instance for ** Visualization **
- * After the calculation, ** reportEdit ** - the control will be assigned output from the ** Report ** class. ** reportEdit ** has a method ** setPlainText (...) ** just for this purpose. Current content in the control can be cleared using the ** clear () ** method.
- * At this work sheet, the program should be a complete independent calculation program.
+ * After the calculation, **report_edit** - the control will be assigned output from the ** Report ** class. **report_edit** has a method **setPlainText(...)** just for this purpose. Current content in the control can be cleared using the **clear()** method.
+ * At this point, the program should be a complete calculation applications.
 
-The submission must consist of a zip file (or other archive format) consisting of:
+The submission must consist of a zip file (or another archive format) consisting of:
 
  * All Python files. (.py files)
  * An example of a saved json file.
