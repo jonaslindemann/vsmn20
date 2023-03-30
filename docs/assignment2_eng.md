@@ -517,7 +517,7 @@ The submission shall consist of a zip file (or other archive format) consisting 
  * Plan spänning
  * u_i,j  där i är nodnummer och j lokal frihetsgrad
 
-### Tvådimensionell värmeledning
+### Two-dimemsional heat flow
 
 ![case2](images/case2.png)
 
@@ -527,7 +527,7 @@ The submission shall consist of a zip file (or other archive format) consisting 
  * T_1 = T_2 = -15.0 0C
  * t = 0.2 m
 
-### Grundvattenströmning
+### Groundwater flow
 
 ![case3](images/case3.png)
 

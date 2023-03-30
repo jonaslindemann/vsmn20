@@ -245,10 +245,10 @@ Ett huvudprogram för vårt finita element program som använder alla våra klas
         model_params = fm.ModelParams()
         model_result = fm.ModelResult()
 
-        model_solver = fm.ModelSolver(model_params, output_data)
+        model_solver = fm.ModelSolver(model_params, model_result)
         model_solver.execute()
 
-        model_report = fm.ModelReport(model_params, output_data)
+        model_report = fm.ModelReport(model_params, model_result)
         print(model_report)
 ```
         
