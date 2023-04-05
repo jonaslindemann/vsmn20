@@ -161,29 +161,31 @@ import flowmodel as fm
 import numpy as np
 
 if __name__ == "__main__":
+
+    model_params = fm.ModelParams()
+
+    model_params.w = 100.0
+    model_params.h = 10.0
+    model_params.d = 5.0
+    model_params.t = 0.5
+    model_params.kx = 20.0
+    model_params.ky = 20.0
+
+    model_results = fm.ModelResults()
     
     dRange = np.linspace(3.0, 7.0, 10).tolist()
+
+    model_solver = fm.ModelSolver(model_params, model_results)
     
     for d in dRange:
     
         print("-------------------------------------------")    
         print("Simulating d = ", d)
     
-        model_params = fm.ModelParams()
-    
-        model_params.w = 100.0
-        model_params.h = 10.0
-        model_params.d = d
-        model_params.t = 0.5
-        model_params.kx = 20.0
-        model_params.ky = 20.0
-        
-        model_result = fm.OutputData()
-    
-        solver = fm.Solver(model_params, model_result)
+        model_params.d = d        
         solver.execute()
         
-        print("Max flow = ", np.max(model_result.maxFlow))        
+        print("Max flow = ", np.max(model_results.maxFlow))        
 ``` 
 ## ModelReport-klassen
 
