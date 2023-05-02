@@ -189,8 +189,8 @@ class MainWindow(QMainWindow):
         
         # --- Show the window
         
-        self.ui.show()
-        self.ui.raise_()
+        self.show()
+        self.raise_()
 ```
 
 The **uic.loadUi()**-method loads and creates the objects in the ui-file directly in the class. For example, an object, **a_text**, in the ui-file can be accessed directly in the main instance as the class attribute **self.a_text**.         
@@ -204,16 +204,16 @@ Our new main program is shown in the following code:
 ``` py
 if __name__ == '__main__':
 
-    # --- Skapa applikationsinstans
+    # --- Create application instance
 
     app = QApplication(sys.argv)
 
-    # --- Skapa och visa huvudfönster
+    # --- Create and show main window
 
     widget = MainWindow()
     widget.show()
 
-    # --- Starta händelseloopen
+    # --- Start main event loop
 
     sys.exit(app.exec_())
 ```
@@ -249,11 +249,11 @@ class MainWindow:
 
         ...
         
-        # --- Läs in gränssnitt från fil
+        # --- Load user interface from ui-file
         
         uic.loadUi('mainwindow.ui', self)
         
-        # --- Koppla kontroller till händelsemetoder
+        # --- Connect controls to event methods
         
         self.new_action.triggered.connect(self.on_new_action)
 ```
@@ -271,7 +271,7 @@ class MainWindow:
     
         ...
         
-        # --- Koppla kontroller till händelsemetoder
+        # --- Connect controls to event methods
         
         self.new_action.triggered.connect(self.on_new_action)
         ...
@@ -299,7 +299,7 @@ To assign values to controls, the **setText(...)** method is used on the text co
 def updateControls(self):
     """Fyll kontrollerna med värden från modellen"""
     
-    self.ui.wEdit.setText(str(self.inputData.w))
+    self.wEdit.setText(str(self.inputData.w))
     ...
 ```
 
@@ -410,20 +410,20 @@ class MainWindow:
     def onActionExecute(self):
         """Kör beräkningen"""
         
-        # --- Avaktivera gränssnitt under beräkningen.        
+        # --- Disable user interface during calculation     
         
-        self.ui.setEnabled(False)
+        self.setEnabled(False)
         
-        # --- Uppdatera värden från kontroller
+        # --- Update model from user interface
         
         self.updateModel()
         
-        # --- Skapa en lösare
+        # --- Create a solver
         
-        self.solver = fm.ModelSolver(self.inputData, self.outputData)
+        self.solver = fm.ModelSolver(self.model_params, self.model_results)
         
-        # --- Starta en tråd för att köra beräkningen, så att 
-        #     gränssnittet inte fryser.
+        # --- Create a thread with the calculation, so that the 
+        #     user interface doesn't freeze.
         
         self.solverThread = ModelSolverThread(self.solver)        
         self.solverThread.start()
@@ -439,11 +439,11 @@ class MainWindow:
     def onModelSolverFinished(self):
         """Anropas när beräkningstråden avslutas"""
         
-        # --- Aktivera gränssnitt igen        
+        # --- Activate user interface       
         
-        self.ui.setEnabled(True)
+        self.setEnabled(True)
         
-        # --- Generera resulatrapport.        
+        # --- Generate result report        
 
         ...
 ```
@@ -487,7 +487,7 @@ class Visualisation(object):
         self.model_params = model_params
         self.model_results = model_results
         
-        # --- Variabler som lagrar referenser till öppnade figurer
+        # --- Variables for storing referencese to figures.
         
         self.geom_fig = None
         self.mesh_fig = None
