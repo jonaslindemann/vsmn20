@@ -156,9 +156,9 @@ The program's import instructions will then be:
 
 import sys
 
-from qtpy.QtCore import pyqtSlot, pyqtSignal, QThread
+from qtpy.QtCore import QThread
 from qtpy.QtWidgets import QApplication, QDialog, QWidget, QMainWindow, QFileDialog
-from qtpy.uic import loadUi
+from qtpy import uic
 
 import flowmodel as fm
 ```
