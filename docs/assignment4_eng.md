@@ -333,7 +333,7 @@ To open an already existing file from disk, we must first ask the user about whi
 def on_open_action(self):
     """Öppna in indata fil"""
     
-    self.filename, _ = QFileDialog.getOpenFileName(self.ui, 
+    self.filename, _ = QFileDialog.getOpenFileName(self, 
         "Öppna modell", "", "Modell filer (*.json *.jpg *.bmp)")
     
     if self.filename!="":
@@ -355,7 +355,7 @@ def on_save_action(self):
     self.update_model()
     
     if self.filename == "":
-        self.filename, _  = QFileDialog.getSaveFileName(self.ui, 
+        self.filename, _  = QFileDialog.getSaveFileName(self, 
             "Spara modell", "", "Modell filer (*.json)")
     
     if self.filename!="":
