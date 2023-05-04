@@ -333,10 +333,14 @@ To open an already existing file from disk, we must first ask the user about whi
 def on_open_action(self):
     """Öppna in indata fil"""
     
-    self.filename, _ = QFileDialog.getOpenFileName(self, 
+    filename, _ = QFileDialog.getOpenFileName(self, 
         "Öppna modell", "", "Modell filer (*.json *.jpg *.bmp)")
     
-    if self.filename!="":
+    if filename!="":
+        self.filename = filename
+
+        # --- Open ModelParams instance
+
         ...
 ```
 
@@ -355,11 +359,15 @@ def on_save_action(self):
     self.update_model()
     
     if self.filename == "":
-        self.filename, _  = QFileDialog.getSaveFileName(self, 
+        filename, _  = QFileDialog.getSaveFileName(self, 
             "Spara modell", "", "Modell filer (*.json)")
+
+        if filename!="":
+            self.filename = filename
     
-    if self.filename!="":
-        ... 
+    # --- Save ModelParams instance
+
+    ... 
 ```
             
 ## Executing computational model
@@ -425,8 +433,8 @@ class MainWindow:
         # --- Create a thread with the calculation, so that the 
         #     user interface doesn't freeze.
         
-        self.solverThread = ModelSolverThread(self.solver)        
-        self.solverThread.start()
+        self.solver_thread = SolverThread(self.solver)   
+        self.solver_thread.start()
 ```
       
 This method will then start the computation as a separate thread that does not affect the event loop.
@@ -436,7 +444,7 @@ To know when the calculation thread ends, we connect a method to the signal **fi
 ``` py
 class MainWindow:
     ...
-    def onModelSolverFinished(self):
+    def on_solver_finished(self):
         """Anropas när beräkningstråden avslutas"""
         
         # --- Activate user interface       
@@ -457,7 +465,7 @@ class MainWindow:
     
         ...
                     
-        self.solver_thread = ModelSolverThread(self.solver)
+        self.solver_thread = SolverThread(self.solver)
         self.solver_thread.finished.connect(self.on_model_solver_finished)   
         self.solver_thread.start()
 ```
