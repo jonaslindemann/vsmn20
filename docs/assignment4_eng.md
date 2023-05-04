@@ -379,7 +379,7 @@ To implement our calculation in a thread, we first create a special thread class
 ``` py
 # -*- coding: utf-8 -*-
 
-from qtpy.QtCore import pyqtSlot, pyqtSignal, QThread
+from qtpy.QtCore import QThread
 from qtpy.QtWidgets import QApplication, QDialog, QWidget, QMainWindow, QFileDialog
 from qtpy.uic import loadUi
 
