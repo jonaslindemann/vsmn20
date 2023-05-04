@@ -178,11 +178,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         """Constructor"""
         super(QMainWindow, self).__init__()
-
-        # --- Store a reference to the application class
-        
-        self.app = app
-                    
+                  
         # --- Load user interface description
         
         uic.loadUi('mainwindow.ui', self)
@@ -424,7 +420,7 @@ class MainWindow:
         
         # --- Update model from user interface
         
-        self.updateModel()
+        self.update_model()
         
         # --- Create a solver
         

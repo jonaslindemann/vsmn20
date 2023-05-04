@@ -179,11 +179,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         """Constructor"""
         super(QMainWindow, self).__init__()
-
-        # --- Lagra en referens till applikationsinstansen i klassen
-        
-        self.app = app
-                    
+                  
         # --- Läs in gränssnitt från fil
         
         uic.loadUi('mainwindow.ui', self)
@@ -330,10 +326,14 @@ För att öppna en redan existerande fil från disk, måste vi först fråga anv
     def on_open_action(self):
         """Öppna in indata fil"""
         
-        self.filename, _ = QFileDialog.getOpenFileName(self, 
+        filename, _ = QFileDialog.getOpenFileName(self, 
             "Öppna modell", "", "Modell filer (*.json *.jpg *.bmp)")
         
-        if self.filename!="":
+        if filename!="":
+            self.filename = filename
+
+            # --- Öppna ModelParams instans
+
             ...
 ```
 
@@ -352,11 +352,15 @@ def on_save_action(self):
     self.update_model()
     
     if self.filename == "":
-        self.filename, _  = QFileDialog.getSaveFileName(self, 
+        filename, _  = QFileDialog.getSaveFileName(self, 
             "Spara modell", "", "Modell filer (*.json)")
-    
-    if self.filename!="":
-        ... 
+
+        if filename!="":
+            self.filename = filename
+
+    # --- Spara ModelParams instans
+
+    ...    
 ```
             
 ## Exekvera beräkningsmodellen
