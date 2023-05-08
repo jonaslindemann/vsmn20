@@ -89,7 +89,7 @@ class ModelParams:
 I **ModelSolver**-klassen måste vi lägga till anrop till nätgenereraren i **calfem.mesh**, **GmshMeshGenerate**. Denna kommer att ge oss element koordinater, topologi samt variabler som kan användas för koppling mellan geometri och elementnät. Ett exempel på hur detta kan se ut i **execute()**-metodn visas nedan:
 
 ``` py
-class Solver:
+class ModelSolver:
     """Klass för att hantera lösningen av vår beräkningsmodell."""
 
     ...
