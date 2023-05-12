@@ -145,7 +145,7 @@ In order for the program to show our interface, the main application must be mod
 
 To implement the graphical interface, we must import several Python modules.
 
-  * PyQt modules **QtGui** and **QtCore**. These are used to create the boundary.
+  * qtpy modules **QtGui** and **QtCore**. These are used to create the boundary.
   * CALFEM modules **calfem.ui**. This contains some special code to integrate our visualization routines and PyQt.
   * Your module for your problem. In this example, we use the **flowmodel** module.
  
@@ -292,10 +292,10 @@ In the previous worksheet, we created our **ModelParams** -, **ModelResults** - 
 To assign values to controls, the **setText(...)** method is used on the text controls. An example of how this is done is shown in the following code:
 
 ``` py
-def updateControls(self):
+def update_controls(self):
     """Fyll kontrollerna med värden från modellen"""
     
-    self.wEdit.setText(str(self.inputData.w))
+    self.w_edit.setText(str(self.model_params.w))
     ...
 ```
 
@@ -389,16 +389,17 @@ import flowmodel as fm
 class SolverThread(QThread):
     """Klass för att hantera beräkning i bakgrunden"""
     
-    def __init__(self, solver, paramStudy = False):
+    def __init__(self, solver, param_study = False):
         """Klasskonstruktor"""
         QThread.__init__(self)
         self.solver = solver
+        self.param_study = param_study
         
     def __del__(self):
         self.wait()
         
     def run(self):
-        ...
+        self.solver.execute()
 
 class MainWindow:
     ...
@@ -411,7 +412,7 @@ To start the calculation when selecting ** Calc / Execute ** in the menu, the ev
 ``` py
 class MainWindow:
     ...
-    def onActionExecute(self):
+    def on_action_execute(self):
         """Kör beräkningen"""
         
         # --- Disable user interface during calculation     
@@ -476,13 +477,13 @@ To get some better control over the visualization windows to be displayed, a met
 
   * **show_geometry()** - Displays the geometry definition for the problem.
   * **show_mesh()** - Displays the computation network generated with GMSH.
-  * **show_nodalValues()** - Shows calculated nodes.
-  * **show_elementValues()** - Shows calculated element values.
+  * **show_nodal_values()** - Shows calculated nodes.
+  * **show_element_values()** - Shows calculated element values.
   
   For the visualization class to keep track of which windows are open, 4 class variables are created to store references to the displayed figures.
 
 ``` py
-class Visualisation(object):
+class ModelVisualisation(object):
     """Klass för visualisering av resulat"""
 
     def __init__(self, model_params, model_results):
@@ -514,6 +515,7 @@ class ModelVisualisation:
         self.geom_fig = cfv.figure(self.geom_fig)
         cfv.clf()            
         cfv.draw_geometry(geometry, title="Geometry")
+        cfv.show()
 ```
 
 The **cfv.figure(...)** function takes an existing figure reference as input. Depending on whether it is assigned or not created, it returns the existing one or automatically creates a new figure. **clf()** clears the contents of the image window.

@@ -146,7 +146,7 @@ För att programmet skall visa vårt gränssnitt måste huvudprogrammet modifier
 
 För att implementera det grafiska gränssnittet måste vi importera ett antal Python-moduler. 
 
- * PyQt modulerna **QtGui** och **QtCore**. Dessa används för att skapa gränsnittet.
+ * qtpy modulerna **QtGui** och **QtCore**. Dessa används för att skapa gränsnittet.
  * CALFEM modulen **calfem.ui**. Denna innehåller en del specialkod för att integrera våra visualiseringrutiner och PyQt.
  * Er egen modul för ert problemområde. I detta exempel använder vi modulen **flowmodel**.
  
@@ -391,12 +391,13 @@ class SolverThread(QThread):
         """Klasskonstruktor"""
         QThread.__init__(self)
         self.solver = solver
+        self.param_study = param_study
         
     def __del__(self):
         self.wait()
         
     def run(self):
-        ...
+        self.solver.execute()
 
 class MainWindow:
     ...

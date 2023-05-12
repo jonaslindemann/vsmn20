@@ -42,20 +42,24 @@ Koppla en händelsemetod, **on_execute_param_study** till **Param study**-knappe
 def on_execute_param_study(self):
     """Exekvera parameterstudie"""
 
-    # --- Hämta värden från grafiskt gränssnitt.
-    
-    self.model_params.param_d = self.param_vary_d_radio.isChecked()
-    self.model_params.param_t = self.param_vary_t_radio.isChecked()
-    
-    if self.model_params.param_d:
-        self.model_params.d_start = float(self.d_edit.text())
-        self.model_params.d_end = float(self.d_end_edit.text())
-    elif self.model_params.param_t:
-        self.model_params.t_start = float(self.t_edit.text())
-        self.model_params.t_end = float(self.t_end_edit.text())
+    # --- Update model from UI
 
-    self.model_params.param_filename = "param_study"
-    self.model_params.param_steps = int(self.param_step.value())
+    self.update_model()    
+
+    # --- Update filename
+
+    self.model_param.param_filename = "param_study"
+
+    # --- Skapa en lösare
+
+    self.solver = sm.ModelSolver(self.model_params, self.model_results)
+    
+    # --- Starta en tråd för att köra beräkningen, så att 
+    #     gränssnittet inte fryser.
+    
+    self.solverThread = SolverThread(self.solver, param_study = True)        
+    self.solverThread.finished.connect(self.on_solver_finished)        
+    self.solverThread.start()
 ``` 
 
 ## Uppdatera ModelSolver-klassen för att hantera parameterstudier
@@ -114,50 +118,41 @@ I nästa steg skall vi skapa en metod i **Solver**-klassen, **exportVtk(...)** f
 
 **pyvtk** har en mängd datatyper. Vi kommer att utgå från primitiven **vtk.PolyData**. Denna datatype lämpar sig bra till att hantera ostrukturerade element som vi har i denna tillämpning. För att definiera uppritning av denna datatyp behövs punkter och topologi. Av en händelse har vi detta som ett resultat av beräkningen. **pyvtk** hanterar dock inte NumPy-arrayer, så vi får göra lite tricks för att konvertera dessa till rätt format:
 
-``` py
+### export_vkt(...) för skalära problem
+
+```py
 def export_vtk(self, filename):
-    """Export results to VTK"""        
-    
+    """Export results to VTK"""
+
     print("Exporting results to %s." % filename)
-    
-    # --- Skapa punkter och polygon definitioner från vårt nät
-    
+
+    # --- Extract points and polygons
+
     points = self.model_results.coords.tolist()
-    
-    # --- Tänk på att topologin i VTK är 0-baserad varför vi måste minskar **edof** med 1.
-    
     polygons = (self.model_results.edof-1).tolist()
-    
-    # --- För spänningsproblemet användas, se också nästa stycke:
-    
-    # polygons = (self.model_results.topo-1).tolist()
-            
-    # --- Resultat från beräkningen skapas i separata objekt. Punkter i vtk.PointData och
-    # --- elementdata i vtk.CellData. Nedan anger vi både vektor data och skalärvärden för elementen.
-    # --- Tänk på att vektorerna måste ha 3 komponenter, så lägg till detta i beräkningsdelen.
-    
-    point_data = vtk.PointData(vtk.Scalars(self.model_results.a.tolist(), name="pressure"))
-    cell_data = vtk.CellData(vtk.Scalars(self.model_results.maxFlow, name="maxflow"), vtk.Vectors(self.model_results.flow, "flow"))
-    
-    # --- För spänningsproblemet blir det istället (ingen pointData)
-    
-    # cell_data = vtk.CellData(vtk.Scalars(self.model_results.mises, name="mises"), vtk.Vectors(self.model_results.stress1, "principal stress 1"), vtk.Vectors(self.model_results.stress2, "principal stress 2"))        
-    
-    # --- Skapa strukturen för elementnätet.
-    
-    structure = vtk.PolyData(points = points, polygons = polygons)
-    
-    # --- Lagra allting i en vtk.VtkData instans
-    
+
+    # --- Create point data from a
+
+    point_data = vtk.PointData(
+        vtk.Scalars(self.model_results.a.tolist(), name="pressure")
+    )
+
+    # --- Create cell data from max_flow and flow
+
+    cell_data = vtk.CellData(
+        vtk.Scalars(self.model_results.max_flow, name="max_flow"),
+        vtk.Vectors(self.model_results.flow, "flow")
+    )
+
+    # --- Create structure
+
+    structure = vtk.PolyData(points=points, polygons=polygons)
+
+    # --- Export to vtk
+
     vtk_data = vtk.VtkData(structure, point_data, cell_data)
-    
-    # --- För spänningsfallet
-    
-    # vtk_data = vtk.VtkData(structure, cell_data)        
-    
-    # --- Spara allt till filen
-    
     vtk_data.tofile(filename, "ascii")
+
 ```
         
 ParaView kan automatiskt hantera resultaten från parameterstudien om filerna namnges **param_study_01.vtk**, **param_study_02.vtk**. Filen kan öppnas som en fil **param_study** i programmet.        
