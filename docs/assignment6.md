@@ -1,13 +1,12 @@
-# Slutinlämning
+# Final submission
 
-Slutinlämningen skall bestå av:
+The submission should consist of:
 
- * Alla kommentarer i inlämningarna skall vara korrigerade.
- * Rapport som beskriver och dokumenterar programmet. Den skall innehålla:
-   * Beskrivning om programmets problemområde och kort om teorin.
-   * Beskrivning av programmets uppbyggnad.
-   * Jämförande kontrollberäkningar MATLAB/Python. Rimlighetsbedömning av resultaten.
-   * Enkel handhavande manual med exempel och utskrifter från programmet.
-   * Appendix med all källkod.
- * zip-fil med allt som behövs för att köra programmet inklusive exempel.
-  
+* All comments in the submissions should be corrected.
+* A report that describes and documents the program. It should include:
+    * Description of the program's problem domain and a brief overview of the theory.
+    * Description of the program's structure.
+    * Comparative calculations in MATLAB/Python. Reasonableness assessment of the results. 
+    * Simple user manual with examples and program outputs.
+    * Appendix with all source code.
+* A zip file containing everything necessary to run the program, including examples.
