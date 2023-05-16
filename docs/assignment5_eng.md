@@ -89,11 +89,18 @@ def execute_param_study(self):
             print("Executing for d = %g..." % d)
             
             # --- Modify parameter in self.model_params
+
             ...
+            
             # --- Execute calculation
-            ...
+            
+            self.execute()
+
             # --- Export to VTK
-            ...
+
+            vtk_filename = "param_study_%02d.vtk" % i
+
+            self.export_vtk(vtk_filename) # <-- See next section
             
     elif self.model_params.param_t:
         ...
@@ -168,7 +175,7 @@ def execute(self):
     # --- Mesh generation
     
     el_type = 3
-    dofs_per_node = 1 
+    dofs_per_node = 2
     geometry = self.model_params.geometry()        
     
     mesh = cfm.GmshMeshGenerator(geometry)
