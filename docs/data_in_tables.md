@@ -2,25 +2,31 @@
 
 In many applications it is important to be able to create readable tables in text based reports. You could of course implement this yourself in Python, but there is an easier way. The Python-module tabulate can take any list or array based structure and present it in a text readable form. The module is installed by the following command:
 
-    pip install tabulate
+```py
+pip install tabulate
+```
 
 The module is imported in Python using the following import statement:
 
-    import tabulate as tbl
+```py
+import tabulate as tbl
+```
 
 A simple example of printing an array in a table with headers is shown in the following examples:
 
-    A = np.random.rand(10,5)
+```py
+A = np.random.rand(10,5)
 
-    A_table = tbl.tabulate(
-        A,
-        headers=["A", "B", "C", "D", "E"],
-        numalign="right",
-        floatfmt=".4f",
-        tablefmt="psql",
-    )
+A_table = tbl.tabulate(
+    A,
+    headers=["A", "B", "C", "D", "E"],
+    numalign="right",
+    floatfmt=".4f",
+    tablefmt="psql",
+)
 
-    print(A_table)
+print(A_table)
+```
 
 The resulting output will be:
 
@@ -43,18 +49,20 @@ The tabulate function always returns a string with table, which make it suitable
 
 It is also possible to add an index to the left side of the table using the showindex keyword:
 
-    B = np.arange(50).reshape(10,5)
+```py
+B = np.arange(50).reshape(10,5)
 
-    B_table = tbl.tabulate(
-        B,
-        headers=["A", "B", "C", "D", "E"],
-        numalign="right",
-        floatfmt=".4f",
-        tablefmt="psql",
-        showindex=range(1, len(A) + 1)
-    )
+B_table = tbl.tabulate(
+    B,
+    headers=["A", "B", "C", "D", "E"],
+    numalign="right",
+    floatfmt=".4f",
+    tablefmt="psql",
+    showindex=range(1, len(A) + 1)
+)
 
-    print(B_table)
+print(B_table)
+```
 
 This results in the following output:
 
