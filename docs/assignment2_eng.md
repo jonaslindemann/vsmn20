@@ -190,7 +190,7 @@ class Solver:
 
 When the calculation has been completed, a report of input parameters and results is generated, this is done by the **ModelReport**-class. The class will have the same input parameters as the **ModelSolver**-class.
 
-For the generation of the report, we will use Python's built-in method ** __ str __ () **. This method is used to implement what should happen when using print ** (...) ** on an instance of the class or the function str ** (...) ** is used to convert the class content to a string.
+For the generation of the report, we will use Python's built-in method **__str__()**. This method is used to implement what should happen when using print ** (...) ** on an instance of the class or the function str ** (...) ** is used to convert the class content to a string.
 
 For this to work, we need two additional methods and a string variable. The string variable we will fill with the text description of the class. The extra methods are used to clean and fill the string with content. The following code shows the implementation of ** Report ** class:
 
@@ -205,20 +205,24 @@ class ModelReport:
     def clear(self):
         self.report = ""
         
-    def addText(self, text=""):
+    def add_text(self, text=""):
         self.report+=str(text)+"\n"
                 
     def __str__(self):
         self.clear()
-        self.addText()
-        self.addText("-------------- Model input ----------------------------------")
+        self.add_text()
+        self.add_text("-------------- Model input ----------------------------------")
         ...
-        self.addText("Coordinates:")
-        self.addText()
-        self.addText(self.model_params.coord)
+        self.add_text("Coordinates:")
+        self.add_text()
+        self.add_text(cfu.str_disp_array(self.model_params.coord, headers=["x (m)", "y (m)"]))
         ...
         return self.report
 ```
+
+!!! note "Good to know"
+
+    The CALFEM commands starting with **cfu.str_disp_xxx(...)** are equivalent of the the **disp_xxx(...)** commands, but instead of printing to the terminal or notebook they return a string of the output. We use the command **cfu.str_disp_array(...)** to return a string with a table representation of the array as a string, which we add to the report in the **.add_text()** method.
 
                            
 ## Main program
