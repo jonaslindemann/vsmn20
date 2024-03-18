@@ -1,4 +1,5 @@
-# Välkommen till Programutveckling för tekniska system - VSMN20
+# Welcome to the course VSMN20
 
-Här hittar du alla arbetsblad och annan information som kan vara bra att ha för projektuppgiften.
+On this page you will find all the worksheets and information required for the project assignment.
+
 

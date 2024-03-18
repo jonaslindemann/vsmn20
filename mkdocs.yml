@@ -1,13 +1,6 @@
-site_name: Programutveckling för Tekniska Tillämpningar
+site_name: Software Development for Technical Applications - VSMN20
 nav:
-- Hem: index.md
-- Arbetsblad (Swedish):
-  - Arbetsblad 1: assignment1.md
-  - Arbetsblad 2: assignment2.md
-  - Arbetsblad 3: assignment3.md
-  - Arbetsblad 4: assignment4.md
-  - Arbetsblad 5: assignment5.md
-  - Slutinlämning: assignment6.md
+- Home: index.md
 - Worksheets (English):
   - Worksheet 1: assignment1_eng.md
   - Worksheet 2: assignment2_eng.md

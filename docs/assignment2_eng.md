@@ -58,7 +58,7 @@ import calfem.core as cfc
 import json
 
 class ModelParams:
-    """Klass för att definiera indata för vår modell."""
+    """Class defining the model parameters"""
     def __init__(self):
         
         self.version = 1
@@ -66,11 +66,11 @@ class ModelParams:
         self.t = 1
         self.ep = [self.t]
 
-        # --- Elementegenskaper
+        # --- Element properties
         
         ...
         
-        # --- Skapa indata för testexempel
+        # --- Create input for the example use cases
         
         self.coord = np.array([
             [0.0, 0.0],
@@ -79,7 +79,7 @@ class ModelParams:
             [0.24, 0.12]
         ])
 
-        # --- Elementtopolgi
+        # --- Element topology
             
         self.edof = np.array([
             [...],
@@ -87,14 +87,14 @@ class ModelParams:
             [...]
         ])
 
-        # --- Laster
+        # --- Loads
 
         self.loads = [
             [5, 6.0],
             [6, 6.0]
         ]
 
-        # --- Randvillkor
+        # --- Boundary conditions
 
         self.bcs = [
             [1, -15.0],
@@ -112,7 +112,7 @@ class ModelParams:
 
 ``` py
 class ModelResult:
-    """Klass för att lagra resultaten från beräkningen."""
+    """Class for storing results from calculations."""
     def __init__(self):
         self.a = None
         self.r = None
@@ -134,7 +134,7 @@ The class **ModelpSolver** is responsible for performing the actual calculation.
 
 ``` py
 class Solver:
-    """Klass för att hantera lösningen av vår beräkningsmodell."""
+    """Class for performing the model computations."""
     def __init__(self, model_params, model_result):
         self.model_params = model_params
         self.model_result = model_result
@@ -149,7 +149,7 @@ The calculation to be performed in the execute (...). The method retrieves input
         
     def execute(self):
         
-        # --- Överför modell variabler till lokala referenser
+        # --- Assign shorter variable names from model properties
         
         edof = self.model_params.edof
         cond = self.model_params.cond
@@ -171,13 +171,13 @@ class Solver:
         
     def execute(self):
     
-        # --- Överför modell variabler till lokala referenser
+        # --- Assign shorter variable names from model properties
         
         ...
 
         ... Beräkningskod ...
         
-        # --- Överför modell variabler till lokala referenser
+        # --- Store results in model_results
 
         self.model_result.a = a
         self.model_result.r = r
@@ -196,7 +196,7 @@ For this to work, we need two additional methods and a string variable. The stri
 
 ``` py
 class ModelReport:
-    """Klass för presentation av indata och utdata i rapportform."""
+    """Class for presenting input and output parameters in report form."""
     def __init__(self, model_params, model_result):
         self.model_params = model_params
         self.model_result = model_result
@@ -222,7 +222,7 @@ class ModelReport:
 
 !!! note "Nice looking tables"
 
-    The CALFEM commands starting with **cfu.str_disp_xxx(...)** are equivalent of the the **disp_xxx(...)** commands, but instead of printing to the terminal or notebook they return a string of the output. We use the command **cfu.str_disp_array(...)** to return a string with a table representation of the array as a string, which we add to the report in the **.add_text()** method. It is also possible to use the **tabulate** module as shown in the [guides section](data_in_tables.md)
+    The CALFEM commands starting with **cfu.str_disp_xxx(...)** are equivalent of the the **disp_xxx(...)** commands, but instead of printing to the terminal or notebook they return a string of the output. We use the command **cfu.str_disp_array(...)** to return a string with a table representation of the array as a string, which we add to the report in the **.add_text()** method. It is also possible to use the **tabulate** module as shown in the [guides section](data_in_tables.md).
 
                            
 ## Main program
@@ -233,7 +233,7 @@ For the program to work, we need a main program. The following code shows how to
 # -*- coding: utf-8 -*-
 
 if __name__ == "__main__":
-    print("Denna fil exekveras direkt och importeras inte.")
+    print("This will is executed as a script and not imported.")
 ```
 
 If a Python file is imported with the **import** statement, the variable ** __ name __ ** will contain the module name, ie the name of the source file. However, if you call the file directly with a Python interpreter ** __ name__ ** will contain the value ** __ main __ **. In this way, you can ensure that only certain code is executed if the file is started directly with the Python interpreter and at the same time use the file as a module. This concept is often used in Python to create test functions for modules.
@@ -369,12 +369,12 @@ We start by implementing writing to a file as we have all input parameters requi
     
 ``` py 
 class ModelParams:
-    """Klass för att definiera indata för vår modell."""
+    """Class defining the model parameters."""
     
     ...
 
     def save(self, filename):
-        """Spara indata till fil."""
+        """Save input to file."""
         
         ...
 ```
@@ -410,7 +410,7 @@ To load an existing JSON file we do the proecdure in reverse. We read the entire
 
 ``` py
     def load(self, filename):
-        """Läs indata från fil."""
+        """Read input from file."""
         
         ifile = open(filename, "r")
         model_params = json.load(ifile)
