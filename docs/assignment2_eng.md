@@ -37,6 +37,7 @@ We begin by defining a python-module, flowmodel.py (chose a name depending on th
 
 import numpy as np
 import calfem.core as cfc
+import calfem.utils as cfu
 ```
     
 For the implementation, we will use object-oriented programming, ie, divide the program into logical objects that can be reused and allow for the expansion and reuse of code. 4 logical classes can be identified for the calculation model:
@@ -55,6 +56,7 @@ The class input data must contain all inputs required to perform the calculation
 
 import numpy as np
 import calfem.core as cfc
+import calfem.utils as cfu
 import json
 
 class ModelParams:
