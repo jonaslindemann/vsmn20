@@ -154,7 +154,6 @@ The calculation to be performed in the execute (...). The method retrieves input
         # --- Assign shorter variable names from model properties
         
         edof = self.model_params.edof
-        cond = self.model_params.cond
         coord = self.model_params.coord
         dof = self.model_params.dof
         ep = self.model_params.ep
