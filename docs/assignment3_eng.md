@@ -204,7 +204,7 @@ There are a number of visualization features in Calfem. In this sheet, the follo
  * Element Values ​​- draw_element_values​​(...)
  * Node values ​​- draw_nodal_values​(...)
  
-Documentation for these procedures, see the user manual for [nätgeneringsrutinerna] (http://training.lunarc.lu.se/pluginfile.php/473/mod_resource/content/1/DAE_rapport_draft06.pdf).
+Documentation for these procedures, see the user manual for [mesh generation routines](https://calfem-for-python.readthedocs.io/en/latest/calfem_mesh_guide.html).
 
 Note that these routines are integrated into Calfem and visvis do not need to be imported explicitly. The following code from the manual:
 
