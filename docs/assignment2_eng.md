@@ -144,9 +144,10 @@ class Solver:
 
 The input parameters are assigned two class variables, **self.model_params** ** and **self.model_result**.
 
-The calculation to be performed in the execute (...). The method retrieves input from **self.model_params** to set up and perform finite element calculations just like a regular Calfem programs. To simplify management of input variables can be local references to the input data is created according to the following code:    class Solver:
-
+The calculation to be performed in the execute (...). The method retrieves input from **self.model_params** to set up and perform finite element calculations just like a regular Calfem programs. To simplify management of input variables can be local references to the input data is created according to the following code:    
 ``` py
+class Solver:
+
     ...
         
     def execute(self):
@@ -186,7 +187,32 @@ class Solver:
         self.model_result.qs = qs
         self.model_result.qt = qt
 ```
-            
+
+### cfc.solveq() load and boundary conditions
+
+**cfc.solveq(...)** uses a different format of loads and boundary conditions compared to what we use in the model. To convert to the correct arguments use the following example as a template:
+
+``` py
+    for load in loads:
+        dof = load[0]
+        mag = load[1]
+        f[dof - 1] = mag
+
+    bc_prescr = []
+    bc_value = []
+
+    for bc in bcs:
+        dof = bc[0]
+        value = bc[1]
+        bc_prescr.append(dof)
+        bc_value.append(value)
+
+    bc_prescr = np.array(bc_prescr)
+    bc_value = np.array(bc_value)
+
+    a, r = cfc.solveq(K, f, bc_prescr, bc_value)
+```
+
 ## The ModelReport-class
 
 When the calculation has been completed, a report of input parameters and results is generated, this is done by the **ModelReport**-class. The class will have the same input parameters as the **ModelSolver**-class.
@@ -216,7 +242,9 @@ class ModelReport:
         ...
         self.add_text("Coordinates:")
         self.add_text()
-        self.add_text(cfu.str_disp_array(self.model_params.coord, headers=["x (m)", "y (m)"]))
+        self.add_text(
+            tab.tabulate(self.params.coords, headers=["x", "y"], tablefmt="psql")
+        )
         ...
         return self.report
 ```
@@ -262,86 +290,365 @@ In the above main program, we import the module **flowmodel** (flowmodel.py) tha
 
 Example of a running program is shown below:
 
-    Solving equation system...
-    Computing element forces...
+=== "Heat problem"
 
-    -------------- Model input ----------------------------------
+    ```
+    # Model report
 
-    t = 1
+    ## Input parameters
 
-    Conductivty:
+    +-----+------+------+
+    |   t |   l1 |   l2 |
+    |-----+------+------|
+    | 0.2 |  1.7 | 0.04 |
+    +-----+------+------+
 
-    [[ 1.7   1.7 ]
-     [ 1.7   1.7 ]
-     [ 0.04  0.04]
-     [ 0.04  0.04]]
+    ### Coords
 
-    Coordinates:
+    +------+------+
+    |    x |    y |
+    |------+------|
+    | 0    | 0    |
+    | 0    | 0.12 |
+    | 0.12 | 0    |
+    | 0.12 | 0.12 |
+    | 0.24 | 0    |
+    | 0.24 | 0.12 |
+    +------+------+
 
-    [[ 0.    0.  ]
-     [ 0.    0.12]
-     [ 0.12  0.  ]
-     [ 0.12  0.12]
-     [ 0.24  0.  ]
-     [ 0.24  0.12]]
+    ### Dofs
 
-    Coordinate dofs:
+    +--------+
+    |   dof1 |
+    |--------|
+    |      1 |
+    |      2 |
+    |      3 |
+    |      4 |
+    |      5 |
+    |      6 |
+    +--------+
 
-    [[1]
-     [2]
-     [3]
-     [4]
-     [5]
-     [6]]
+    ### Edof
 
-    Topology:
+    +-------+-------+-------+
+    |   el1 |   el2 |   el3 |
+    |-------+-------+-------|
+    |     1 |     4 |     2 |
+    |     1 |     3 |     4 |
+    |     3 |     6 |     4 |
+    |     3 |     5 |     6 |
+    +-------+-------+-------+
 
-    [[1 4 2]
-     [1 3 4]
-     [3 6 4]
-     [3 5 6]]
+    ### Loads
 
-    Element coordinates X
+    +-------+-------+
+    |   dof |   mag |
+    |-------+-------|
+    |     5 |     6 |
+    |     6 |     6 |
+    +-------+-------+
 
-    [[ 0.    0.12  0.  ]
-     [ 0.    0.12  0.12]
-     [ 0.12  0.24  0.12]
-     [ 0.12  0.24  0.24]]
+    ### BCs
 
-    Element coordinates Y
+    +-------+---------+
+    |   dof |   value |
+    |-------+---------|
+    |     1 |     -15 |
+    |     2 |     -15 |
+    +-------+---------+
 
-    [[ 0.    0.12  0.12]
-     [ 0.    0.    0.12]
-     [ 0.    0.12  0.12]
-     [ 0.    0.    0.12]]
+    ## Results
 
-    -------------- Results --------------------------------------
+    ### Nodal temps and flows (a and r)
 
-    Displacements:
+    +----------+----------------+-----------+
+    |   D.o.f. |   Temp [Deg C] |   q [W/m] |
+    |----------+----------------+-----------|
+    |        1 |       -15.0000 |   -6.0000 |
+    |        2 |       -15.0000 |   -6.0000 |
+    |        3 |        20.2941 |    0.0000 |
+    |        4 |        20.2941 |    0.0000 |
+    |        5 |      1520.2941 |    0.0000 |
+    |        6 |      1520.2941 |    0.0000 |
+    +----------+----------------+-----------+
 
-    [[ -15.        ]
-     [ -15.        ]
-     [  -7.94117647]
-     [  -7.94117647]
-     [ 292.05882353]
-     [ 292.05882353]]
+    ### Element flows
 
-    Reactions:
+    +-----------+-------------+-------------+
+    |   Element |   q_x [W/m] |   q_y [W/m] |
+    |-----------+-------------+-------------|
+    |         1 |   -500.0000 |     -0.0000 |
+    |         2 |   -500.0000 |      0.0000 |
+    |         3 |   -500.0000 |      0.0000 |
+    |         4 |   -500.0000 |      0.0000 |
+    +-----------+-------------+-------------+
 
-    [[ -6.00000000e+00]
-     [ -6.00000000e+00]
-     [ -3.55271368e-15]
-     [ -1.02829510e-15]
-     [ -1.77635684e-15]
-     [ -8.88178420e-16]]
+    ### Element gradients
 
-    Element forces:
+    +-----------+------------+-----------+
+    |   Element |    g_x [-] |   g_y [-] |
+    |-----------+------------+-----------|
+    |         1 |   294.1176 |    0.0000 |
+    |         2 |   294.1176 |    0.0000 |
+    |         3 | 12500.0000 |   -0.0000 |
+    |         4 | 12500.0000 |    0.0000 |
+    +-----------+------------+-----------+
 
-    [[-100.   0.]
-     [-100.   0.]
-     [-100.   0.]
-     [-100.   0.]]   
-     
+    ### Element temps
+
+    +-----------+---------------+---------------+---------------+
+    |   Element |   T_1 [deg C] |   T_2 [deg C] |   T_3 [deg C] |
+    |-----------+---------------+---------------+---------------|
+    |         1 |      -15.0000 |       20.2941 |      -15.0000 |
+    |         2 |      -15.0000 |       20.2941 |       20.2941 |
+    |         3 |       20.2941 |     1520.2941 |       20.2941 |
+    |         4 |       20.2941 |     1520.2941 |     1520.2941 |
+    +-----------+---------------+---------------+---------------+
+    ```
+
+=== "Groundwater problem"
+
+    ```
+    # Model report
+
+    ## Input parameters
+
+    +-----+-----+
+    |   t |   k |
+    |-----+-----|
+    |   1 |  50 |
+    +-----+-----+
+
+    ### Coords
+
+    +------+-----+
+    |    x |   y |
+    |------+-----|
+    |    0 |   0 |
+    |    0 | 600 |
+    |  600 |   0 |
+    |  600 | 600 |
+    | 1200 |   0 |
+    | 1200 | 600 |
+    +------+-----+
+
+    ### Dofs
+
+    +--------+
+    |   dof1 |
+    |--------|
+    |      1 |
+    |      2 |
+    |      3 |
+    |      4 |
+    |      5 |
+    |      6 |
+    +--------+
+
+    ### Edof
+
+    +-------+-------+-------+
+    |   el1 |   el2 |   el3 |
+    |-------+-------+-------|
+    |     1 |     4 |     2 |
+    |     1 |     3 |     4 |
+    |     3 |     6 |     4 |
+    |     3 |     5 |     6 |
+    +-------+-------+-------+
+
+    ### Loads
+
+    +-------+-------+
+    |   dof |   mag |
+    |-------+-------|
+    |     6 |  -400 |
+    +-------+-------+
+
+    ### BCs
+
+    +-------+---------+
+    |   dof |   value |
+    |-------+---------|
+    |     2 |      60 |
+    |     4 |      60 |
+    +-------+---------+
+
+    ## Results
+
+    ### Nodal temps and flows (a and r)
+
+    +----------+-----------+---------------+
+    |   D.o.f. |   Phi [m] |   q [m^2/day] |
+    |----------+-----------+---------------|
+    |        1 |   59.0588 |        0.0000 |
+    |        2 |   60.0000 |       23.5294 |
+    |        3 |   58.1176 |        0.0000 |
+    |        4 |   60.0000 |      376.4706 |
+    |        5 |   53.4118 |       -0.0000 |
+    |        6 |   48.7059 |        0.0000 |
+    +----------+-----------+---------------+
+
+    ### Element flows
+
+    +-----------+-----------------+-----------------+
+    |   Element |   q_x [m^2/day] |   q_y [m^2/day] |
+    |-----------+-----------------+-----------------|
+    |         1 |         -0.0000 |         -0.0784 |
+    |         2 |          0.0784 |         -0.1569 |
+    |         3 |          0.9412 |         -0.1569 |
+    |         4 |          0.3922 |          0.3922 |
+    +-----------+-----------------+-----------------+
+
+    ### Element gradients
+
+    +-----------+-----------+-----------+
+    |   Element |   g_x [-] |   g_y [-] |
+    |-----------+-----------+-----------|
+    |         1 |    0.0000 |    0.0016 |
+    |         2 |   -0.0016 |    0.0031 |
+    |         3 |   -0.0188 |    0.0031 |
+    |         4 |   -0.0078 |   -0.0078 |
+    +-----------+-----------+-----------+
+
+    ### Element temps
+
+    +-----------+-------------+-------------+-------------+
+    |   Element |   phi_1 [m] |   phi_2 [m] |   phi_3 [m] |
+    |-----------+-------------+-------------+-------------|
+    |         1 |     59.0588 |     60.0000 |     60.0000 |
+    |         2 |     59.0588 |     58.1176 |     60.0000 |
+    |         3 |     58.1176 |     48.7059 |     60.0000 |
+    |         4 |     58.1176 |     53.4118 |     48.7059 |
+    +-----------+-------------+-------------+-------------+
+    ```
+
+=== "Stress problem"
+
+    ```
+    # Model report
+
+    ## Input parameters
+
+    +------+----------+------+
+    |    t |        E |    v |
+    |------+----------+------|
+    | 0.01 | 2.08e+10 | 0.35 |
+    +------+----------+------+
+
+    ### Coords
+
+    +-----+-----+
+    |   x |   y |
+    |-----+-----|
+    | 0   | 0   |
+    | 0   | 0.1 |
+    | 0.1 | 0   |
+    | 0.1 | 0.1 |
+    | 0.2 | 0   |
+    | 0.2 | 0.1 |
+    +-----+-----+
+
+    ### Dofs
+
+    +--------+--------+
+    |   dof1 |   dof2 |
+    |--------+--------|
+    |      1 |      2 |
+    |      3 |      4 |
+    |      5 |      6 |
+    |      7 |      8 |
+    |      9 |     10 |
+    |     11 |     12 |
+    +--------+--------+
+
+    ### Edof
+
+    +-------+-------+-------+-------+-------+-------+
+    |   el1 |   el2 |   el3 |   el4 |   el5 |   el6 |
+    |-------+-------+-------+-------+-------+-------|
+    |     1 |     2 |     7 |     8 |     3 |     4 |
+    |     1 |     2 |     5 |     6 |     7 |     8 |
+    |     5 |     6 |    11 |    12 |     7 |     8 |
+    |     5 |     6 |     9 |    10 |    11 |    12 |
+    +-------+-------+-------+-------+-------+-------+
+
+    ### Loads
+
+    +-------+--------+
+    |   dof |    mag |
+    |-------+--------|
+    |    12 | -10000 |
+    +-------+--------+
+
+    ### BCs
+
+    +-------+---------+
+    |   dof |   value |
+    |-------+---------|
+    |     1 |       0 |
+    |     2 |       0 |
+    |     3 |       0 |
+    |     4 |       0 |
+    +-------+---------+
+
+    ## Model results
+
+
+    ### Displacements and reactions
+
+    +-------+----------------------+-----------------------+
+    |   DOF |   Displacements [mm] |   Reaction force [kN] |
+    |-------+----------------------+-----------------------|
+    |     1 |               0.0000 |               20.0000 |
+    |     2 |               0.0000 |               -2.5031 |
+    |     3 |               0.0000 |              -20.0000 |
+    |     4 |               0.0000 |               12.5031 |
+    |     5 |              -0.1052 |                0.0000 |
+    |     6 |              -0.2423 |                0.0000 |
+    |     7 |               0.0973 |               -0.0000 |
+    |     8 |              -0.2198 |                0.0000 |
+    |     9 |              -0.1262 |               -0.0000 |
+    |    10 |              -0.5736 |                0.0000 |
+    |    11 |               0.1178 |                0.0000 |
+    |    12 |              -0.5946 |                0.0000 |
+    +-------+----------------------+-----------------------+
+
+    ### Element displacements
+
+    +-------+------------+------------+------------+------------+------------+------------+
+    |   el. |   ed1 [mm] |   ed2 [mm] |   ed3 [mm] |   ed4 [mm] |   ed5 [mm] |   ed6 [mm] |
+    |-------+------------+------------+------------+------------+------------+------------|
+    |     1 |     0.0000 |     0.0000 |     0.0973 |    -0.2198 |     0.0000 |     0.0000 |
+    |     2 |     0.0000 |     0.0000 |    -0.1052 |    -0.2423 |     0.0973 |    -0.2198 |
+    |     3 |    -0.1052 |    -0.2423 |     0.1178 |    -0.5946 |     0.0973 |    -0.2198 |
+    |     4 |    -0.1052 |    -0.2423 |    -0.1262 |    -0.5736 |     0.1178 |    -0.5946 |
+    +-------+------------+------------+------------+------------+------------+------------+
+
+    ### Element stresses
+
+    +-------+-------------+-------------+-------------+
+    |   el. |   es1 (MPa) |   es2 (MPa) |   es3 (Mpa) |
+    |-------+-------------+-------------+-------------|
+    |     1 |     23.0674 |      8.0736 |    -16.9326 |
+    |     2 |    -23.0674 |     -3.3852 |     -3.0674 |
+    |     3 |      6.7242 |      7.0419 |    -13.2758 |
+    |     4 |     -6.7242 |     -6.7242 |     -6.7242 |
+    +-------+-------------+-------------+-------------+
+
+    ### Element strains:
+
+    +-------+------------+------------+------------+
+    |   el. |   et1 [mm] |   et2 [mm] |   et3 [mm] |
+    |-------+------------+------------+------------|
+    |     1 |     0.9732 |     0.0000 |    -2.1980 |
+    |     2 |    -1.0520 |     0.2254 |    -0.3982 |
+    |     3 |     0.2048 |     0.2254 |    -1.7233 |
+    |     4 |    -0.2101 |    -0.2101 |    -0.8729 |
+    +-------+------------+------------+------------+
+    ```
+
+
 ## Reading and writing to a file using JSON
 
 An important part of a calculation program is being able to read and write input files. In most cases, the problems are so large that they can not be defined in the program code. In this program, we will use JSON (JavaScript Object Notation) as the format of the files we will write. The following code is an example of how a JSON file might look like.
