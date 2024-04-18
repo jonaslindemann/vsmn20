@@ -38,6 +38,7 @@ We begin by defining a python-module, flowmodel.py (chose a name depending on th
 import numpy as np
 import calfem.core as cfc
 import calfem.utils as cfu
+import tabulate as tab
 ```
     
 For the implementation, we will use object-oriented programming, ie, divide the program into logical objects that can be reused and allow for the expansion and reuse of code. 4 logical classes can be identified for the calculation model:
@@ -57,6 +58,7 @@ The class input data must contain all inputs required to perform the calculation
 import numpy as np
 import calfem.core as cfc
 import calfem.utils as cfu
+import tabulate as tab
 import json
 
 class ModelParams:
@@ -279,9 +281,27 @@ class ModelReport:
         return self.report
 ```
 
-!!! note "Nice looking tables"
+<!-- !!! note "Nice looking tables"
 
     The CALFEM commands starting with **cfu.str_disp_xxx(...)** are equivalent of the the **disp_xxx(...)** commands, but instead of printing to the terminal or notebook they return a string of the output. We use the command **cfu.str_disp_array(...)** to return a string with a table representation of the array as a string, which we add to the report in the **.add_text()** method. It is also possible to use the **tabulate** module as shown in the [guides section](data_in_tables.md).
+-->
+
+### Combining multiple arrays for tabulate
+
+Sometimes you want to combine multiple arrays into a single table, such as displacements and reactions. This can be done using the NumPy commands **np.hstack(...)** and **np.vstack(...)**. Below is an example of how to achieve this:
+
+``` py
+a_and_r = np.hstack((a, r))
+
+temp_table = tab.tabulate(
+    np.asarray(a_and_r),
+    headers=["D.o.f.", "Phi [m]", "q [m^2/day]"],
+    numalign="right",
+    floatfmt=".4f",
+    tablefmt="psql",
+    showindex=range(1, len(a_and_r) + 1),
+)
+```
 
                            
 ## Main program
