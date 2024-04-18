@@ -281,11 +281,6 @@ class ModelReport:
         return self.report
 ```
 
-<!-- !!! note "Nice looking tables"
-
-    The CALFEM commands starting with **cfu.str_disp_xxx(...)** are equivalent of the the **disp_xxx(...)** commands, but instead of printing to the terminal or notebook they return a string of the output. We use the command **cfu.str_disp_array(...)** to return a string with a table representation of the array as a string, which we add to the report in the **.add_text()** method. It is also possible to use the **tabulate** module as shown in the [guides section](data_in_tables.md).
--->
-
 ### Combining multiple arrays for tabulate
 
 Sometimes you want to combine multiple arrays into a single table, such as displacements and reactions. This can be done using the NumPy commands **np.hstack(...)** and **np.vstack(...)**. Below is an example of how to achieve this:
