@@ -213,6 +213,39 @@ class Solver:
     a, r = cfc.solveq(K, f, bc_prescr, bc_value)
 ```
 
+### Extracting and storing results from elements
+
+To be able to use the results from the elements we need to do some array operations as the output from the element routines can differ.
+
+=== "Flow/Heatflow problem"
+
+    ```py
+    # Calculate element flows and gradients
+
+    es = np.zeros([n_el, 2])
+    et = np.zeros([n_el, 2])
+
+    for elx, ely, eld, eles, elet, ... in zip(ex, ey, ed, es, et, ... ):
+
+        ...
+
+        es_el, et_el = cfc.flw2ts(elx, ely, D, eld)
+        eles[:] = es_el[0, :]
+        elet[:] = et_el[0, :]
+    ```
+
+=== "Stress"
+
+    ```py
+    es = np.zeros([n_el, 3])
+    et = np.zeros([n_el, 3])
+
+    for i, (elx, ely, eld) in enumerate(zip(ex, ey, ed)):
+        els, elt = cfc.plants(elx, ely, ep, D, eld)
+        es[i] = els
+        et[i] = elt
+    ```
+
 ## The ModelReport-class
 
 When the calculation has been completed, a report of input parameters and results is generated, this is done by the **ModelReport**-class. The class will have the same input parameters as the **ModelSolver**-class.
@@ -784,7 +817,6 @@ The submission shall consist of a zip file (or other archive format) consisting 
   * All the Python files. (.py Files)
   * An example of a saved file JSON.
   * Printing from applications run.
-  * Comparative calculation of Calfem for MATLAB.
 
 ## Element types
 
