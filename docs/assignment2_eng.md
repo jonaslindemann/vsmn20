@@ -225,10 +225,7 @@ To be able to use the results from the elements we need to do some array operati
     es = np.zeros([n_el, 2])
     et = np.zeros([n_el, 2])
 
-    for elx, ely, eld, eles, elet, ... in zip(ex, ey, ed, es, et, ... ):
-
-        ...
-
+    for elx, ely, eld, eles, elet in zip(ex, ey, ed, es, et):
         es_el, et_el = cfc.flw2ts(elx, ely, D, eld)
         eles[:] = es_el[0, :]
         elet[:] = et_el[0, :]
