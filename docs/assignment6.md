@@ -6,7 +6,7 @@ The submission should consist of:
 * A report that describes and documents the program. It should include:
     * Description of the program's problem domain and a brief overview of the theory.
     * Description of the program's structure.
-    * Comparative calculations in MATLAB/Python. Reasonableness assessment of the results. 
+    * Reasonableness assessment of the results (Check with values in previous worksheets). 
     * Simple user manual with examples and program outputs.
     * Appendix with all source code.
 * A zip file containing everything necessary to run the program, including examples.
