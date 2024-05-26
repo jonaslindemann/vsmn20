@@ -35,6 +35,10 @@ extra_javascript:
   - javascripts/tablesort.js 
 
 markdown_extensions:
+
+markdown_extensions:
+  - markdown_include.include:
+      base_path: docs
   - admonition
   - attr_list
   - pymdownx.highlight:
