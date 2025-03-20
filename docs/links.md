@@ -8,7 +8,7 @@
     * [Ingenjörens guide till Python](http://guidetillpython.se/)
     * [CALFEM for Python documentation](https://calfem-for-python.readthedocs.io/en/latest/)
  * Software 
-    * [Anaconda Python distribution](https://www.anaconda.com/)
+    * [Conda-Forge Python distribution](https://conda-forge.org/)
     * [Google Colab - Notebooks](https://colab.research.google.com/)
     * [Visual Studio Code](https://code.visualstudio.com/Download)
     * [ParaView](https://www.paraview.org/download/)
