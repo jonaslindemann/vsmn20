@@ -1,351 +1,598 @@
-# Worksheet 3
+# Worksheet 3: Parametric Geometric Modeling and Visualization
 
-!!! note "Important"
+## Introduction
 
-    When **...** appears in the program examples, this indicates that there is no code that you yourselves must add. Variables and data structures are only examples. Depending on the type of problem you may need other data structures than those described in the code examples.
+In this worksheet, we will enhance the finite element application you developed in Worksheet 2 by implementing a **parametric geometric model**. This represents a significant advancement in your application's capabilities - instead of directly defining nodes and elements, you'll now describe your problem domain through geometric parameters (like width, height, etc.). This approach makes it much easier to modify the model and run studies with different geometries.
 
-## General
+**Prerequisites:**
 
-In this worksheet contains the following elements:
+- Completed implementation of Worksheet 2 classes
+- Basic understanding of Python object-oriented programming
+- GMSH installation (included with CALFEM)
 
-  1. The classes implemented in sheet 2 are adapted to implementa geometric model that describes the calculation model parametrically.
-  2. load and save functions must be adapted to handle the geometric model.
-  2. grid generation is implemented using **GMSH** and the results visualized.
-  3. Visualization of the model to be made with **calfem.vis_mpl** functions.
+**Learning Objectives:**
 
-## Geometric model
+After completing this worksheet, you will be able to:
 
-In this worksheet, we will update our classes to manage a geometric model that is the basis for the mesh generation in our **ModelSolver**-class. Instead of defining the model in terms of nodes and elements, we define it instead with parameters such as width and height.
+1. Create parametric geometric models using CALFEM's geometry module
+1. Generate finite element meshes automatically using GMSH
+1. Visualize model geometry, meshes, and calculation results
+1. Conduct parameter studies by varying geometric properties
+1. Save and load models with geometric descriptions
 
-In this worksheet, we use some additional Calfem modules. Add the following modules in the module where your classes are defined:
+## Setting Up Required Modules
 
-``` py hl_lines="4-6"
-import json, math, sys
+In this worksheet, we need to import additional modules for geometry description, mesh generation, and visualization. Add the following imports to your module file:
+
+```py hl_lines="8-10"
+# -*- coding: utf-8 -*-
+
+import json
+import math
+import sys
 
 import calfem.core as cfc
-import calfem.geometry as cfg
-import calfem.mesh as cfm
-import calfem.vis_mpl as cfv
-import calfem.utils as cfu
+import calfem.geometry as cfg  # For geometric modeling
+import calfem.mesh as cfm      # For mesh generation
+import calfem.vis_mpl as cfv   # For visualization
+import calfem.utils as cfu     # Utility functions
 
 import numpy as np
 import tabulate as tb
-``` 
+```
 
-## Updating the ModelParams-class
+!!! note
 
-**ModelParams**-class must be updated to handle a parametric model described using parameters instead of defining the problem at the element level. For the groundwater problem, parameters **w** **t** , **d**  and **h** are used to describe the geometry and **EP**  **kx** and **ky** to describe elements properties. Variables for loads and boundary conditions can be maintained. The difference now is that instead of storing the degrees of freedom and value we now store the boundary condition marker and value.
+    The `calfem.vis_mpl` module provides visualization functions based on Matplotlib. This allows us to create visual representations of our model, mesh, and results.
 
-All variables such as **coord** and **edof** describing the input of element level to be moved to the **ModelSolver** - class because they will be created when the elements are generated in the solver.
+## Parametric Geometric Modeling
 
-The geometry will be defined with the classes and functions of  **calfem.geometry**. To ensure that the **ModelSolver** method **execute()** will get an up-to-date geometry definition we add a method **geometry()** in the **ModelParams**-class, which will return a **cfg.Geometry**-instance. An example of how this method might look like the following example:
+In Worksheet 2, the `ModelParams` class defined our problem directly using nodes (coordinates) and elements (topology). Now, we need to modify this class to describe the geometry using parameters instead of explicit node/element definitions.
 
-``` py
-class ModelParams(object):
-    """Class defining our model parameters"""
-    ...
-    
-    def geometry(self):
-        """Skapa en geometri instans baserat på definierade parametrar"""
+For example, instead of defining exact coordinates for a groundwater flow problem, we'll use parameters like:
+
+* `w` - Width of the domain
+* `h` - Height of the domain
+* `d` - Depth of barrier
+* `t` - Thickness of barrier
+
+The element-level variables from Worksheet 2 (`coords`, `edof`, etc.) should be moved to the `ModelResult` class, as they will now be generated by the mesh generator.
+
+Here's how the updated `ModelParams` class might look:
+
+```python
+class ModelParams:
+    """Class defining parametric model properties"""
+    def __init__(self):
         
-        # --- Create a geometry instance to store the geometry
-        #     description
+        # Version tracking
+        
+        self.version = 1
+        
+        # Geometric parameters (example for groundwater problem)
+        
+        self.w = 100.0  # Width of domain
+        self.h = 10.0   # Height of domain
+        self.d = 5.0    # Depth of barrier
+        self.t = 0.5    # Thickness of barrier
+        
+        # Material properties (example for groundwater problem)
+        
+        self.kx = 20.0  # Permeability in x-direction
+        self.ky = 20.0  # Permeability in y-direction
+        
+        # Mesh control
+        
+        self.el_size_factor = 0.5  # Controls element size in mesh generation
+        
+        # Boundary conditions and loads will now reference markers 
+        # instead of node numbers or degrees of freedom
+        
+        self.bc_markers = {
+            "left_bc": 10,    # Marker for left boundary
+            "right_bc": 20   # Marker for right boundary
+        }
+        
+        self.bc_values = {
+            "left_bc": 10.0,  # Value for left boundary
+            "right_bc": 0.0  # Value for right boundary
+        }
+        
+        self.load_markers = {
+        }
+        
+        self.load_values = {
+        }
+```
+
+As a final step we need to add a `geometry()` method to the `ModelParams` class that creates and returns an instance of the geometry in the form of a `cfg.Geometry` instance. This will be later used to generate the mesh.
+
+Here's an example implementation for a groundwater flow problem:
+
+```python
+class ModelParams:
+    """Class defining parametric model properties"""
+    def __init__(self):
+        
+        # ... (existing code)
+
+    def geometry(self):
+        """Create and return a geometry instance based on defined parameters"""
+        
+        # Create a geometry instance
         
         g = cfg.Geometry()
         
-        # --- Create shorter variable references to class attributes
+        # Use shorter variable names for readability
         
         w = self.w
         h = self.h
         t = self.t
         d = self.d
         
-        # --- Points in the geometry are created with the .point() method
+        # Define points for the geometry
+        # Point indices start at 0
         
-        g.point([0, 0])
-        g.point([w, 0])
-        g.point([w, h])
+        g.point([0, 0])          # Point 0: Bottom left corner
+        g.point([w, 0])          # Point 1: Bottom right corner
+        g.point([w, h])          # Point 2: Top right corner
+        g.point([0, h])          # Point 3: Top left corner
         
-        ...
+        # Add points for the barrier
         
-        # --- Lines and splies are created with the .spline method.
+        g.point([w/2-t/2, h])    # Point 4: Top left of barrier
+        g.point([w/2+t/2, h])    # Point 5: Top right of barrier
+        g.point([w/2-t/2, h-d])  # Point 6: Bottom left of barrier
+        g.point([w/2+t/2, h-d])  # Point 7: Bottom right of barrier
         
-        g.spline([0, 1])            
-        g.spline([1, 2])           
-        g.spline([2, 3], marker=...) # <-- Use marker to define
-                                     #     lines that will have  
-                                     #     boundary conditions 
-                                     #     and loads.
+        # Define splines (lines) connecting the points
+        # Use markers for boundaries with conditions
         
-        ...
+        g.spline([0, 1])                         # Bottom boundary
+        g.spline([1, 2])                         # Right boundary, marker for fixed value
+        g.spline([2, 5], marker=self.bc_markers["right_bc"])
+        g.spline([5, 4])                         # Top of barrier
+        g.spline([4, 3], marker=self.bc_markers["left_bc"]) # Left boundary, marker for fixed value
+        g.spline([3, 0])
+        g.spline([4, 6])                         # Left side of barrier
+        g.spline([5, 7])                         # Right side of barrier
+        g.spline([6, 7])                         # Bottom of barrier
         
-        # --- Surface defining what defines the geometry
+        # Define the surface (domain) using the spline indices
+        # Surface is defined by a list of spline indices that form a closed loop
         
-        g.surface([0,1, ... ,6,7])
-
-        # --- Return the generated geometry.
+        g.surface([0, 1, 2, 3, 4, 5, 6, 7, 8])
         
+        # Return the complete geometry
         return g
 ```
 
-## Updating the ModelSolver-class
+!!! important
 
-In the **ModelSolver**-class, we must add a call to the mesh generator in the **calfem.mesh**-module, **GmshMeshGenerator**. This will give us the element coordinates, topology, and variables that can be used for the connection between geometry and element mesh. An example of how this might look in the **execute()**-method is shown below:
+    The geometry will vary depending on your chosen problem type. The above example is for a groundwater flow problem with a barrier. You'll need to adapt the point and spline definitions for your specific problem.
 
-``` py
-class ModelSolver(object):
-    """Class implementing the solver for our model."""
+The key concept here is the use of **markers**. Markers are integer identifiers we assign to specific elements of the geometry (like lines or surfaces). Later, we'll use these markers to apply boundary conditions and loads to the correct parts of the model.
 
-    ...
-                
+## Adding Mesh Generation to ModelSolver
+
+GMSH is an open-source mesh generator that CALFEM interfaces with through the `calfem.mesh` module. It can create a finite element mesh from our geometric model.
+
+The `ModelSolver` class needs to generate a mesh based on the geometry before performing the finite element calculation. To acomplish this we modify the `execute()` method to do this:
+
+```python
+class ModelSolver:
+    """Class for solving the finite element model"""
+    def __init__(self, model_params, model_result):
+        self.model_params = model_params
+        self.model_result = model_result
+    
     def execute(self):
-        """Perform finite element computation."""
+        """Perform mesh generation and finite element computation"""
         
-        # --- Create references (shortcuts) to input data variables
-        
-        version = self.model_params.version
-        ep = self.model_params.ep
+        # Create shorter references to input variables
 
-        ...
+        ep = self.model_params.ep
+        kx = self.model_params.kx
+        ky = self.model_params.ky
         
+        # Get geometry from model_params
+
+        geometry = self.model_params.geometry()
         
-        # --- Call the mode
+        # Store geometry in results for visualization
         
-        geometry = self.model_params.geometry()        
+        self.model_result.geometry = geometry
         
-        # --- Mesh generation
+        # Set up mesh generation
         
-        el_type = 3        # <-- four node element flw2i4e
-        dofs_per_node = 1  # <-- scalar problem
+        el_type = 3        # 3 = 4-node quadrilateral element
+        dofs_per_node = 1  # 1 for scalar problem (flow, heat), 2 for vector (stress)
         
-        mesh = cfm.GmshMesh(geometry)
-        mesh.el_size_factor = 0.5     # <-- max area for elements
+        # Create mesh generator
+        
+        mesh = cfm.GmshMeshGenerator(geometry)
+        
+        # Configure mesh generator
+        
         mesh.el_type = el_type
         mesh.dofs_per_node = dofs_per_node
+        mesh.el_size_factor = self.model_params.el_size_factor
         mesh.return_boundary_elements = True
         
+        # Generate mesh
+        
         coords, edof, dofs, bdofs, element_markers, boundary_elements = mesh.create()
-```
-            
-Element generation and assemblation do not need to be changed from worksheet 2. However, one must update the handling of loads and boundary conditions, as we are now working load markers instead of degrees of freedom. Use the functions **apply_bc(...)** and **apply_force_total(...)**/**apply_tracion_linear_element(...)** available in the **calfem.utils** module.
-
-Solving equations and calculating element forces do not need to be changed. However, we need to store the generated variables **coord**, **edof**, **geometry** and other output variables needed to visualize the results.
-
-!!! note "Tip"
-
-    It may also be useful to define a variable in the **ModelParams** - class to set the maximum size of the generated elements such as **el_size_factor**, which can then be assigned to **cfm.GmshMesh** - class attribute **el_size_factor**.
-
-## Using the parametric model
-
-The idea of the parametric description of the problem is that a user easily be able to specify their area of concern in the code without having to go into the module for the model. This is shown in the following code:
-
-``` py
-# -*- coding: utf-8 -*-
-
-import flowmodel as fm
-
-if __name__ == "__main__":
-    
-    model_params = fm.ModelParams()
-
-    model_params.w = 100.0
-    model_params.h = 10.0
-    model_params.d = 5.0
-    model_params.t = 0.5
-    model_params.kx = 20.0
-    model_params.ky = 20.0
-    
-    ...
+        
+        # Store mesh data in results
+        
+        self.model_result.coords = coords
+        self.model_result.edof = edof
+        self.model_result.dofs = dofs
+        self.model_result.bdofs = bdofs
+        self.model_result.element_markers = element_markers
+        self.model_result.boundary_elements = boundary_elements
+        self.model_result.el_type = el_type
+        self.model_result.dofs_per_node = dofs_per_node
+        
+        # TODO: 
+        # 
+        # Now continue with FE calculation similar to Worksheet 2
+        # but using the generated mesh data
+        
+        # Extract node and element data from mesh for element calculations
+        # ...
 ```
 
-In this way, one can also easily study the effect of, an increasing depth of the tongue in the ground and find out how this affects the flow, as shown below:
+!!! note
 
-``` py
+    The code above needs to be modified for the problem type selected. The code above shows the ground water problem. For the heat transfer and plane stress problems, the element type and degrees of freedom per node will be different.
+
+## Handling Boundary Conditions and Loads
+
+In Worksheet 2, we directly specified loads and boundary conditions using node/degree of freedom indices. Now, we need to use markers to apply them. CALFEM provides utility functions for this:
+
+```python
+class ModelSolver:
+
+    # ... (existing code)
+
+    def execute(self):
+
+        # Initialize the global stiffness matrix and load vector
+
+        n_dofs = np.max(dofs)
+        K = np.zeros((n_dofs, n_dofs))
+        f = np.zeros((n_dofs, 1))
+
+        # TODO:
+        #
+        # Assemble element contributions to global stiffness matrix
+        # ... (similar to Worksheet 2)
+
+        # Apply boundary conditions based on markers
+
+        bc_prescr = []
+        bc_values = []
+
+        # For each boundary condition marker in model_params
+
+        for marker_name, marker_id in self.model_params.bc_markers.items():
+            if marker_name in self.model_params.bc_values:
+                value = self.model_params.bc_values[marker_name]
+                cfu.apply_bc_from_markers(
+                    bdofs,
+                    boundary_elements,
+                    marker_id,
+                    bc_prescr,
+                    bc_values,
+                    value
+                )
+
+        # Convert to numpy arrays
+
+        bc_prescr = np.array(bc_prescr)
+        bc_values = np.array(bc_values)
+
+        # Apply loads based on markers
+
+        for marker_name, marker_id in self.model_params.load_markers.items():
+            if marker_name in self.model_params.load_values:
+                value = self.model_params.load_values[marker_name]
+                cfu.apply_force_from_markers(
+                    bdofs,
+                    boundary_elements,
+                    marker_id,
+                    f,
+                    value
+                )
+
+        # Solve equation system
+
+        a, r = cfc.solveq(K, f, bc_prescr, bc_values)
+
+        # Store displacement and reaction forces
+
+        self.model_result.a = a
+        self.model_result.r = r
+
+        # TODO:
+        #
+        # Calculate element displacements, stresses/flows, etc.
+        # ... (similar to Worksheet 2)
+
+        # Calculate maximum flow/stress for parameter studies
+
+        element_values = np.sqrt(np.sum(self.model_result.es**2, axis=1))
+        self.model_result.max_value = np.max(element_values)
+```
+
+## Results Visualization
+
+To help understand the results, we'll create a new class called `ModelVisualization` that handles visualization of different aspects of the model. This class takes a ModelParams and ModelResult instance as input and provides methods to display the geometry, mesh, nodal values, element values, and deformed mesh (for stress problems).
+
+
+```python
+class ModelVisualization:
+    """Class for visualizing model geometry, mesh, and results"""
+    
+    def __init__(self, model_params, model_result):
+        """Constructor"""
+        self.model_params = model_params
+        self.model_result = model_result
+        
+        # Store references to visualization windows
+
+        self.geom_fig = None
+        self.mesh_fig = None
+        self.nodal_val_fig = None
+        self.element_val_fig = None
+        self.deformed_fig = None
+    
+    def show_geometry(self):
+        """Display model geometry"""
+
+        # Get the geometry from results
+
+        geometry = self.model_result.geometry
+
+        # Create a new figure
+        
+        cfv.figure()
+        cfv.clf()
+        
+        # Draw geometry
+
+        cfv.draw_geometry(geometry, draw_points=True, label_points=True, 
+                         draw_line_numbers=True, title="Model Geometry")
+    
+    def show_mesh(self):
+        """Display finite element mesh"""
+
+        # Create a new figure
+
+        cfv.figure()
+        cfv.clf()
+        
+        # Draw mesh
+
+        cfv.draw_mesh(
+            coords=self.model_result.coords,
+            edof=self.model_result.edof,
+            dofs_per_node=self.model_result.dofs_per_node,
+            el_type=self.model_result.el_type,
+            filled=True,
+            title="Finite Element Mesh"
+        )
+    
+    def show_nodal_values(self):
+        """Display nodal values (e.g., temperature, pressure)"""
+
+        # TODO:
+        #   
+        # Implement this method to display nodal values
+
+
+    
+    def show_element_values(self):
+        """Display element values (e.g., flows, stresses)"""
+
+        # TODO:
+        #   
+        # Implement this method to display element values
+
+    
+    def show_deformed_mesh(self, scale_factor=1.0):
+        """Display deformed mesh (for stress problems)"""
+
+        # TODO:
+        #   
+        # Implement this method to display deformed mesh
+    
+    def wait(self):
+        """Wait for user to close all visualization windows"""
+        cfv.show_and_wait()
+```
+
+## Conducting Parameter Studies
+
+One of the key advantages of parametric modeling is the ability to easily perform parameter studies. Here's an example of how to implement a parameter study:
+
+```python
 # -*- coding: utf-8 -*-
 
-import flowmodel as fm
 import numpy as np
+import matplotlib.pyplot as plt
+import flowmodel as fm
 
-if __name__ == "__main__":
+def run_parameter_study():
+    """Run a parameter study by varying the barrier depth"""
     
-    dRange = np.linspace(3.0, 7.0, 10).tolist()
+    # Parameters to vary
+
+    d_values = np.linspace(3.0, 7.0, 10)
+    max_flow_values = []
     
-    for d in dRange:
-    
-        print("-------------------------------------------")    
-        print("Simulating d = ", d)
-    
+    # Run simulation for each value
+
+    for d in d_values:
+        print(f"Simulating with barrier depth d = {d:.2f}...")
+        
+        # Create model with current parameter
+
         model_params = fm.ModelParams()
-    
+        model_params.d = d  # Set current barrier depth
+        
+        # Other parameters remain constant
+
         model_params.w = 100.0
         model_params.h = 10.0
-        model_params.d = d
         model_params.t = 0.5
         model_params.kx = 20.0
         model_params.ky = 20.0
         
-        model_results = fm.ModelResults()
-    
-        solver = fm.ModelSolver(model_params, model_results)
+        # Create result storage and solver
+
+        model_result = fm.ModelResult()
+        solver = fm.ModelSolver(model_params, model_result)
+        
+        # Run the simulation
+
         solver.execute()
         
-        print("Max flow = ", np.max(model_result.maxFlow))        
-```
+        # Store the maximum flow for this configuration
 
-## ModelReport class
+        max_flow_values.append(model_result.max_value)
+        print(f"Maximum flow value: {model_result.max_value:.4f}")
+    
+    # Plot the results
 
-In the **ModelReport**-class, we need to add the ability to print the geometry description.
+    plt.figure(figsize=(10, 6))
+    plt.plot(d_values, max_flow_values, 'o-', linewidth=2)
+    plt.grid(True)
+    plt.xlabel('Barrier Depth (d)')
+    plt.ylabel('Maximum Flow')
+    plt.title('Parameter Study: Effect of Barrier Depth on Maximum Flow')
+    plt.savefig('parameter_study.png')
+    plt.show()
+    
+    # Return results for further analysis if needed
 
-## Visualisation with a new class ModelVisualisation
-
-In worksheet 2 the only output from the calculations where the printout from the **ModelResult**-class. To interpret the results in text format can be difficult. We must therefore use routines from the CALFEM visualization module **calfem.vis**. The visualization will be implemented in the new class **ModeVisualization**. This class has the same input parameters as the **ModelResult**-class with references to instances of **ModelParams** and **ModelResult**.
-
-There are a number of visualization features in Calfem. In this sheet, the following visualizations are implemented:
-
- * Geometry - draw_geometry(...)
- * Generated network - draw_mesh(...)
- * Deformed networks - draw_mesh(...) (for example voltage)
- * Element Values ​​- draw_element_values​​(...)
- * Node values ​​- draw_nodal_values​(...)
- 
-Documentation for these procedures, see the user manual for [mesh generation routines](https://calfem-for-python.readthedocs.io/en/latest/calfem_mesh_guide.html).
-      
-The following code shows how the class can be implemented with a method for visualising the model geometry.
-
-``` py
-class ModelVisualisation(object):
-    def __init__(self, model_params, model_result):
-        self.model_params = model_params
-        self.model_result = model_result
-        
-    def show(self):
-        
-        geometry = self.model_result.geometry
-        a = self.model_result.a
-        max_flow = self.model_result.max_flow
-        coords = self.model_result.coords
-        edof = self.model_result.edof
-        dofs_per_node = self.model_result.dofs_per_node
-        el_type = self.model_result.el_type
-        
-        cfv.figure() 
-        cfv.draw_geometry(geometry, title="Geometry")
-        
-        ...
-                    
-    def wait(self):
-        """This method make sure the windows are kept updated."""
-
-        cfv.show_and_wait()
-```
-            
-The **ModelVisualiation**-class is then added to the main program in the code shown:
-
-``` py
-# -*- coding: utf-8 -*-
-
-import flowmodel as fm
+    return d_values, max_flow_values
 
 if __name__ == "__main__":
-    
-    model_params = fm.ModelParams()
-
-    model_result = fm.OutputData()
-
-    solver = fm.Solver(model_params, model_result)
-    solver.execute()
-
-    report = fm.Report(model_params, model_result)
-    print(report)
-    
-    vis = fm.ModelVisualisation(model_params, model_result)
-    vis.show()
-    vis.wait()        
+    run_parameter_study()
 ```
 
-**vis.wait()** must be called last in the main program, since this function does not return until the final visualization window closes.
+This script creates a series of models with varying barrier depths, solves each one, and plots the maximum flow values against the barrier depth.
 
-## Submission and reporting
+## Example Problems
 
-It is to be done in this worksheet are:
+Below are the specifications for the three problem types you can choose from. Remember to select just one problem type to implement.
 
- * Change **ModelPArams**-class to describe the problem parametrically according to the examples described at the end of this sheet. Create a method **geometry()** that returns a **cfg.Geometry**-instance with geometry defined based on the parameter description.
- * Update the **ModelSolver**-class so that this creates an element mesh using **cfm.GmshMeshGenerator**-class. Save maximum flows / maxspänningar (von Mises) and store these in the **ModelResult**-class.
- * Complete the implementation of the **ModelVisualization**-class to handle visualisation of geometry, element mesh, element flows and node values.
- * Makes a parameter study wherein one of the parameters is varied and maximum flow/max stress is plotted relative to the selected parameter. Create a new main program for parameter study.
+### Groundwater Flow Problem
 
-The submission shall consist of a zip file (or other archive format) consisting of:
+![Groundwater Flow Problem](images/gw.svg)
 
- * All the Python files. (.py files)
- * An example of a saved file JSON.
- * Printing from program execution.
- * Printing of the parameter study.
+**Geometric parameters:**
 
-## Example problems
+- h = 10.0 (height of domain)
+- w = 100.0 (width of domain)
+- d = 5.0 (depth of barrier)
+- t = 0.5 (thickness of barrier)
 
-### Grundvattenströmning
- 
-![case1](images/gw.svg)
+**Material properties:**
 
-h = 10.0, w = 100.0, d = 5.0, t = 0.5
+- k_x = k_y = 20 m/day (permeability in x and y directions)
 
-k_x = k_y = 20 m/dag
+**Boundary conditions:**
 
-### Tvådimensionell värmeledning
- 
-![case2](images/temp.svg)
+- Fixed pressure head (phi) of 60.0 m on left and right boundaries
+- Flow rate (q) of -400 m²/day at the specified outlet
 
-h = 0.1, w = 0.1, a = 0.01, b = 0.01, x = 0.01, y = 0.01
+### Heat Transfer Problem
 
-lambda_x = lambda_y = 1.7 W/m C
+![Heat Transfer Problem](images/temp.svg)
 
-### Plan skiva
- 
-![case3](images/stress.svg)
+**Geometric parameters:**
 
-h = 0.1, w = 0.3, a = 0.05, b = 0.025
+- h = 0.1 (height of domain)
+- w = 0.1 (width of domain)
+- a = 0.01 (width of left heat source)
+- b = 0.01 (width of right heat source)
+- x = 0.01 (distance from left boundary to left heat source)
+- y = 0.01 (distance from right boundary to right heat source)
 
-E = 2.08e11, ν = 0.3, t = 0.010
+**Material properties:**
 
-q = 100 kN / m
+- lambda_x = lambda_y = 1.7 W/mC (thermal conductivity in x and y directions)
 
-## Solution to problems
+**Boundary conditions:**
 
-=== "Groundwater problem 3 node (flw2te)"
+- Fixed temperature on top and bottom boundaries
+- Heat flux at specified locations
 
-    ```
-    {!flowmodel_v3_el2.txt!}
-    ```
+### Plane Stress Problem
 
-=== "Groundwater problem 3 node (flw2i4e)"
+![Plane Stress Problem](images/stress.svg)
 
-    ```
-    {!flowmodel_v3_el3.txt!}
-    ```
+**Geometric parameters:**
 
-=== "Heat problem 3 node (flw2te)"
+- h = 0.1 (height of domain)
+- w = 0.3 (width of domain)
+- a = 0.05 (width of left cutout)
+- b = 0.025 (height of cutout)
 
-    ```
-    {!heatmodel_v3_el2.txt!}
-    ```
+**Material properties:**
 
-=== "Heat problem 4 node (flw2i4e)"
+- E = 2.08e11 Pa (Young's modulus)
+- ν = 0.3 (Poisson's ratio)
+- t = 0.010 m (thickness)
 
-    ```
-    {!heatmodel_v3_el3.txt!}
-    ```
+**Boundary conditions:**
 
-=== "Stress problem - 3 node (plante)"
+- Fixed displacement on left edge
+- Distributed load q = 100 kN/m on right edge
 
-    ```
-    {!stressmodel_v3_el2.txt!}
-    ```
+## Submission Requirements
 
-=== "Stress problem - 4 node (planqe)"
+Your submission should include:
 
-    ```
-    {!stressmodel_v3_el3.txt!}
-    ```
+1. **Python Files:**
+    - Updated `ModelParams` class with parametric description and `geometry()` method
+    - Updated `ModelSolver` class with mesh generation
+    - New `ModelVisualization` class with visualization methods
+    - Main program for standard execution
+    - Parameter study program
+2. **Example Files:**
+    - A JSON file with saved model parameters
+    - Screenshots of visualizations (geometry, mesh, results)
+    - Plot of parameter study results
+3. **Documentation:**
+    - Brief explanation of your geometric model
+    - Analysis of parameter study results
+    - Any challenges encountered and how you solved them
 
+Package all files in a ZIP archive for submission.
 
+## Troubleshooting Guide
 
+1. **GMSH Not Found Error:**
+    - Ensure GMSH is properly installed with CALFEM
+    - Try reinstalling CALFEM with `pip install calfem-python`
+2. **Mesh Generation Errors:**
+    - Check that your geometry is properly defined with no gaps in the boundary
+    - Ensure all points are correctly connected by splines
+    - Try increasing the `el_size_factor` for simpler meshes
+3. **Visualization Not Showing:**
+    - Make sure you're calling `wait()` after showing visualizations
+    - Check that Matplotlib is properly installed
+    - Try running with a different backend: `import matplotlib; matplotlib.use('TkAgg')`
+4. **Parameter Study Issues:** 
+    - Start with a small number of parameter values for testing
+    - Add print statements to track progress and debug issues
+    - Check that results are being properly stored in the result object
+
+## Further Reading
+
+- [CALFEM for Python Documentation](https://calfem-for-python.readthedocs.io/)
+- [GMSH Documentation](https://gmsh.info/doc/texinfo/gmsh.html)
