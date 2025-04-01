@@ -9,6 +9,7 @@ nav:
   - Worksheet 5: assignment5_eng.md
   - Final hand-in: assignment6.md
 - Guides:
+  - Installation guide for Windows: installation_guide_windows.md
   - Creating tables with Tabulate: data_in_tables.md
 - Links: links.md
 
