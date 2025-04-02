@@ -6,161 +6,142 @@ This document provides a step-by-step guide to installing Conda-Forge on Windows
 
 Go to the [Conda-Forge page](https://conda-forge.org) and download the Anaconda installer for Windows.
 
-![Conda-Forge homepage](images/cf-install-01.png)
+![Conda-Forge homepage](images/cf-install-mac-01.png)
 
 Click on the button **Download Installer**.
 
-![Conda-Forge homepage](images/cf-install-02.png)
+![Conda-Forge homepage](images/cf-install-mac-02.png)
 
-Click on the **Windows** Button to download the installer for Windows.
-
-A download message will appear on the top right corner of your browser. Click on the **Open file** when the download has completed.
-
-![Conda-Forge installer](images/cf-install-03.png)
+In this step it is important to now if you are using a Intel- or Apple Silicon Mac. If you are using a Intel Mac, click on the **macOS** Button to download the installer for Intel Macs. If you are using an Apple Silicon Mac, click on the **Apple Silicon** Button to download the installer for Apple Silicon Macs.
 
 ## Step 2: Installing Conda-Forge
 
-When the installer opens, you will see a welcome screen. 
+When the download completed the installation needs to be completed in a Terminal. To open a Terminal, press **Command** + **Space** and type in **Terminal**. This will open the Terminal application.
 
-![Conda-Forge installer](images/cf-install-04.png)
+In the terminal we need to navigate to the folder where the installer was downloaded. By default, this is the **Downloads** folder. To navigate to the Downloads folder, run the following command in the terminal:
 
-Click on **Next** to continue. The following page will be displayed:
-
-![Conda-Forge installer](images/cf-install-05.png)
-
-Select the option **Install only for me** and click on **Next**. The following page will be displayed:
-
-![Conda-Forge installer](images/cf-install-06.png)
-
-Leave the suggested location for the installation and click on **Next**. The following page will be displayed:
-
-![Conda-Forge installer](images/cf-install-07.png)
-
-Here it is important to select the option "Register Anaconda as my default Python 3.x". This will ensure that the Conda-Forge packages are available in your Python environment. Click on **Next** to continue. The installation of Conda-Forge will start and the following page will be displayed:
-
-![Conda-Forge installer](images/cf-install-08.png)
-
-When this dialog has finished the Conda-Forge installation is complete.
-
-## Step 3: Opening an Miniforge prompt
-
-Press the **Start** button in Windows. This should bring up the following menu.
-
-![Conda-Forge installer](images/cf-install-09.png)
-
-In the top part of the start menu enter miniforge. This should show the shortcut for the Miniforge prompt. Click on the **Miniforge Prompt** to open a command line window as shown below:
-
-![Conda-Forge installer](images/cf-install-10.png)
-
-To install the required packages for this course we create an environment. An environment is a self-contained installation of Python with its own set of packages. This allows you to have multiple versions of Python and packages installed on your system without conflicts. To create an environment called `vsmn20` with Python 3.8, run the following command in the Miniforge prompt:
-
-```cmd
-conda create -n vsmn20 python=3.8 numpy scipy matplotlib
+```bash
+cd ~/Downloads
 ```
 
-Running this command will check for the required packages and their dependencies. If everything is ok, you will be prompted to confirm the installation. Type `y` and press enter to continue.
+We are now ready to start the installer. The installer is a `.sh` file. To start the installation, run the following command in the terminal:
 
-![Conda-Forge installer](images/cf-install-12.png)
-
-When the installation completes, you will see the following message:
-
-```cmd
-Downloading and Extracting Packages:
-
-Preparing transaction: done
-Verifying transaction: done
-Executing transaction: done
-#
-# To activate this environment, use
-#
-#     $ conda activate vsmn20
-#
-# To deactivate an active environment, use
-#
-#     $ conda deactivate
+```bash
+sh Miniforge3-MacOSX-arm64.sh
 ```
 
-To use this environment in the future, you need to activate it. To do this, run the following command in the Miniforge prompt:
+![Conda-Forge installer](images/cf-install-mac-03.png)
 
-```cmd
+When the installer starts it shows the license agreement. To accept the license agreement, we need to move down in the text. To do this, press the **Space** key until the end of the license agreement is reached. After that, type in **yes** and press **Enter** to accept the license agreement.
+
+![Conda-Forge installer](images/cf-install-mac-05.png)
+
+Next you will be asked where to install Conda-Forge. By default, it will be installed in the home directory under the folder **miniforge3**. To accept the default location, press **Enter**. If you want to change the location, type in the new location and press **Enter**.
+
+![Conda-Forge installer](images/cf-install-mac-06.png)
+
+The installer now downloads the required packages. Finally it asks if you would like to configure the shell to use conda by default. This is recommended, so type in **yes** and press **Enter**.
+
+![Conda-Forge installer](images/cf-install-mac-07.png)
+
+The installation is now complete. Before we use the Conda-Forge, we need to restart the terminal. To do this, close the terminal and open it again. 
+
+The new terminal should look like this:
+
+![Conda-Forge installer](images/cf-install-mac-08.png)
+
+That is there should be a prompt with `(base)` in front of it. This indicates that the Conda-Forge is installed and ready to use.
+
+## Step 3: Creating an envrionment for this course
+
+In the opened terminal we need to create a new environment for this course. An environment is a self contained Python installation with a set of packages. To create a new environment, run the following command in the terminal:
+
+```bash
+conda create -n vsmn20 python=3.12 numpy scipy matplotlib
+```
+
+This will create a new environment called `vsmn20` with Python 3.12 and the packages `numpy`, `scipy` and `matplotlib`. The command will also install all the dependencies required for these packages. 
+
+![Conda-Forge installer](images/cf-install-mac-11.png)
+
+At some point during the installation, you will be asked if you want to proceed with the installation. Type in **y** and press **Enter** to proceed with the installation.
+
+When the installation is complete, you will see a message indicating that the environment has been created and how to activate it.
+
+![Conda-Forge installer](images/cf-install-mac-12.png)
+
+To continue our installation with the packages required for this course, we need to activate the environment. To do this, run the following command in the terminal:
+
+```bash
 conda activate vsmn20
 ```
 
-This will activate the `vsmn20` environment and you will see the following message:
+This will activate the environment and change the prompt to indicate that the environment is active. The prompt should now look like this:
 
-```cmd
-(vsmn20) C:\Users\YourUsername>
+```bash
+(vsmn20) user@computer:~$
+``` 
+
+In this environment we now have to install CALFEM for Python. We will use a special package manager calle pip to install CALFEM. To do this, run the following command in the terminal:
+
+```bash
+pip install calfem-python
 ```
 
-This indicates that you are now in the `vsmn20` environment and any packages you install or run will be from this environment.
-To deactivate the environment, run the following command:
+If all goes well, you should see a message indicating that CALFEM has been installed successfully.
 
-```cmd
-conda deactivate
+![Conda-Forge installer](images/cf-install-mac-14.png)
+
+## Step 4: Testing the installation
+
+To test the installation, will open a Python interpreter. To do this, run the following command in the terminal:
+
+```bash
+python
 ```
 
-This will deactivate the `vsmn20` environment and return you to the base environment.
+This will open the Python interpreter. The prompt should now look like this:
 
-## Step 4: Installing additional packages
-
-In this course there are additional packages required that are not included in the default installation of Conda-Forge. To install these packages make sure the `vsmn20` environment is activated and run the following command: 
-
-```cmd
-conda activate vsmn20
+```bash
+>>> 
 ```
 
-To install the additional packages we will ue the `pip` command. This is a package manager for Python that allows you to install packages from the Python Package Index (PyPI). Using `pip` we will install CALFEM.
+On this prompt we type in the following command to import CALFEM:
 
-```cmd
-pip install calfem
+```python
+>>> import calfem.core as cfc
+>>> help(cfc.beam2e)
 ```
 
-When the installation is complete you will see the following message:
+This shoudl display the following in the terminal:
 
-![Conda-Forge installer](images/cf-install-16.png)
+![Conda-Forge installer](images/cf-install-mac-15.png)
+
+To exit out of this help display press **q**. To exit out of the Python interpreter, type in **exit()** and press **Enter**.
 
 ## Step 5: Installing Visual Studio Code
 
-Download Visual Studio Code from here:
+To install Visual Studio Code, go to the [Visual Studio Code page](https://code.visualstudio.com) and download the installer for macOS. Clicking on the Mac download button should automatically select the correct version for your system.
 
-https://code.visualstudio.com/Download
+The download comes inthe form of a `.zip` file. 
 
-![Visual Studio Code](images/vc-install-01.png)
+![Visual Studio Code homepage](images/vc-install-mac-01.png)
 
-Click on the **open file** when the download has completed.
+Open the **Downloads** folder. It shoudl look like this:
 
-![Visual Studio Code](images/vc-install-02.png)
+![Visual Studio Code homepage](images/vc-install-mac-02.png)
 
-When running the installer the first time it will show a warning that the installer is not meant to be run as an administrator. This is OK. Press **OK** to continue.
+Double click on the downloaded file. This will extract the contents of the zip file. You should see a new icon called **Visual Studio Code**. 
 
-![Visual Studio Code](images/vc-install-03.png)
+![Visual Studio Code homepage](images/vc-install-mac-03.png)
 
-A welcom page is shown asking you to accept the license agreement. Press **I accept the agreement** and click on **Next**.
+Drag the **Visual Studio Code** icon to the **Applications** folder. This will copy the application to the Applications folder.
 
-![Visual Studio Code](images/vc-install-04.png)
+To open Visual Studio Code, go to the **Applications** folder and double click on the **Visual Studio Code** icon. You can also search for Visual Studio Code in the **Spotlight** search by pressing **Command** + **Space** and typing in **Visual Studio Code**.
 
-Next a page is shown where you can select the installation folder. Leave the default folder and click on **Next**.
+![Visual Studio Code homepage](images/vc-install-mac-04.png)
 
-![Visual Studio Code](images/vc-install-05.png)
-
-In the next page just accept the default name of the shortcut to be created. Click on **Next**.
-
-![Visual Studio Code](images/vc-install-06.png)
-
-In the next page it is important that you select all checkboxes. This will ensure that Visual Studio Code is added to the PATH and that the file types are associated with Visual Studio Code. Click on **Next**.
-
-![Visual Studio Code](images/vc-install-07.png)
-
-Click on **Install** to start the installation.
-
-![Visual Studio Code](images/vc-install-08.png)
-
-When the installation is complete, you will see the following message:
-
-![Visual Studio Code](images/vc-install-09.png)
-
-Leave the checkbox **Launch Visual Studio Code** checked and click on **Finish**.
-This will start Visual Studio Code.
+When you open Visual Studio Code for the first time, you will see a welcome screen. You can close this screen by clicking on the **X** in the top right corner.
 
 ## Step 6: Installing the Python extension for Visual Studio Code
 
@@ -190,8 +171,5 @@ This will open a list of available Python interpreters. Select the one that corr
 When this has been done, everytime you open a Python file in Visual Studio Code, it will show a play button in the top right corner. This will run the code in the file using the selected Python interpreter. Below shows what happens when you click on the play button.
 
 ![Visual Studio Code](images/vc-install-16.png)
-
-
-
 
 
