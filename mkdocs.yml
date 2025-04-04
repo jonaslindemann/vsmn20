@@ -10,6 +10,7 @@ nav:
   - Final hand-in: assignment6.md
 - Guides:
   - Installation guide for Windows: installation_guide_windows.md
+  - Installation guide for macOS: installation_guide_macos.md
   - Creating tables with Tabulate: data_in_tables.md
 - Links: links.md
 
