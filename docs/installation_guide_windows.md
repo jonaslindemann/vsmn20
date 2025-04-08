@@ -55,7 +55,7 @@ In the top part of the start menu enter miniforge. This should show the shortcut
 To install the required packages for this course we create an environment. An environment is a self-contained installation of Python with its own set of packages. This allows you to have multiple versions of Python and packages installed on your system without conflicts. To create an environment called `vsmn20` with Python 3.8, run the following command in the Miniforge prompt:
 
 ```cmd
-conda create -n vsmn20 python=3.8 numpy scipy matplotlib
+conda create -n vsmn20 python=3.11 numpy=1.24 scipy matplotlib
 ```
 
 Running this command will check for the required packages and their dependencies. If everything is ok, you will be prompted to confirm the installation. Type `y` and press enter to continue.

@@ -57,7 +57,7 @@ That is there should be a prompt with `(base)` in front of it. This indicates th
 In the opened terminal we need to create a new environment for this course. An environment is a self contained Python installation with a set of packages. To create a new environment, run the following command in the terminal:
 
 ```bash
-conda create -n vsmn20 python=3.12 numpy scipy matplotlib
+conda create -n vsmn20 python=3.11 numpy=1.24 scipy matplotlib
 ```
 
 This will create a new environment called `vsmn20` with Python 3.12 and the packages `numpy`, `scipy` and `matplotlib`. The command will also install all the dependencies required for these packages. 
