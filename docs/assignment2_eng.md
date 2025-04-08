@@ -67,6 +67,16 @@ All classes in this worksheet will be implemented in the flowmodel.py file.
 
     When ** ... ** appears in the program examples, this indicates that there is no code that you yourselves must add. Variables and data structures are only examples. Depending on the type of problem you may need other data structures than those described in the code examples.
 
+!!! note "Important"
+
+    It could be a good idea to implement the module as simple CALFEM Python script before implementing it in the classes in the sections below. This will help you to understand the problem and how to implement it in Python. You can then use the code in the module as a template for the classes.
+
+[CALFEM Python Documentation](https://calfem-for-python.readthedocs.io/en/latest/index.html)
+
+[CALFEM Python Examples](https://calfem-for-python.readthedocs.io/en/latest/examples/exs4.html)
+
+[CALFEM examples on Github](https://github.com/CALFEM/calfem-python/tree/master/examples)
+
 ## The ModelParams-class
 
 The **ModelParams** class will be used to store all input data required for the calculation as member variables. The class will have a constructor, `__init__(...)`, which will initialize all variables to default values, ensuring that the program runs without errors.
