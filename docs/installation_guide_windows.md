@@ -113,6 +113,7 @@ To install the additional packages we will ue the `pip` command. This is a packa
 
 ```cmd
 pip install calfem
+pip install pyvtk
 ```
 
 When the installation is complete you will see the following message:
