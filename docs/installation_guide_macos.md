@@ -87,6 +87,7 @@ In this environment we now have to install CALFEM for Python. We will use a spec
 ```bash
 pip install calfem-python
 pip install pyvtk
+pip install pyqt6-tools
 ```
 
 If all goes well, you should see a message indicating that CALFEM has been installed successfully.
@@ -172,5 +173,19 @@ This will open a list of available Python interpreters. Select the one that corr
 When this has been done, everytime you open a Python file in Visual Studio Code, it will show a play button in the top right corner. This will run the code in the file using the selected Python interpreter. Below shows what happens when you click on the play button.
 
 ![Visual Studio Code](images/vc-install-16.png)
+
+## Step 7: Running Qt Designer
+
+If you haven't installed the pip packages `pyqt6-tools` and `pyqt6`, you can do this by running the following command in the terminal:
+
+```bash
+pip install pyqt6-tools
+```
+
+This will install the Qt Designer application. To run Qt Designer, run the following command in the terminal:
+
+```bash
+pyqt6-tools designer
+```
 
 
