@@ -87,22 +87,17 @@ class ModelParams:
         
         # Boundary conditions and loads will now reference markers 
         # instead of node numbers or degrees of freedom
-        
-        self.bc_markers = {
-            "left_bc": 10,    # Marker for left boundary
-            "right_bc": 20   # Marker for right boundary
-        }
-        
-        self.bc_values = {
-            "left_bc": 10.0,  # Value for left boundary
-            "right_bc": 0.0  # Value for right boundary
-        }
-        
-        self.load_markers = {
-        }
-        
-        self.load_values = {
-        }
+
+        self.left_bc = 10
+        self.right_bc = 20
+
+        self.bcs = [
+            [self.left_bc, 0.0],  # Left boundary condition (fixed value)
+            [self.right_bc, 0.0]  # Right boundary condition (fixed value)
+        ]
+
+        self.loads = [
+        ]
 ```
 
 As a final step we need to add a `geometry()` method to the `ModelParams` class that creates and returns an instance of the geometry in the form of a `cfg.Geometry` instance. This will be later used to generate the mesh.
@@ -150,9 +145,9 @@ class ModelParams:
         
         g.spline([0, 1])                         # Bottom boundary
         g.spline([1, 2])                         # Right boundary, marker for fixed value
-        g.spline([2, 5], marker=self.bc_markers["right_bc"])
+        g.spline([2, 5], marker=self.right_bc)
         g.spline([5, 4])                         # Top of barrier
-        g.spline([4, 3], marker=self.bc_markers["left_bc"]) # Left boundary, marker for fixed value
+        g.spline([4, 3], marker=self.left_bc)    # Left boundary, marker for fixed value
         g.spline([3, 0])
         g.spline([4, 6])                         # Left side of barrier
         g.spline([5, 7])                         # Right side of barrier
@@ -264,6 +259,9 @@ class ModelSolver:
         K = np.zeros((n_dofs, n_dofs))
         f = np.zeros((n_dofs, 1))
 
+        bcs = self.model_params.bcs
+        loads = self.model_params.loads
+
         # TODO:
         #
         # Assemble element contributions to global stiffness matrix
@@ -271,40 +269,18 @@ class ModelSolver:
 
         # Apply boundary conditions based on markers
 
-        bc_prescr = []
-        bc_values = []
+        bc_prescr = np.array([], int)
+        bc_val = np.array([], float)
 
         # For each boundary condition marker in model_params
 
-        for marker_name, marker_id in self.model_params.bc_markers.items():
-            if marker_name in self.model_params.bc_values:
-                value = self.model_params.bc_values[marker_name]
-                cfu.apply_bc_from_markers(
-                    bdofs,
-                    boundary_elements,
-                    marker_id,
-                    bc_prescr,
-                    bc_values,
-                    value
-                )
+        for bc in bcs:
+            bc_prescr, bc_val = cfu.applybc(
+                bdofs, bc_prescr, bc_val, bc[0], bc[1]
+            )
 
-        # Convert to numpy arrays
-
-        bc_prescr = np.array(bc_prescr)
-        bc_values = np.array(bc_values)
-
-        # Apply loads based on markers
-
-        for marker_name, marker_id in self.model_params.load_markers.items():
-            if marker_name in self.model_params.load_values:
-                value = self.model_params.load_values[marker_name]
-                cfu.apply_force_from_markers(
-                    bdofs,
-                    boundary_elements,
-                    marker_id,
-                    f,
-                    value
-                )
+        for load in loads:
+            cfu.apply_force_total(bdofs, f, load[0], load[1])
 
         # Solve equation system
 
