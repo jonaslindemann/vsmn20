@@ -482,8 +482,7 @@ Below are the specifications for the three problem types you can choose from. Re
 
 **Boundary conditions:**
 
-- Fixed pressure head (phi) of 60.0 m on left and right boundaries
-- Flow rate (q) of -400 m²/day at the specified outlet
+- Fixed pressure head (phi) of 10.0 m on left and 0.0 m on the right boundary.
 
 ### Heat Transfer Problem
 
@@ -504,8 +503,7 @@ Below are the specifications for the three problem types you can choose from. Re
 
 **Boundary conditions:**
 
-- Fixed temperature on top and bottom boundaries
-- Heat flux at specified locations
+- Fixed temperature 20.0 on the surrounding boundaries and 120 degrees in the opening.
 
 ### Plane Stress Problem
 
@@ -572,3 +570,39 @@ Package all files in a ZIP archive for submission.
 
 - [CALFEM for Python Documentation](https://calfem-for-python.readthedocs.io/)
 - [GMSH Documentation](https://gmsh.info/doc/texinfo/gmsh.html)
+
+## Example results
+
+=== "Groundwater Flow Problem (triangular mesh)"
+
+    ```
+    {!flowmodel_v3_el2.txt!}
+    ```
+=== "Groundwater Flow Problem (quad mesh)"
+
+    ```
+    {!flowmodel_v3_el3.txt!}
+    ```
+
+=== "Heat Transfer Problem (triangular mesh)"
+
+    ```
+    {!heatmodel_v3_el2.txt!}
+    ```
+=== "Heat Transfer Problem (quad mesh)"
+
+    ```
+    {!heatmodel_v3_el3.txt!}
+    ```
+
+=== "Plane Stress Problem (triangular mesh)"
+
+    ```
+    {!stressmodel_v3_el2.txt!}
+    ```
+=== "Plane Stress Problem (quad mesh)"
+
+    ```
+    {!stressmodel_v3_el3.txt!}
+    ```
+

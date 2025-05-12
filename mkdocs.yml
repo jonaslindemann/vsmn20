@@ -9,9 +9,10 @@ nav:
   - Worksheet 5: assignment5_eng.md
   - Final hand-in: assignment6.md
 - Guides:
+  - Creating tables with Tabulate: data_in_tables.md
   - Installation guide for Windows: installation_guide_windows.md
   - Installation guide for macOS: installation_guide_macos.md
-  - Creating tables with Tabulate: data_in_tables.md
+  - Installing Qt designer: installing_qt_designer.md
 - Links: links.md
 
 theme: 
