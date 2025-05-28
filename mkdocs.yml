@@ -13,6 +13,7 @@ nav:
   - Installation guide for Windows: installation_guide_windows.md
   - Installation guide for macOS: installation_guide_macos.md
   - Installing Qt designer: installing_qt_designer.md
+  - Handling high DPI displays in Qt: high_dpi_qt.md
 - Links: links.md
 
 theme: 
