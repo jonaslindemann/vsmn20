@@ -1,10 +1,28 @@
-# Worksheet 1
+# Worksheet 1 — Python and NumPy Fundamentals
 
-This worksheet consists of a number of tasks to be solved using Python and NumPy. The links provided [here](links.md) may be helpful for completing the tasks.
+This worksheet introduces Python programming through a series of practical tasks, building up the skills needed for the finite element application in later worksheets.
 
-Please go through the sections up to "Recursion" in the online book ["How To Think Like a Computer Scientist"](https://runestone.academy/ns/books/published/thinkcspy/index.html) before starting the worksheet.
+**Prerequisites:**
 
-All source files should be stored as separate Python files (files with the extension .py).
+- A working Python installation — see the [Windows](installation_guide_windows.md) or [macOS](installation_guide_macos.md) installation guide.
+- No prior Python experience required.
+
+**Learning Objectives:**
+
+After completing this worksheet, you will be able to:
+
+1. Write and run basic Python scripts.
+2. Use variables, loops, conditionals, and functions.
+3. Perform numerical calculations with NumPy arrays and linear algebra routines.
+4. Plot functions and data with Matplotlib.
+5. Read data from files and handle exceptions.
+
+!!! tip "Recommended reading"
+    Please go through the sections up to "Recursion" in the online book
+    [How To Think Like a Computer Scientist](https://runestone.academy/ns/books/published/thinkcspy/index.html)
+    before starting the worksheet. The [Links](links.md) page collects additional references.
+
+All source files should be stored as separate Python files (`.py` extension).
 
 ## Task 1: Write a "hello, world" program
 
@@ -94,4 +112,16 @@ import numpy as np
 
 !!! tip
 
-    A linear equation solver is as np.linalg.solve (A, B). The inverse of a matrix can be calculated using np.linalg.inv(A). The transpose of a matrix can be calculated using np.transpose(A) or A.T.
+    A linear equation solver is `np.linalg.solve(A, b)`. The inverse of a matrix can be calculated using `np.linalg.inv(A)`. The transpose of a matrix can be calculated using `np.transpose(A)` or `A.T`.
+
+## Submission requirements
+
+To complete this worksheet, submit a zip archive containing:
+
+* `hello_world.py` — Task 1
+* `unit_conversion.py` — Task 2
+* `interest.py` — Task 3
+* `fahrenheit.py` — Task 4
+* `sum_file.py` — Task 5 (include the input data file used for testing)
+* `plot_function.py` — Task 6
+* `matrices.py` — Task 7

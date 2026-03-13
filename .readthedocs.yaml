@@ -1,19 +1,19 @@
-# Read the Docs configuration file for MkDocs projects
-# See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
+# Read the Docs configuration file for Zensical projects
+# See https://docs.readthedocs.com/platform/latest/intro/zensical.html for details
 
 # Required
 version: 2
 
-# Set the version of Python and other tools you might need
 build:
-  os: ubuntu-22.04
+  os: ubuntu-24.04
   tools:
-    python: "3.12"
-
-mkdocs:
-  configuration: mkdocs.yml
-
-# Optionally declare the Python requirements required to build your docs
-python:
-  install:
-  - requirements: requirements.txt
+    python: latest
+  jobs:
+    install:
+      - pip install zensical markdown-include pymdown-extensions
+    build:
+      html:
+        - zensical build
+    post_build:
+      - mkdir -p $READTHEDOCS_OUTPUT/html/
+      - cp --recursive site/* $READTHEDOCS_OUTPUT/html/

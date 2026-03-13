@@ -1,4 +1,4 @@
-# Worksheet 2 - Implementing Finite Element Model classes.
+# Worksheet 2 — Implementing Finite Element Model Classes
 
 ## Introduction
 
@@ -161,11 +161,11 @@ class ModelResult:
     **None** can be used as a generic data type that can be used to create variables without content. It is also possible to test if a variable is assigned by an if statement:
 
         if self.a == None:
-            self.a = np.array(...) # Tilldela en riktigt datatyp om self.a == None 
+            self.a = np.array(...) # Assign a proper data type if self.a == None
     
 ## The ModelSolver-class
 
-The class **ModelpSolver** is responsible for performing the actual calculation. The class will have a constructor, __init__(...) and a method execute() to perform the actual calculation. Constructor must have two input parameters, **model_params** and **model_result**, which are instances of the classes **ModelParams** and **ModelResult**. The constructor will look like the following:
+The class **ModelSolver** is responsible for performing the actual calculation. The class will have a constructor, __init__(...) and a method execute() to perform the actual calculation. Constructor must have two input parameters, **model_params** and **model_result**, which are instances of the classes **ModelParams** and **ModelResult**. The constructor will look like the following:
 
 ``` py
 class Solver:
@@ -175,7 +175,7 @@ class Solver:
         self.model_result = model_result
 ```
 
-The input parameters are assigned two class variables, **self.model_params** ** and **self.model_result**.
+The input parameters are assigned two class variables, **self.model_params** and **self.model_result**.
 
 The calculation should be performed in the execute(...) method. The method uses the input parameters from **self.model_params** to set up and perform finite element calculations just like a regular CALFEM. To simplify management of input variables we create local references to the input data variable as shown in the following code:    
 
@@ -816,10 +816,10 @@ The complete **ModelParams** class with read and write functionality is shown be
 
 ``` py
 class ModelParams:
-    """Klass för att definiera indata för vår modell."""
+    """Class defining the model parameters."""
 
     def save(self, filename):
-        """Spara indata till fil."""
+        """Save input data to file."""
 
         model_params = {}
         model_params["version"] = self.version
@@ -834,8 +834,8 @@ class ModelParams:
         ofile.close()
 
     def load(self, filename):
-        """Läs indata från fil."""
-        
+        """Read input data from file."""
+
         ifile = open(filename, "r")
         model_params = json.load(ifile)
         ifile.close()
@@ -868,44 +868,44 @@ The submission shall consist of a zip file (or other archive format) consisting 
 
 ![eltype1](images/eltype1.png)
 
- * u = förskjutning
- * x1,y1,x2,y2,x3,y3 = koordinater
- * E = elasticitetsmodul
- * v = Poissons tal
- * CALFEM för Python element : **plante/plants**
+ * u = displacement
+ * x1,y1,x2,y2,x3,y3 = coordinates
+ * E = Young's modulus
+ * v = Poisson's ratio
+ * CALFEM for Python element: **plante/plants**
 
 ### 2-dimensional heat flow
 
 ![eltype2](images/eltype2.png)
 
- * T = temperatur
- * x1,y1,x2,y2,x3,y3 = koordinater
- * lambda,x, lambda,y = värmekonduktivitet
- * CALFEM för Python element : **flw2te/flw2te**
+ * T = temperature
+ * x1,y1,x2,y2,x3,y3 = coordinates
+ * lambda_x, lambda_y = thermal conductivity
+ * CALFEM for Python element: **flw2te/flw2ts**
 
 ### Groundwater flow
 
 ![eltype3](images/eltype3.png)
 
- * phi = tryckhöjd
- * x1,y1,x2,y2,x3,y3 = koordinater
- * kx, ky = permeabiliteter
- * CALFEM för Python element : **flw2te/flw2ts**
+ * phi = pressure head
+ * x1,y1,x2,y2,x3,y3 = coordinates
+ * kx, ky = permeabilities
+ * CALFEM for Python element: **flw2te/flw2ts**
 
-## Testexempel
+## Test examples
 
-### Plan skiva
+### Plane stress
 
 ![case1](images/case1.png)
 
  * E = 20.8 GPa
  * t = 0.01 m
  * R_6,2 = -10.0 kN
- * u_1,1 = u_1,2 = u_2,1 = u_2,2 = 0.0 
- * Plan spänning
- * u_i,j  där i är nodnummer och j lokal frihetsgrad
+ * u_1,1 = u_1,2 = u_2,1 = u_2,2 = 0.0
+ * Plane stress
+ * u_i,j where i is the node number and j is the local degree of freedom
 
-### Two-dimemsional heat flow
+### Two-dimensional heat flow
 
 ![case2](images/case2.png)
 

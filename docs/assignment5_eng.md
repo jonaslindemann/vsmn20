@@ -1,4 +1,19 @@
-# Program for Technical Applications - Worksheet 5
+# Worksheet 5 — Parameter Studies and ParaView Export
+
+**Prerequisites:**
+
+- Completed implementation of [Worksheet 4](assignment4_eng.md), including the Qt GUI and `SolverThread` class.
+- ParaView installed — download from [paraview.org](https://www.paraview.org/download/).
+- `pyvtk` Python package installed (`pip install pyvtk`).
+
+**Learning Objectives:**
+
+After completing this worksheet, you will be able to:
+
+1. Extend a Qt GUI with parameter study controls.
+2. Implement a parametric sweep over model inputs and collect results.
+3. Export finite element results to VTK format using `pyvtk`.
+4. Visualise time-series VTK results in ParaView.
 
 ## General
 
@@ -23,7 +38,7 @@ The following controls and associated names have been added:
 
 Set good default values on all controls so that one can perform a calculation without having to fill in all values.
 
-Connect an event method, **on_execute_param_study** to the **Param study** button. In order to handle parameter studies in our model, we must add a number of extra variables in our **ModelPArams** class:
+Connect an event method, **on_execute_param_study** to the **Param study** button. In order to handle parameter studies in our model, we must add a number of extra variables in our **ModelParams** class:
 
  * **param_d** - Flag indicating whether parameter d should be varied.
  * **param_t** - Flag indicating whether the parameter t should be varied.
@@ -38,25 +53,25 @@ Connect an event method, **on_execute_param_study** to the **Param study** butto
 
 ```py
 def on_execute_param_study(self):
-    """Exekvera parameterstudie"""
+    """Execute parameter study"""
 
     # --- Update model from UI
 
-    self.update_model()    
+    self.update_model()
 
     # --- Update filename
 
     self.model_param.param_filename = "param_study"
 
-    # --- Skapa en lösare
+    # --- Create a solver
 
     self.solver = sm.ModelSolver(self.model_params, self.model_results)
-    
-    # --- Starta en tråd för att köra beräkningen, så att 
-    #     gränssnittet inte fryser.
-    
-    self.solverThread = SolverThread(self.solver, param_study = True)        
-    self.solverThread.finished.connect(self.on_solver_finished)        
+
+    # --- Start a thread to run the calculation so that
+    #     the interface does not freeze.
+
+    self.solverThread = SolverThread(self.solver, param_study = True)
+    self.solverThread.finished.connect(self.on_solver_finished)
     self.solverThread.start()
 ```
 
@@ -67,7 +82,7 @@ In the **ModelSolver** class, we now add a routine, **execute_param_study(...)**
 
 ```py
 def execute_param_study(self):
-    """Kör parameter studie"""
+    """Run parameter study"""
     
     # -- Store current values for the d and t parameters
     
@@ -235,7 +250,7 @@ The **SolverThread** class needs to be updated to be able to run a parameter stu
 
 ```py
 class SolverThread(QThread):
-    """Background calucation thread"""
+    """Background calculation thread"""
     
     def __init__(self, solver, param_study = False):
         """Constructor"""

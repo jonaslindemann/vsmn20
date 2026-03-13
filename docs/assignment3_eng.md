@@ -576,33 +576,33 @@ Package all files in a ZIP archive for submission.
 === "Groundwater Flow Problem (triangular mesh)"
 
     ```
-    {!flowmodel_v3_el2.txt!}
+    --8<-- "flowmodel_v3_el2.txt"
     ```
 === "Groundwater Flow Problem (quad mesh)"
 
     ```
-    {!flowmodel_v3_el3.txt!}
+    --8<-- "flowmodel_v3_el3.txt"
     ```
 
 === "Heat Transfer Problem (triangular mesh)"
 
     ```
-    {!heatmodel_v3_el2.txt!}
+    --8<-- "heatmodel_v3_el2.txt"
     ```
 === "Heat Transfer Problem (quad mesh)"
 
     ```
-    {!heatmodel_v3_el3.txt!}
+    --8<-- "heatmodel_v3_el3.txt"
     ```
 
 === "Plane Stress Problem (triangular mesh)"
 
     ```
-    {!stressmodel_v3_el2.txt!}
+    --8<-- "stressmodel_v3_el2.txt"
     ```
 === "Plane Stress Problem (quad mesh)"
 
     ```
-    {!stressmodel_v3_el3.txt!}
+    --8<-- "stressmodel_v3_el3.txt"
     ```
 

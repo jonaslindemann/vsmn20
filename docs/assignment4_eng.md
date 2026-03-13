@@ -1,8 +1,24 @@
-# Program for Technical Applications - Worksheet 4
+# Worksheet 4 — Graphical User Interface with Qt
+
+**Prerequisites:**
+
+- Completed implementation of [Worksheet 3](assignment3_eng.md) classes (`ModelParams`, `ModelSolver`, `ModelResult`, `ModelVisualization`).
+- Qt Designer installed — see the [Qt Designer installation guide](installing_qt_designer.md).
+- Basic understanding of Python classes and event-driven programming.
+
+**Learning Objectives:**
+
+After completing this worksheet, you will be able to:
+
+1. Design a graphical user interface using Qt Designer.
+2. Load a `.ui` file and integrate it with Python using `qtpy`.
+3. Connect Qt signals to Python event methods.
+4. Run long computations in a background thread to keep the UI responsive.
+5. Open and save model files via standard file dialogs.
 
 !!! note "Please note"
 
-    When ... appears in the program examples, this indicates that there is code that you have to provide yourself. Variables and data structures are just examples. Depending on the type of problem you may need other data structures than those described in the code examples.
+    When `...` appears in the program examples, this indicates code that you must provide yourself. Variables and data structures are examples only — adapt them to your chosen problem type.
 
 ## General
 
@@ -173,7 +189,7 @@ Our main window is best implemented in a separate class **MainWindow**. The resp
 
 ``` py
 class MainWindow(QMainWindow):
-    """MainWindow-klass som hanterar vårt huvudfönster"""
+    """Main window class that handles the main application window"""
 
     def __init__(self):
         """Constructor"""
@@ -232,7 +248,7 @@ The first events we need to connect are from the menu. The menu-action in the ui
 class MainWindow:
     ...
     def on_new_action(self):
-        """Skapa en ny modell"""
+        """Create a new model"""
         print("on_new_action")
 ```
             
@@ -276,8 +292,8 @@ class MainWindow:
     ...
     
     def on_show_geometry(self):
-        """Visa geometrifönster"""
-        
+        """Show geometry window"""
+
         print("on_show_geometry")
 ```
 
@@ -293,7 +309,7 @@ To assign values to controls, the **setText(...)** method is used on the text co
 
 ``` py
 def update_controls(self):
-    """Fyll kontrollerna med värden från modellen"""
+    """Populate controls with values from the model"""
     
     self.w_edit.setText(str(self.model_params.w))
     ...
@@ -307,7 +323,7 @@ To retrieve values from the controls, the **text()** method is used in the text 
 
 ``` py
 def update_model(self):
-    """Hämta värden från kontroller och uppdatera modellen"""
+    """Read values from controls and update the model"""
     
     self.model_params.w = float(self.w_edit.text())
     ...
@@ -327,10 +343,10 @@ To open an already existing file from disk, we must first ask the user about whi
 
 ``` py
 def on_open_action(self):
-    """Öppna in indata fil"""
-    
-    filename, _ = QFileDialog.getOpenFileName(self, 
-        "Öppna modell", "", "Modell filer (*.json *.jpg *.bmp)")
+    """Open input file"""
+
+    filename, _ = QFileDialog.getOpenFileName(self,
+        "Open model", "", "Model files (*.json *.jpg *.bmp)")
     
     if filename!="":
         self.filename = filename
@@ -350,13 +366,13 @@ Similarly, if the user wants to save a model to disk, we must first ask the user
 
 ``` py
 def on_save_action(self):
-    """Spara modell"""
-    
+    """Save model"""
+
     self.update_model()
-    
+
     if self.filename == "":
-        filename, _  = QFileDialog.getSaveFileName(self, 
-            "Spara modell", "", "Modell filer (*.json)")
+        filename, _ = QFileDialog.getSaveFileName(self,
+            "Save model", "", "Model files (*.json)")
 
         if filename!="":
             self.filename = filename
@@ -387,10 +403,10 @@ import calfem.ui as cfui
 import flowmodel as fm
 
 class SolverThread(QThread):
-    """Klass för att hantera beräkning i bakgrunden"""
-    
+    """Class for handling computation in the background"""
+
     def __init__(self, solver, param_study = False):
-        """Klasskonstruktor"""
+        """Constructor"""
         QThread.__init__(self)
         self.solver = solver
         self.param_study = param_study
@@ -413,7 +429,7 @@ To start the calculation when selecting ** Calc / Execute ** in the menu, the ev
 class MainWindow:
     ...
     def on_action_execute(self):
-        """Kör beräkningen"""
+        """Run the calculation"""
         
         # --- Disable user interface during calculation     
         
@@ -442,7 +458,7 @@ To know when the calculation thread ends, we connect a method to the signal **fi
 class MainWindow:
     ...
     def on_solver_finished(self):
-        """Anropas när beräkningstråden avslutas"""
+        """Called when the calculation thread finishes"""
         
         # --- Activate user interface       
         
@@ -484,10 +500,10 @@ To get some better control over the visualization windows to be displayed, a met
 
 ``` py
 class ModelVisualisation(object):
-    """Klass för visualisering av resulat"""
+    """Class for visualization of results"""
 
     def __init__(self, model_params, model_results):
-        """Konstruktor"""
+        """Constructor"""
         
         self.model_params = model_params
         self.model_results = model_results
@@ -502,13 +518,13 @@ class ModelVisualisation(object):
             
 We set the variables to **None** so that we can distinguish them from the assigned variables.
 
-Ett exempel på hur detta kan användas visas i följande metod:
+An example of how this can be used is shown in the following method:
 
 ``` py
 class ModelVisualisation:
     ...
     def show_geometry(self):
-        """Visa geometri visualisering"""
+        """Show geometry visualization"""
         
         geometry = self.model_results.geometry
         
@@ -529,8 +545,8 @@ What to do in this worksheet is:
  * Implement _all_ event methods for the controls used in the interface.
  * Implement basic features like new model, save model, save as and exit program.
  * Implement controls to ensure that visualization methods are not called if a calculation is not performed. Use a flag **self.calc_done** to enter the calculation status.
- * Complete the implementation of the ** Visualization ** class so it can handle all visualization cases. Re-create the object of this class after each completed calculation. Create an empty variable ** MainWindow ** constructor, so if-rates can be used to test if there is a current instance for ** Visualization **
- * After the calculation, **report_edit** - the control will be assigned output from the ** Report ** class. **report_edit** has a method **setPlainText(...)** just for this purpose. Current content in the control can be cleared using the **clear()** method.
+ * Complete the implementation of the **ModelVisualisation** class so it can handle all visualization cases. Re-create the object of this class after each completed calculation. Create an empty variable in the **MainWindow** constructor so that if-statements can be used to test if there is a current visualization instance.
+ * After the calculation, the **report_edit** control should be assigned output from the **ModelReport** class. **report_edit** has a method **setPlainText(...)** just for this purpose. Current content in the control can be cleared using the **clear()** method.
  * At this point, the program should be a complete calculation applications.
 
 The submission must consist of a zip file (or another archive format) consisting of:
