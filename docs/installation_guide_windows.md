@@ -55,7 +55,7 @@ In the top part of the start menu enter miniforge. This should show the shortcut
 To install the required packages for this course we create an environment. An environment is a self-contained installation of Python with its own set of packages. This allows you to have multiple versions of Python and packages installed on your system without conflicts. To create an environment called `vsmn20` with Python 3.8, run the following command in the Miniforge prompt:
 
 ```cmd
-conda create -n vsmn20 python=3.11 numpy=1.26 scipy matplotlib qtpy pyqt 
+conda create -n vsmn20 python=3.13 numpy scipy matplotlib qtpy pyqt 
 ```
 
 Running this command will check for the required packages and their dependencies. If everything is ok, you will be prompted to confirm the installation. Type `y` and press enter to continue.
@@ -112,7 +112,7 @@ conda activate vsmn20
 To install the additional packages we will ue the `pip` command. This is a package manager for Python that allows you to install packages from the Python Package Index (PyPI). Using `pip` we will install CALFEM.
 
 ```cmd
-pip install calfem
+pip install calfem-python
 pip install pyvtk
 ```
 

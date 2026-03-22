@@ -71,7 +71,7 @@ All classes in this worksheet will be implemented in the flowmodel.py file.
 
     It could be a good idea to implement the module as simple CALFEM Python script before implementing it in the classes in the sections below. This will help you to understand the problem and how to implement it in Python. You can then use the code in the module as a template for the classes.
 
-[CALFEM Python Documentation](https://calfem-for-python.readthedocs.io/en/latest/index.html)
+[CALFEM Python Manual](https://calfem-python-manual.readthedocs.io/en/latest/)
 
 [CALFEM Python Examples](https://calfem-for-python.readthedocs.io/en/latest/examples/exs4.html)
 

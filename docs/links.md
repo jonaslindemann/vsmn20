@@ -7,7 +7,7 @@
 * [NumPy tutorial](https://numpy.org/learn/) — Covers array creation, indexing, and linear algebra used in Worksheets 1–5.
 * [Matplotlib user's guide](https://matplotlib.org/stable/users/index) — Plotting library used for graphs and visualisation in Worksheets 1–3.
 * [Ingenjörens guide till Python](http://guidetillpython.se/) — Swedish introduction to Python for engineering students.
-* [CALFEM for Python documentation](https://calfem-for-python.readthedocs.io/en/latest/) — Primary reference for all FEM routines used in Worksheets 2–5.
+* [CALFEM for Python Manual](https://calfem-python-manual.readthedocs.io/en/latest/) — Primary reference for all FEM routines used in Worksheets 2–5.
 
 ## Software
 
