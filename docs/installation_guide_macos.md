@@ -87,7 +87,6 @@ In this environment we now have to install CALFEM for Python. We will use a spec
 ```bash
 pip install calfem-python
 pip install pyvtk
-pip install pyqt6-tools
 ```
 
 If all goes well, you should see a message indicating that CALFEM has been installed successfully.
