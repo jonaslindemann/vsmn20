@@ -188,9 +188,22 @@ This will open a list of available Python interpreters. Select the one that corr
 
 ![Visual Studio Code](images/vc-install-15.png)
 
+![Visual Studio Code](images/vc-install-16.png)
+
+## Step 7: Setting the default Terminal Profile
+
+On Windows the default terminal by default is PowerShell, which can cause problems in VS Code. For Miniforge to work correctly we need to change this to use the standard Windows Command Prompt shell. This can be done by changing the settings in VS Code as follows:
+
+1. Open the Command Palette by pressing Ctrl + Shift + P
+2. Skriv: Terminal: Select Default Profile
+3. Välj: Command Prompt (cmd.exe)
+
 When this has been done, everytime you open a Python file in Visual Studio Code, it will show a play button in the top right corner. This will run the code in the file using the selected Python interpreter. Below shows what happens when you click on the play button.
 
-![Visual Studio Code](images/vc-install-16.png)
+!!! note 
+
+    It can be required to restart VS Code for this to work.
+
 
 
 
