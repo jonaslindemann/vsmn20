@@ -193,7 +193,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         """Constructor"""
-        super(QMainWindow, self).__init__()
+        super().__init__()
                   
         # --- Load user interface description
         
