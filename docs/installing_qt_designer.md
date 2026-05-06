@@ -8,7 +8,7 @@ As Qt Designer is not part of the Anaconda distribution, you will need to instal
 
 First we need to download the Qt installer. The Qt installer is a graphical installer that allows you to install Qt and its components. It is available for Windows, macOS, and Linux. To download the Qt installer, follow these steps:
 
- 1. Go to the [Qt download page](https://www.qt.io/development/download-qt-installer-oss) and download the Qt installer for your operating system.
+ 1. Go to the [Qt download page](https://www.qt.io/development/download-qt-installer-oss) and download the Qt installer for your operating system. 
 
  2. To use the installer you need to create a Qt account. This is free and you can use your email address to create an account. Once you have created an account, you will be able to download the installer.
 
